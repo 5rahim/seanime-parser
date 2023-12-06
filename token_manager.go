@@ -1,7 +1,6 @@
 package seanime_parser
 
 import (
-	"github.com/google/uuid"
 	"strings"
 )
 
@@ -25,34 +24,172 @@ func newTokenManager(filename string) tokenManager {
 	return tm
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+func (t *tokens) getIndexOf(tkn *token) int {
+	for i, _tkn := range *t {
+		if _tkn == tkn {
+			return i
+		}
+	}
+	return -1
+}
+
 func (t *tokens) setTokens(tkns []*token) {
 	*t = tkns
 }
 
-func (t *tokens) insert(index int, tkn token) {
-	if index == 0 {
-		if len(*t) == 0 {
-			tkn.UUID = uuid.New().String()
-			*t = append(*t, &tkn)
-			return
-		} else if len(*t) == 1 && tkn.Value != (*t)[index].Value {
-			tkn.UUID = uuid.New().String()
-			(*t)[index] = &tkn
-			return
-		}
-	} else if index > len(*t)-1 {
-		return
-	} else if index < 0 {
+func (t *tokens) insertAt(index int, tkn token) {
+	if index < 0 || index > len(*t) {
 		return
 	}
-	if (*t)[index].Value == tkn.Value {
-		return
-	}
-	tkn.UUID = uuid.New().String()
-	startList := append((*t)[:index], &tkn)
-	*t = append(startList, (*t)[index:]...)
+	*t = append((*t)[:index], append([]*token{&tkn}, (*t)[index:]...)...)
 }
 
-func (tm *tokenManager) getTokens() []*token {
-	return *tm.tokens
+func (t *tokens) insertAtEnd(tkn token) {
+	*t = append(*t, &tkn)
+}
+
+func (t *tokens) insertAtStart(tkn token) {
+	*t = append([]*token{&tkn}, *t...)
+}
+
+func (t *tokens) insertManyAt(index int, tkns []*token) {
+	if index < 0 || index > len(*t) {
+		return
+	}
+	*t = append((*t)[:index], append(tkns, (*t)[index:]...)...)
+}
+
+func (t *tokens) removeAt(index int) {
+	if index < 0 || index > len(*t) {
+		return
+	}
+	*t = append((*t)[:index], (*t)[index+1:]...)
+}
+
+func (t *tokens) overwriteAt(index int, tkn token) {
+	(*t)[index] = &tkn
+}
+
+func (t *tokens) overwriteManyAt(index int, tkns []*token) {
+	*t = append((*t)[:index], append(tkns, (*t)[index+len(tkns):]...)...)
+}
+
+func (t *tokens) getAtSafe(index int) (*token, bool) {
+	if index < 0 || index > len(*t) {
+		return nil, false
+	}
+	return (*t)[index], true
+}
+func (t *tokens) getAt(index int) *token {
+	return (*t)[index]
+}
+
+func (t *tokens) getFromUUID(uuid string) *token {
+	for _, tkn := range *t {
+		if tkn.UUID == uuid {
+			return tkn
+		}
+	}
+	return nil
+}
+
+func (t *tokens) getFromUUIDSafe(uuid string) (*token, bool) {
+	for _, tkn := range *t {
+		if tkn.UUID == uuid {
+			return tkn, true
+		}
+	}
+	return nil, false
+}
+
+func (t *tokens) getFromUUIDs(uuids []string) []*token {
+	tkns := make([]*token, 0)
+	for _, uuid := range uuids {
+		tkn := t.getFromUUID(uuid)
+		if tkn != nil {
+			tkns = append(tkns, tkn)
+		}
+	}
+	return tkns
+}
+
+func (t *tokens) getFrom(index int) []*token {
+	if index < 0 || index > len(*t) {
+		return []*token{}
+	}
+	return (*t)[index:]
+}
+
+func (t *tokens) getTo(index int) []*token {
+	if index < 0 || index > len(*t) {
+		return []*token{}
+	}
+	return (*t)[:index]
+}
+
+func (t *tokens) getToInc(index int) []*token {
+	if index < 0 || index+1 > len(*t) {
+		return []*token{}
+	}
+	return (*t)[:index+1]
+}
+
+func (t *tokens) getFromTo(start int, end int) []*token {
+	// check indices
+	if start < 0 || end < 0 || start > end || start > len(*t) || end > len(*t) {
+		return []*token{}
+	}
+	return (*t)[start:end]
+}
+
+func (t *tokens) getFromToInc(start int, end int) []*token {
+	// check indices
+	if start < 0 || end < 0 || start > end || start+1 > len(*t) || end+1 > len(*t) {
+		return []*token{}
+	}
+	return (*t)[start : end+1]
+}
+
+// getCategorySequenceAfter returns the sequence of tokens in the given categories after the specified start index,
+// along with a boolean indicating if the sequence was found.
+// The skipDelimiters parameter determines whether to skip delimiter tokens when collecting the sequence.
+func (t *tokens) getCategorySequenceAfter(start int, categories []tokenCategory, skipDelimiters bool) ([]*token, bool) {
+	if start < 0 || start+1 > len(*t) {
+		return []*token{}, false
+	}
+
+	_tkns := make([]*token, 0)
+	if skipDelimiters {
+		for i := start + 1; i < len(*t); i++ {
+			if !(*t)[i].isDelimiter() {
+				_tkns = append(_tkns, (*t)[i])
+			} else {
+				continue
+			}
+		}
+	} else {
+		_tkns = (*t)[start+1:]
+	}
+
+	var collec []*token
+	for i := 0; i < len(categories); i++ {
+		if _tkns[i].isCategory(categories[i]) {
+			uuid, ok := t.getFromUUIDSafe(_tkns[i].UUID)
+			if !ok {
+				break
+			}
+			collec = append(collec, uuid)
+		} else {
+			break
+		}
+	}
+
+	if len(collec) == len(categories) {
+		return collec, true
+	}
+
+	return []*token{}, false
+
 }

@@ -6,6 +6,28 @@ func (t *token) getValue() string {
 	}
 	return t.Value
 }
+
+func (t *token) getCategory() string {
+	if t == nil {
+		return ""
+	}
+	return t.Category
+}
+
+func (t *token) getKind() string {
+	if t == nil {
+		return ""
+	}
+	return t.Kind
+}
+
+func (t *token) isCategory(cat tokenCategory) bool {
+	if t == nil {
+		return false
+	}
+	return t.Category == cat
+}
+
 func (t *token) isOpeningBracket() bool {
 	if t == nil {
 		return false
