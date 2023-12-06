@@ -156,7 +156,10 @@ func (t *tokens) getFromToInc(start int, end int) []*token {
 // along with a boolean indicating if the sequence was found.
 // The skipDelimiters parameter determines whether to skip delimiter tokens when collecting the sequence.
 func (t *tokens) getCategorySequenceAfter(start int, categories []tokenCategory, skipDelimiters bool) ([]*token, bool) {
-	if start < 0 || start+1 > len(*t) {
+	if start < 0 {
+		start = -1
+	}
+	if start+1 > len(*t) {
 		return []*token{}, false
 	}
 
@@ -191,5 +194,58 @@ func (t *tokens) getCategorySequenceAfter(start int, categories []tokenCategory,
 	}
 
 	return []*token{}, false
+}
 
+func (t *tokens) getCategorySequenceAfterInc(start int, categories []tokenCategory, skipDelimiters bool) ([]*token, bool) {
+	return t.getCategorySequenceAfter(start-1, categories, skipDelimiters)
+}
+
+// getCategorySequenceBefore returns the sequence of tokens in the given categories before the specified start index,
+// along with a boolean indicating if the sequence was found.
+// The skipDelimiters parameter determines whether to skip delimiter tokens when collecting the sequence.
+func (t *tokens) getCategorySequenceBefore(start int, categories []tokenCategory, skipDelimiters bool) ([]*token, bool) {
+	if start > len(*t) {
+		start = len(*t) + 1
+	}
+	if start < 0 {
+		return []*token{}, false
+	}
+
+	_tkns := make([]*token, 0)
+	if skipDelimiters {
+		for i := start - 1; i >= 0; i-- {
+			if !(*t)[i].isDelimiter() {
+				_tkns = append(_tkns, (*t)[i])
+			} else {
+				continue
+			}
+		}
+	} else {
+		for i := start - 1; i >= 0; i-- {
+			_tkns = append(_tkns, (*t)[i])
+		}
+	}
+
+	var collec []*token
+	for i := 0; i < len(categories); i++ {
+		if _tkns[i].isCategory(categories[i]) {
+			uuid, ok := t.getFromUUIDSafe(_tkns[i].UUID)
+			if !ok {
+				break
+			}
+			collec = append(collec, uuid)
+		} else {
+			break
+		}
+	}
+
+	if len(collec) == len(categories) {
+		return collec, true
+	}
+
+	return []*token{}, false
+}
+
+func (t *tokens) getCategorySequenceBeforeInc(start int, categories []tokenCategory, skipDelimiters bool) ([]*token, bool) {
+	return t.getCategorySequenceBefore(start+1, categories, skipDelimiters)
 }
