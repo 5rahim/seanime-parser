@@ -125,3 +125,11 @@ func findNumberInString(str string) int {
 	}
 	return -1
 }
+
+func mergeValues(start string, values []string) string {
+	merged := start
+	for _, v := range values {
+		merged += v
+	}
+	return merged
+}

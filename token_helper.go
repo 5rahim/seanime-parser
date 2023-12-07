@@ -1,5 +1,20 @@
 package seanime_parser
 
+const tokenIdentifiedAsParts = 0
+const tokenIdentifiedAsKeyword = 1
+
+func (t *token) isIdentified() (int, bool) {
+	if t == nil {
+		return -1, false
+	}
+	if t.IdentifiedKeywordCategory != keywordCatNone {
+		return tokenIdentifiedAsKeyword, true
+	}
+	if t.Parts != nil {
+		return tokenIdentifiedAsParts, true
+	}
+	return -1, false
+}
 func (t *token) getValue() string {
 	if t == nil {
 		return ""
@@ -26,6 +41,27 @@ func (t *token) isCategory(cat tokenCategory) bool {
 		return false
 	}
 	return t.Category == cat
+}
+
+func (t *token) isKeyword() bool {
+	if t == nil {
+		return false
+	}
+	return t.IdentifiedKeywordCategory != keywordCatNone
+}
+
+func (t *token) isKeywordCategory(c keywordCategory) bool {
+	if t == nil {
+		return false
+	}
+	return t.IdentifiedKeywordCategory == c
+}
+
+func (t *token) isKind(kind tokenKind) bool {
+	if t == nil {
+		return false
+	}
+	return t.Kind == kind
 }
 
 func (t *token) isOpeningBracket() bool {

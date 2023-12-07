@@ -26,9 +26,58 @@ func newTokenManager(filename string) tokenManager {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+func (tm *tokenManager) identifyKeyword(tkn *token) ([]*token, bool) {
+	// Check if token is a known keyword prefix (e.g. "Blu" for "Blu-ray")
+	keywordParts, found := tm.keywordManager.findKeywordPartGroups(tkn.getValue())
+	if found {
+		for _, keywordGroup := range keywordParts {
+			if retTkns, found := tm.tokens.peekValuesAfter(tm.tokens.getIndexOf(tkn), keywordGroup.seqParts); found {
+				// Update token value
+				seqPartsStr := ""
+				for _, t := range retTkns {
+					seqPartsStr += t.getValue()
+				}
+				tkn.setValue(mergeValues(tkn.getValue(), []string{seqPartsStr}))
+				tkn.setIdentifiedKeywordCategory(keywordGroup.category)
+				tkn.setKind(tokenKindWord)
+				// Remove subsequent tokens
+				for _, retTkn := range retTkns {
+					tm.tokens.removeAt(tm.tokens.getIndexOf(retTkn))
+				}
+				break
+			}
+		}
+	}
+	//if !ok {
+	//	return []*token{}, false
+	//}
+
+	return nil, false
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+func (t *tokens) getTokenAfter(tkn *token) (*token, bool) {
+	index := t.getIndexOf(tkn)
+	if index == -1 {
+		return nil, false
+	}
+	return t.getAtSafe(index + 1)
+}
+
+func (t *tokens) getTokenBefore(tkn *token) (*token, bool) {
+	index := t.getIndexOf(tkn)
+	if index == -1 {
+		return nil, false
+	}
+	return t.getAtSafe(index - 1)
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 func (t *tokens) getIndexOf(tkn *token) int {
 	for i, _tkn := range *t {
-		if _tkn == tkn {
+		if _tkn.UUID == tkn.UUID {
 			return i
 		}
 	}
@@ -248,4 +297,50 @@ func (t *tokens) getCategorySequenceBefore(start int, categories []tokenCategory
 
 func (t *tokens) getCategorySequenceBeforeInc(start int, categories []tokenCategory, skipDelimiters bool) ([]*token, bool) {
 	return t.getCategorySequenceBefore(start+1, categories, skipDelimiters)
+}
+
+////////////////////
+
+func (t *tokens) peekValuesAfter(start int, strs []string) ([]*token, bool) {
+
+	if start+1+len(strs) > len(*t) {
+		return nil, false
+	}
+
+	_tkns := (*t)[start+1 : start+1+len(strs)]
+
+	var collec []*token
+	for i := 0; i < len(strs); i++ {
+		if strings.ToUpper(_tkns[i].getValue()) == strings.ToUpper(strs[i]) {
+			uuid, ok := t.getFromUUIDSafe(_tkns[i].UUID)
+			if !ok {
+				break
+			}
+			collec = append(collec, uuid)
+		} else {
+			break
+		}
+	}
+
+	if len(collec) == len(strs) {
+		return collec, true
+	}
+
+	return nil, false
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+func (t *tokens) sPrint() string {
+	str := "["
+	for idx, tkn := range *t {
+		str += "\"" + tkn.getValue()
+		if idx < len(*t)-1 {
+			str += "\", "
+		} else {
+			str += "\""
+		}
+	}
+	str += "]"
+	return str
 }

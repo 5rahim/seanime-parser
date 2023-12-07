@@ -31,24 +31,26 @@ const (
 )
 
 type token struct {
-	UUID         string
-	Value        string
-	Category     tokenCategory
-	Kind         tokenKind
-	Enclosed     bool
-	Parts        []*token
-	MetadataKind metadataKind
+	UUID                      string
+	Value                     string
+	Category                  tokenCategory
+	Kind                      tokenKind
+	IdentifiedKeywordCategory keywordCategory
+	Enclosed                  bool
+	Parts                     []*token
+	MetadataKind              metadataKind
 }
 
 func newToken(value string) *token {
 	return &token{
-		UUID:         uuid.NewString(),
-		Value:        value,
-		Category:     tokenCatUnknown,
-		Kind:         tokenKindUnknown,
-		Enclosed:     false,
-		Parts:        nil,
-		MetadataKind: 0,
+		UUID:                      uuid.NewString(),
+		Value:                     value,
+		Category:                  tokenCatUnknown,
+		Kind:                      tokenKindUnknown,
+		IdentifiedKeywordCategory: keywordCatNone,
+		Enclosed:                  false,
+		Parts:                     nil,
+		MetadataKind:              0,
 	}
 }
 
@@ -66,12 +68,28 @@ func (t *token) setMetadataKind(mk metadataKind) {
 	}
 }
 
+func (t *token) setValue(s string) {
+	if t == nil {
+		return
+	}
+
+	t.Value = s
+}
+
 func (t *token) setCategory(c tokenCategory) {
 	if t == nil {
 		return
 	}
 
 	t.Category = c
+}
+
+func (t *token) setIdentifiedKeywordCategory(c keywordCategory) {
+	if t == nil {
+		return
+	}
+
+	t.IdentifiedKeywordCategory = c
 }
 
 func (t *token) setKind(k tokenKind) {

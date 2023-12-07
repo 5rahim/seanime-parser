@@ -1,27 +1,33 @@
 package seanime_parser
 
+import (
+	"strings"
+
+	"golang.org/x/text/unicode/norm"
+)
+
 type keywordCategory uint8
 
 const (
-	keywordCategoryUnknown keywordCategory = iota
-	keywordCategorySeasonPrefix
-	keywordCategoryAnimeType
-	keywordCategoryYear
-	keywordCategoryAudioTerm
-	keywordCategoryDeviceCompat
-	keywordCategoryEpisodePrefix
-	keywordCategoryPartPrefix
-	keywordCategoryVolumePrefix
-	keywordCategoryFileChecksum
-	keywordCategoryFileExtension
-	keywordCategoryLanguage
-	keywordCategoryReleaseGroup
-	keywordCategoryReleaseInformation
-	keywordCategoryReleaseVersion
-	keywordCategorySource
-	keywordCategorySubtitles
-	keywordCategoryVideoResolution
-	keywordCategoryVideoTerm
+	keywordCatNone keywordCategory = iota
+	keywordCatSeasonPrefix
+	keywordCatAnimeType
+	keywordCatYear
+	keywordCatAudioTerm
+	keywordCatDeviceCompat
+	keywordCatEpisodePrefix
+	keywordCatPartPrefix
+	keywordCatVolumePrefix
+	keywordCatFileChecksum
+	keywordCatFileExtension
+	keywordCatLanguage
+	keywordCatReleaseGroup
+	keywordCatReleaseInformation
+	keywordCatReleaseVersion
+	keywordCatSource
+	keywordCatSubtitles
+	keywordCatVideoResolution
+	keywordCatVideoTerm
 )
 
 type keywordKind uint8
@@ -40,8 +46,15 @@ type (
 		kind     keywordKind
 	}
 
+	keywordParts struct {
+		category keywordCategory
+		prefix   string
+		seqParts []string
+	}
+
 	keywordManager struct {
-		keywords []*keyword
+		keywords     []*keyword
+		keywordParts []*keywordParts
 	}
 )
 
@@ -53,17 +66,17 @@ func newKeywordManager() *keywordManager {
 	// Season
 
 	km.addGroup(
-		keywordCategorySeasonPrefix,
+		keywordCatSeasonPrefix,
 		keywordKindCombinedWithNumber,
 		[]string{"S"},
 	)
 	km.addGroup(
-		keywordCategorySeasonPrefix,
+		keywordCatSeasonPrefix,
 		keywordKindSeparatedWithNumber,
 		[]string{"SEASON", "SAISON", "SEASONS", "SAISONS"},
 	)
 	km.addGroup(
-		keywordCategorySeasonPrefix,
+		keywordCatSeasonPrefix,
 		keywordKindOrdinalSuffix,
 		[]string{"SEASON", "SAISON", "SEASONS", "SAISONS"},
 	)
@@ -71,12 +84,12 @@ func newKeywordManager() *keywordManager {
 	// Episode
 
 	km.addGroup(
-		keywordCategoryEpisodePrefix,
+		keywordCatEpisodePrefix,
 		keywordKindCombinedWithNumber,
 		[]string{"E", "\x7B2C", "EP", "EPS", "EPISODE", "EPISODES", "CAPITULO", "EPISODIO", "FOLDE"},
 	)
 	km.addGroup(
-		keywordCategoryEpisodePrefix,
+		keywordCatEpisodePrefix,
 		keywordKindSeparatedWithNumber,
 		[]string{"EP", "EPS", "EPISODE", "EPISODES", "CAPITULO", "EPISODIO", "FOLDE"},
 	)
@@ -84,12 +97,12 @@ func newKeywordManager() *keywordManager {
 	// Volume
 
 	km.addGroup(
-		keywordCategoryVolumePrefix,
+		keywordCatVolumePrefix,
 		keywordKindCombinedWithNumber,
 		[]string{"VOL", "VOLUME", "VOLUMES"},
 	)
 	km.addGroup(
-		keywordCategoryVolumePrefix,
+		keywordCatVolumePrefix,
 		keywordKindSeparatedWithNumber,
 		[]string{"VOL", "VOLUME", "VOLUMES"},
 	)
@@ -97,17 +110,17 @@ func newKeywordManager() *keywordManager {
 	// Part
 
 	km.addGroup(
-		keywordCategoryPartPrefix,
+		keywordCatPartPrefix,
 		keywordKindCombinedWithNumber,
 		[]string{"PART", "PARTS", "COUR"},
 	)
 	km.addGroup(
-		keywordCategoryPartPrefix,
+		keywordCatPartPrefix,
 		keywordKindSeparatedWithNumber,
 		[]string{"PART", "PARTS", "COUR"},
 	)
 	km.addGroup(
-		keywordCategoryPartPrefix,
+		keywordCatPartPrefix,
 		keywordKindOrdinalSuffix,
 		[]string{"PART", "COUR"},
 	)
@@ -115,24 +128,24 @@ func newKeywordManager() *keywordManager {
 	// Anime Type
 
 	km.addGroup(
-		keywordCategoryAnimeType,
+		keywordCatAnimeType,
 		keywordKindCombinedWithNumber,
 		[]string{"SP"},
 	)
 	km.addGroup(
-		keywordCategoryAnimeType,
+		keywordCatAnimeType,
 		keywordKindCombinedWithNumber,
 		[]string{"SP", "MOVIE", "OAD", "OAV", "ONA", "OVA", "SPECIAL", "SPECIALS", "ED", "ENDING", "NCED", "NCOP", "OPED", "OP", "OPENING",
 			"番外編", "總集編", "映像特典", "特典", "特典アニメ"},
 	)
 	km.addGroup(
-		keywordCategoryAnimeType,
+		keywordCatAnimeType,
 		keywordKindSeparatedWithNumber,
 		[]string{"SP", "MOVIE", "OAD", "OAV", "ONA", "OVA", "SPECIAL", "SPECIALS", "ED", "ENDING", "NCED", "NCOP", "OPED", "OP", "OPENING",
 			"番外編", "總集編", "映像特典", "特典", "特典アニメ"},
 	)
 	km.addGroup(
-		keywordCategoryAnimeType,
+		keywordCatAnimeType,
 		keywordKindStandalone,
 		[]string{
 			"MOVIE", "GEKIJOUBAN", "ONA", "OVA", "OAV", "OAD", "SPECIALS", "TV",
@@ -142,7 +155,7 @@ func newKeywordManager() *keywordManager {
 	// Audio Term
 
 	km.addGroup(
-		keywordCategoryAudioTerm,
+		keywordCatAudioTerm,
 		keywordKindStandalone,
 		[]string{
 			// Audio channels
@@ -156,21 +169,37 @@ func newKeywordManager() *keywordManager {
 		},
 	)
 
+	km.addGroupParts(
+		keywordCatAudioTerm,
+		[]*keywordParts{
+			{prefix: "2", seqParts: []string{".", "0CH"}},          // 2.0CH
+			{prefix: "5", seqParts: []string{".", "1"}},            // 5.1
+			{prefix: "DTS", seqParts: []string{"-", "ES"}},         // DTS-ES
+			{prefix: "DTS5", seqParts: []string{".", "1"}},         // DTS5.1
+			{prefix: "TRUEHD5", seqParts: []string{".", "1"}},      // TRUEHD5.1
+			{prefix: "DUAL", seqParts: []string{"-", "AUDIO"}},     // DUAL-AUDIO
+			{prefix: "DUAL", seqParts: []string{".", "AUDIO"}},     // DUAL.AUDIO
+			{prefix: "DUAL", seqParts: []string{" ", "AUDIO"}},     // DUAL AUDIO
+			{prefix: "DD2", seqParts: []string{".", "0"}},          // DD2.0
+			{prefix: "E", seqParts: []string{"-", "AC", "-", "3"}}, // E-AC-3
+		},
+	)
+
 	// Video Term
 
 	km.addGroup(
-		keywordCategoryVideoTerm,
+		keywordCatVideoTerm,
 		keywordKindStandalone,
 		[]string{
 			// Frame rate
-			"23.976FPS", "24FPS", "29.97FPS", "30FPS", "60FPS", "120FPS",
+			"24FPS", "30FPS", "60FPS", "120FPS",
 			// Video codec
-			"8BIT", "8-BIT", "10BIT", "10BITS", "10-BIT", "10-BITS",
+			"8BIT", "10BIT", "10BITS",
 			"HI10", "HI10P", "HI444", "HI444P", "HI444PP",
-			"H264", "H265", "H.264", "H.265", "X264", "X265", "X.264",
+			"H264", "H265", "X264", "X265",
 			"AVC", "HEVC", "HEVC2", "DIVX", "DIVX5", "DIVX6", "XVID",
 			"AV1",
-			"HDR", "DV", "DOLBY VISION",
+			"HDR", "DV",
 			// Video format
 			"AVI", "RMVB", "WMV", "WMV3", "WMV9",
 			// Video quality
@@ -180,10 +209,29 @@ func newKeywordManager() *keywordManager {
 		},
 	)
 
+	km.addGroupParts(
+		keywordCatVideoTerm,
+		[]*keywordParts{
+			{prefix: "23", seqParts: []string{".", "976FPS"}},    // 23.976FPS
+			{prefix: "29", seqParts: []string{".", "97FPS"}},     // 29.97FPS
+			{prefix: "8", seqParts: []string{".", "BIT"}},        // 8.BIT
+			{prefix: "8", seqParts: []string{"-", "BIT"}},        // 8-BIT
+			{prefix: "10", seqParts: []string{" ", "BIT"}},       // 10 BIT
+			{prefix: "10", seqParts: []string{".", "BIT"}},       // 10.BIT
+			{prefix: "10", seqParts: []string{"-", "BIT"}},       // 10-BIT
+			{prefix: "10", seqParts: []string{"-", "BITS"}},      // 10-BITS
+			{prefix: "10", seqParts: []string{" ", "BITS"}},      // 10 BITS
+			{prefix: "H", seqParts: []string{".", "264"}},        // H.264
+			{prefix: "H", seqParts: []string{".", "265"}},        // H.265
+			{prefix: "X", seqParts: []string{".", "264"}},        // X.264
+			{prefix: "DOLBY", seqParts: []string{" ", "VISION"}}, // DOLBY VISION
+		},
+	)
+
 	// Device Compat
 
 	km.addGroup(
-		keywordCategoryDeviceCompat,
+		keywordCatDeviceCompat,
 		keywordKindStandalone,
 		[]string{"IPAD3", "IPHONE5", "IPOD", "PS3", "XBOX", "XBOX360", "ANDROID"},
 	)
@@ -192,7 +240,7 @@ func newKeywordManager() *keywordManager {
 	// should be last
 
 	km.addGroup(
-		keywordCategoryFileExtension,
+		keywordCatFileExtension,
 		keywordKindStandalone,
 		[]string{"3GP", "AVI", "DIVX", "FLV", "M2TS", "MKV", "MOV", "MP4", "MPG",
 			"OGM", "RM", "RMVB", "TS", "WEBM", "WMV"},
@@ -202,7 +250,7 @@ func newKeywordManager() *keywordManager {
 	// should be enclosed
 
 	km.addGroup(
-		keywordCategoryLanguage,
+		keywordCatLanguage,
 		keywordKindStandalone,
 		[]string{"ENG", "ENGLISH", "ESPANOL", "JAP", "PT-BR", "SPANISH", "VOSTFR", "ESP", "ITA"},
 	)
@@ -210,14 +258,14 @@ func newKeywordManager() *keywordManager {
 	// Release info
 
 	km.addGroup(
-		keywordCategoryReleaseInformation,
+		keywordCatReleaseInformation,
 		keywordKindStandalone,
 		[]string{"REMASTER", "REMASTERED", "UNCENSORED", "UNCUT", "TS", "VFR",
 			"WIDESCREEN", "WS", "BATCH", "COMPLETE", "PATCH", "REMUX"},
 	)
 
 	km.addGroup(
-		keywordCategorySubtitles,
+		keywordCatSubtitles,
 		keywordKindStandalone,
 		[]string{"ASS", "BIG5", "DUB", "DUBBED", "HARDSUB", "HARDSUBS", "RAW",
 			"SOFTSUB", "SOFTSUBS", "SUB", "SUBBED", "SUBTITLED", "MULTISUB"},
@@ -226,12 +274,25 @@ func newKeywordManager() *keywordManager {
 	// Source
 
 	km.addGroup(
-		keywordCategorySubtitles,
+		keywordCatSubtitles,
 		keywordKindStandalone,
 		[]string{"BD", "BDRIP", "BLURAY", "BLU-RAY", "DVD", "DVD5", "DVD9",
 			"DVD-R2J", "DVDRIP", "DVD-RIP", "R2DVD", "R2J", "R2JDVD",
 			"R2JDVDRIP", "HDTV", "HDTVRIP", "TVRIP", "TV-RIP",
 			"WEBCAST", "WEBRIP"},
+	)
+
+	km.addGroupParts(
+		keywordCatSubtitles,
+		[]*keywordParts{
+			{prefix: "BLU", seqParts: []string{"-", "RAY"}},
+			{prefix: "BLU", seqParts: []string{" ", "RAY"}},
+			{prefix: "DVD", seqParts: []string{"-", "R2J"}},
+			{prefix: "DVD", seqParts: []string{"-", "RIP"}},
+			{prefix: "DVD", seqParts: []string{" ", "RIP"}},
+			{prefix: "TV", seqParts: []string{"-", "RIP"}},
+			{prefix: "TV", seqParts: []string{" ", "RIP"}},
+		},
 	)
 
 	return &km
@@ -245,4 +306,39 @@ func (km *keywordManager) addGroup(category keywordCategory, kind keywordKind, g
 			kind:     kind,
 		})
 	}
+}
+
+func (km *keywordManager) addGroupParts(category keywordCategory, group []*keywordParts) {
+	for _, value := range group {
+		km.keywordParts = append(km.keywordParts, &keywordParts{
+			category: category,
+			prefix:   value.prefix,
+			seqParts: value.seqParts,
+		})
+	}
+}
+
+func (km *keywordManager) normalize(text string) string {
+	f := norm.Form(3)
+
+	return strings.ToUpper(string(f.Bytes([]byte(text))))
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+func (km *keywordManager) findKeywordPartGroups(s string) ([]*keywordParts, bool) {
+	text := km.normalize(s)
+
+	partsToTest := make([]*keywordParts, 0)
+	for _, kwParts := range km.keywordParts {
+		if text == kwParts.prefix {
+			partsToTest = append(partsToTest, kwParts)
+		}
+	}
+
+	if len(partsToTest) == 0 {
+		return partsToTest, false
+	}
+
+	return partsToTest, true
 }

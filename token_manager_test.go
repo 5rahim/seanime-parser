@@ -5,7 +5,34 @@ import (
 	"testing"
 )
 
-// Test set up
+func TestKeywordGroups(t *testing.T) {
+
+	tests := []struct {
+		name             string
+		input            string
+		expectedTknValue string
+	}{
+		{"1", "BLU RAY 1080P", "BLU RAY"},
+		{"2", "BLU-RAY 1080P", "BLU-RAY"},
+		{"3", "TV RIP 1080P", "TV RIP"},
+		{"4", "10 bits 1080P", "10 bits"},
+		{"4", "10-bit 1080P", "10-bit"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tm := newTokenManager(tt.input)
+			tkn, _ := tm.tokens.getAtSafe(0)
+			_, _ = tm.identifyKeyword(tkn)
+			assert.Equal(t, tt.expectedTknValue, tkn.getValue())
+			t.Log(tm.tokens.sPrint())
+		})
+	}
+
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 func setUp() *tokens {
 	return &tokens{
 		newToken("A"),
@@ -180,5 +207,13 @@ func TestTokenSequenceFunctions(t *testing.T) {
 		tokenCatUnknown,   // 01
 	}, true)
 	assert.True(t, found)
+
+	//
+
+	_, found = tm.tokens.peekValuesAfter(0, []string{" ", "-", " ", "05"})
+	assert.True(t, found)
+
+	_, found = tm.tokens.peekValuesAfter(0, []string{" ", "-", " ", "05", " "}) // out of range
+	assert.False(t, found)
 
 }
