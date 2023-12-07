@@ -53,14 +53,21 @@ type (
 	}
 
 	keywordManager struct {
-		keywords     []*keyword
-		keywordParts []*keywordParts
+		keywords          []*keyword
+		keywordParts      []*keywordParts
+		ambiguousKeywords []string
 	}
 )
 
 func newKeywordManager() *keywordManager {
 	km := keywordManager{
 		keywords: make([]*keyword, 0),
+	}
+
+	// The parser will treat these keywords as standalone ambiguous tokens and will not attempt to identify them if
+	// they are found in the first half of the filename.
+	km.ambiguousKeywords = []string{
+		"SP", "ANDROID", "ITA", "ESP", "BD",
 	}
 
 	// Season
@@ -268,13 +275,24 @@ func newKeywordManager() *keywordManager {
 		keywordCatSubtitles,
 		keywordKindStandalone,
 		[]string{"ASS", "BIG5", "DUB", "DUBBED", "HARDSUB", "HARDSUBS", "RAW",
-			"SOFTSUB", "SOFTSUBS", "SUB", "SUBBED", "SUBTITLED", "MULTISUB"},
+			"SOFTSUB", "SOFTSUBS", "SUB", "SUBBED", "SUBTITLED", "MULTISUB", "MULTIAUDIO"},
+	)
+
+	km.addGroupParts(
+		keywordCatSubtitles,
+		[]*keywordParts{
+			{prefix: "MULTI", seqParts: []string{"-", "SUB"}},
+			{prefix: "MULTI", seqParts: []string{".", "SUB"}},
+			{prefix: "MULTI", seqParts: []string{"-", "AUDIO"}},
+			{prefix: "MULTI", seqParts: []string{" ", "AUDIO"}},
+			{prefix: "MULTI", seqParts: []string{".", "AUDIO"}},
+		},
 	)
 
 	// Source
 
 	km.addGroup(
-		keywordCatSubtitles,
+		keywordCatSource,
 		keywordKindStandalone,
 		[]string{"BD", "BDRIP", "BLURAY", "BLU-RAY", "DVD", "DVD5", "DVD9",
 			"DVD-R2J", "DVDRIP", "DVD-RIP", "R2DVD", "R2J", "R2JDVD",
@@ -283,7 +301,7 @@ func newKeywordManager() *keywordManager {
 	)
 
 	km.addGroupParts(
-		keywordCatSubtitles,
+		keywordCatSource,
 		[]*keywordParts{
 			{prefix: "BLU", seqParts: []string{"-", "RAY"}},
 			{prefix: "BLU", seqParts: []string{" ", "RAY"}},
@@ -341,4 +359,22 @@ func (km *keywordManager) findKeywordPartGroups(s string) ([]*keywordParts, bool
 	}
 
 	return partsToTest, true
+}
+
+func (km *keywordManager) findStandaloneKeywordByValue(s string) (*keyword, bool) {
+	text := km.normalize(s)
+
+	var keyword *keyword
+	for _, kw := range km.keywords {
+		if text == kw.value && kw.kind == keywordKindStandalone {
+			keyword = kw
+			break
+		}
+	}
+
+	if keyword == nil {
+		return nil, false
+	}
+
+	return keyword, true
 }

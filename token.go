@@ -76,6 +76,14 @@ func (t *token) setValue(s string) {
 	t.Value = s
 }
 
+// setCategory will update the token's Category to the specified tokenCategory value.
+// If the token is nil, the function will return without making any changes.
+//
+// Example:
+//
+//	tkn := &token{}
+//	tkn.setCategory(tokenCatKnown)
+//	fmt.Println(tkn.Category)  // Output: tokenCatKnown
 func (t *token) setCategory(c tokenCategory) {
 	if t == nil {
 		return
@@ -84,6 +92,14 @@ func (t *token) setCategory(c tokenCategory) {
 	t.Category = c
 }
 
+// setIdentifiedKeywordCategory updates the `IdentifiedKeywordCategory` of a token
+// with the provided keyword category.
+//
+// Example:
+//
+//	tkn := &token{}
+//	tkn.setIdentifiedKeywordCategory(keywordCatSeasonPrefix)
+//	fmt.Println(tkn.IdentifiedKeywordCategory)  // Output: keywordCatSeasonPrefix
 func (t *token) setIdentifiedKeywordCategory(c keywordCategory) {
 	if t == nil {
 		return

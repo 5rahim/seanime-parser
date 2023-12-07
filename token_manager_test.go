@@ -22,9 +22,42 @@ func TestKeywordGroups(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tm := newTokenManager(tt.input)
+
 			tkn, _ := tm.tokens.getAtSafe(0)
-			_, _ = tm.identifyKeyword(tkn)
+			found := tm.identifyKeyword(tkn)
+
+			assert.True(t, found)
 			assert.Equal(t, tt.expectedTknValue, tkn.getValue())
+
+			t.Log(tm.tokens.sPrint())
+		})
+	}
+
+}
+func TestStandaloneKeywords(t *testing.T) {
+
+	tests := []struct {
+		name               string
+		input              string
+		expectedKeywordCat keywordCategory
+	}{
+		{"1", "BLURAY 1080P", keywordCatSource},
+		{"2", "60FPS 1080P", keywordCatVideoTerm},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tm := newTokenManager(tt.input)
+
+			tkn, _ := tm.tokens.getAtSafe(0)
+			found := tm.identifyKeyword(tkn)
+
+			assert.True(t, found)
+
+			tknKeywordCat, found := tkn.getIdentifiedKeywordCategory()
+
+			assert.Equal(t, tt.expectedKeywordCat, tknKeywordCat)
+
 			t.Log(tm.tokens.sPrint())
 		})
 	}

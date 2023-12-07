@@ -22,14 +22,21 @@ func (t *token) getValue() string {
 	return t.Value
 }
 
-func (t *token) getCategory() string {
+func (t *token) getCategory() tokenCategory {
 	if t == nil {
 		return ""
 	}
 	return t.Category
 }
 
-func (t *token) getKind() string {
+func (t *token) getIdentifiedKeywordCategory() (keywordCategory, bool) {
+	if t == nil {
+		return 0, false
+	}
+	return t.IdentifiedKeywordCategory, t.IdentifiedKeywordCategory != keywordCatNone
+}
+
+func (t *token) getKind() tokenKind {
 	if t == nil {
 		return ""
 	}

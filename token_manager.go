@@ -26,10 +26,23 @@ func newTokenManager(filename string) tokenManager {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-func (tm *tokenManager) identifyKeyword(tkn *token) ([]*token, bool) {
-	// Check if token is a known keyword prefix (e.g. "Blu" for "Blu-ray")
+func (tm *tokenManager) identifyKeyword(tkn *token) bool {
+
+	if tkn.Kind == tokenKindCrc32 {
+		tkn.setIdentifiedKeywordCategory(keywordCatFileChecksum)
+		return true
+	}
+
+	if tkn.Kind == tokenKindPossibleVideoRes {
+		tkn.setIdentifiedKeywordCategory(keywordCatVideoResolution)
+		return true
+	}
+
+	// Check if token is a known pre-defined keyword prefix (e.g. "Blu" for "Blu-ray")
 	keywordParts, found := tm.keywordManager.findKeywordPartGroups(tkn.getValue())
+	foundParts := false
 	if found {
+		foundParts = false
 		for _, keywordGroup := range keywordParts {
 			if retTkns, found := tm.tokens.peekValuesAfter(tm.tokens.getIndexOf(tkn), keywordGroup.seqParts); found {
 				// Update token value
@@ -44,15 +57,27 @@ func (tm *tokenManager) identifyKeyword(tkn *token) ([]*token, bool) {
 				for _, retTkn := range retTkns {
 					tm.tokens.removeAt(tm.tokens.getIndexOf(retTkn))
 				}
+				foundParts = true
 				break
 			}
 		}
 	}
+
+	if foundParts {
+		return true
+	}
+
+	// Check if token is a known pre-defined standalone keyword (e.g. "60FPS")
+	if keyword, found := tm.keywordManager.findStandaloneKeywordByValue(tkn.getValue()); found {
+		tkn.setIdentifiedKeywordCategory(keyword.category)
+		return true
+	}
+
 	//if !ok {
 	//	return []*token{}, false
 	//}
 
-	return nil, false
+	return false
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
