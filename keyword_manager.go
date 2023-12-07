@@ -378,3 +378,25 @@ func (km *keywordManager) findStandaloneKeywordByValue(s string) (*keyword, bool
 
 	return keyword, true
 }
+
+func (km *keywordManager) findCombinedKeywordByValue(s string) (*keyword, bool) {
+	text := km.normalize(s)
+
+	var keyword *keyword
+	for _, kw := range km.keywords {
+		if strings.HasPrefix(text, kw.value) && kw.kind == keywordKindCombinedWithNumber {
+			// Check if the remaining part of the string is a number or number-like (e.g. "S01", "SO1E01" or "S1", "E01" or "E1")
+			remaining := strings.TrimPrefix(text, kw.value)
+			if isNumberOrLike(remaining) {
+				keyword = kw
+				break
+			}
+		}
+	}
+
+	if keyword == nil {
+		return nil, false
+	}
+
+	return keyword, true
+}

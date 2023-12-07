@@ -68,9 +68,39 @@ func (tm *tokenManager) identifyKeyword(tkn *token) bool {
 	}
 
 	// Check if token is a known pre-defined standalone keyword (e.g. "60FPS")
-	if keyword, found := tm.keywordManager.findStandaloneKeywordByValue(tkn.getValue()); found {
-		tkn.setIdentifiedKeywordCategory(keyword.category)
-		return true
+	if len(tkn.getValue()) > 1 {
+		if keyword, found := tm.keywordManager.findStandaloneKeywordByValue(tkn.getValue()); found {
+			tkn.setIdentifiedKeywordCategory(keyword.category)
+			return true
+		}
+	}
+
+	// Test for S01E01
+	if strings.HasPrefix(tkn.getValue(), "S") && len(tkn.getValue()) > 3 {
+		if season, sep, episode, ok := extractSeasonAndEpisode(tkn.getValue()); ok {
+			seasonPrefixTkn := newToken("S")
+			seasonPrefixTkn.setIdentifiedKeywordCategory(keywordCatSeasonPrefix)
+			seasonPrefixTkn.setKind(tokenKindCharacter)
+
+			seasonTkn := newToken(season)
+			seasonTkn.setMetadataKind(metadataKindSeason)
+			seasonTkn.setKind(tokenKindNumber)
+
+			sepTkn := newToken(sep)
+			sepTkn.setIdentifiedKeywordCategory(keywordCatEpisodePrefix)
+			sepTkn.setKind(tokenKindCharacter)
+
+			episodeTkn := newToken(episode)
+			episodeTkn.setMetadataKind(metadataKindEpisodeNumber)
+			if isNumber(episode) {
+				episodeTkn.setKind(tokenKindNumber)
+			} else {
+				episodeTkn.setKind(tokenKindNumberLike)
+			}
+
+			tm.tokens.overwriteAndInsertManyAt(tm.tokens.getIndexOf(tkn), []*token{seasonPrefixTkn, seasonTkn, sepTkn, episodeTkn})
+			return true
+		}
 	}
 
 	//if !ok {
@@ -148,6 +178,13 @@ func (t *tokens) overwriteAt(index int, tkn token) {
 
 func (t *tokens) overwriteManyAt(index int, tkns []*token) {
 	*t = append((*t)[:index], append(tkns, (*t)[index+len(tkns):]...)...)
+}
+
+func (t *tokens) overwriteAndInsertManyAt(index int, tkns []*token) {
+	*t = append((*t)[:index], (*t)[index+1:]...)
+	// Then insert new elements at index
+	// append takes a slice and follows that with a variadic parameter hence the need for ...
+	*t = append((*t)[:index], append(tkns, (*t)[index:]...)...)
 }
 
 func (t *tokens) getAtSafe(index int) (*token, bool) {

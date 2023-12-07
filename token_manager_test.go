@@ -5,6 +5,50 @@ import (
 	"testing"
 )
 
+func TestTokenParts(t *testing.T) {
+
+	tests := []struct {
+		name              string
+		input             string
+		expectedTknValues []string
+	}{
+		{"1", "S01E01", []string{"S", "01", "E", "01"}},
+		{"2", "S01E01v2", []string{"S", "01", "E", "01v2"}},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tm := newTokenManager(tt.input)
+
+			tkn, ok := tm.tokens.getAtSafe(0)
+			assert.True(t, ok)
+
+			// identifyKeyword
+			found := tm.identifyKeyword(tkn)
+			assert.True(t, found)
+
+			tkn, ok = tm.tokens.getAtSafe(0)
+			assert.True(t, ok)
+
+			assert.Equal(t, tt.expectedTknValues[0], tkn.getValue())
+
+			tkn, ok = tm.tokens.getAtSafe(1)
+			assert.True(t, ok)
+			assert.Equal(t, tt.expectedTknValues[1], tkn.getValue())
+
+			tkn, ok = tm.tokens.getAtSafe(2)
+			assert.True(t, ok)
+			assert.Equal(t, tt.expectedTknValues[2], tkn.getValue())
+
+			tkn, ok = tm.tokens.getAtSafe(3)
+			assert.True(t, ok)
+			assert.Equal(t, tt.expectedTknValues[3], tkn.getValue())
+
+			t.Log(tm.tokens.sPrint())
+		})
+	}
+
+}
 func TestKeywordGroups(t *testing.T) {
 
 	tests := []struct {
@@ -34,6 +78,7 @@ func TestKeywordGroups(t *testing.T) {
 	}
 
 }
+
 func TestStandaloneKeywords(t *testing.T) {
 
 	tests := []struct {
@@ -168,13 +213,15 @@ func TestTokenFunctions(t *testing.T) {
 	tkn, _ = tokensList.getAtSafe(2)
 	assert.Equal(t, "Y", tkn.getValue())
 
-	// Test for overwriteManyAt method
+	// Test for overwriteAndInsertManyAt method
 	tokensList = setUp()
-	tokensList.overwriteManyAt(1, []*token{newToken("X"), newToken("Y")})
+	tokensList.overwriteAndInsertManyAt(1, []*token{newToken("X"), newToken("Y")})
 	tkn, _ = tokensList.getAtSafe(1)
 	assert.Equal(t, "X", tkn.getValue())
 	tkn, _ = tokensList.getAtSafe(2)
 	assert.Equal(t, "Y", tkn.getValue())
+	tkn, _ = tokensList.getAtSafe(3)
+	assert.Equal(t, "C", tkn.getValue())
 }
 
 func TestTokenSequenceFunctions(t *testing.T) {
