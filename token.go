@@ -38,7 +38,7 @@ type token struct {
 	IdentifiedKeywordCategory keywordCategory
 	Enclosed                  bool
 	Parts                     []*token
-	MetadataKind              metadataKind
+	MetadataCategory          metadataCategory
 }
 
 func newToken(value string) *token {
@@ -50,20 +50,20 @@ func newToken(value string) *token {
 		IdentifiedKeywordCategory: keywordCatNone,
 		Enclosed:                  false,
 		Parts:                     nil,
-		MetadataKind:              0,
+		MetadataCategory:          0,
 	}
 }
 
-// setMetadataKind will update the token's MetadataKind
-// and update its Category to tokenCatKnown if the metadataKind is not metadataKindUnknown.
-func (t *token) setMetadataKind(mk metadataKind) {
+// setMetadataCategory will update the token's MetadataCategory
+// and update its Category to tokenCatKnown if the metadataCategory is not metadataUnknown.
+func (t *token) setMetadataCategory(mk metadataCategory) {
 	if t == nil {
 		return
 	}
 
-	t.MetadataKind = mk
+	t.MetadataCategory = mk
 	t.Category = tokenCatKnown
-	if mk == metadataKindUnknown {
+	if mk == metadataUnknown {
 		t.Category = tokenCatUnknown
 	}
 }

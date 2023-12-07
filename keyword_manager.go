@@ -336,7 +336,7 @@ func (km *keywordManager) addGroupParts(category keywordCategory, group []*keywo
 	}
 }
 
-func (km *keywordManager) normalize(text string) string {
+func normalize(text string) string {
 	f := norm.Form(3)
 
 	return strings.ToUpper(string(f.Bytes([]byte(text))))
@@ -345,11 +345,9 @@ func (km *keywordManager) normalize(text string) string {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 func (km *keywordManager) findKeywordPartGroups(s string) ([]*keywordParts, bool) {
-	text := km.normalize(s)
-
 	partsToTest := make([]*keywordParts, 0)
 	for _, kwParts := range km.keywordParts {
-		if text == kwParts.prefix {
+		if normalize(s) == kwParts.prefix {
 			partsToTest = append(partsToTest, kwParts)
 		}
 	}
@@ -362,11 +360,9 @@ func (km *keywordManager) findKeywordPartGroups(s string) ([]*keywordParts, bool
 }
 
 func (km *keywordManager) findStandaloneKeywordByValue(s string) (*keyword, bool) {
-	text := km.normalize(s)
-
 	var keyword *keyword
 	for _, kw := range km.keywords {
-		if text == kw.value && kw.kind == keywordKindStandalone {
+		if normalize(s) == kw.value && kw.kind == keywordKindStandalone {
 			keyword = kw
 			break
 		}
@@ -379,24 +375,39 @@ func (km *keywordManager) findStandaloneKeywordByValue(s string) (*keyword, bool
 	return keyword, true
 }
 
-func (km *keywordManager) findCombinedKeywordByValue(s string) (*keyword, bool) {
-	text := km.normalize(s)
+func (km *keywordManager) findKeywordsBy(pred func(kw *keyword) bool) ([]*keyword, bool) {
 
-	var keyword *keyword
+	var kws []*keyword
 	for _, kw := range km.keywords {
-		if strings.HasPrefix(text, kw.value) && kw.kind == keywordKindCombinedWithNumber {
-			// Check if the remaining part of the string is a number or number-like (e.g. "S01", "SO1E01" or "S1", "E01" or "E1")
-			remaining := strings.TrimPrefix(text, kw.value)
-			if isNumberOrLike(remaining) {
-				keyword = kw
-				break
-			}
+		if pred(kw) {
+			kws = append(kws, kw)
 		}
 	}
 
-	if keyword == nil {
+	if len(kws) == 0 {
 		return nil, false
 	}
 
-	return keyword, true
+	return kws, true
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//func (k *keyword) getMetadataKindFromKeywordCategory(cat keywordCategory) metadataCategory {
+//	switch cat {
+//	case keywordCatSource:
+//		return metadataKindSource
+//	case keywordCatReleaseInformation:
+//		return metadataKindReleaseInformation
+//	case keywordCatReleaseVersion:
+//		return metadataKindReleaseVersion
+//	case keywordCatReleaseGroup:
+//		return metadataKindReleaseGroup
+//	case keywordCatLanguage:
+//		return metadataKindLanguage
+//	case keywordCatFileExtension:
+//		return metadataKindFileExtension
+//	case keywordCatVolumePrefix:
+//
+//	}
+//}

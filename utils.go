@@ -12,11 +12,22 @@ func isNumber(s string) bool {
 	return err == nil
 }
 
+// isNumberLike checks if the provided string matches a specific pattern.
+// It returns true if the string matches the pattern, otherwise false.
+// The pattern is defined as follows:
+//   - The string must start with one or more digits. (e.g. 123)
+//   - The string may have an optional 'x' followed by one or two digits. (e.g. 03x04)
+//   - The string may have an optional 'v' followed by a single digit. (e.g. 03v2)
+//   - The string may end with an optional single quote ('). (e.g. 04')
 func isNumberLike(s string) bool {
 	rgx := regexp.MustCompile(`^(?i)\d+((x(\d{1,2}))|(v\d))?(')?$`)
 	return rgx.MatchString(s)
 }
 
+// isNumberOrLike checks if the provided string is a number, or follows a specific pattern.
+// It returns true if the string is a number, or matches the specified pattern, otherwise false.
+// The function relies on the helper functions isNumber and isNumberLike to determine if the string is a number
+// or matches the pattern.
 func isNumberOrLike(s string) bool {
 	return isNumber(s) || isNumberLike(s)
 }
@@ -47,7 +58,7 @@ func isOrdinalNumber(s string) bool {
 // getNumberFromOrdinal returns the corresponding numeric value of the ordinal string provided.
 // If the provided string does not match any of the supported ordinals, it returns 0.
 // Example usage: getNumberFromOrdinal("5th") => 5
-func getNumberFromOrdinal(s string) int {
+func getNumberFromOrdinal(s string) (int, bool) {
 	ordinals := map[string]int{
 		"1st": 1, "first": 1,
 		"2nd": 2, "second": 2,
@@ -58,11 +69,12 @@ func getNumberFromOrdinal(s string) int {
 		"7th": 7, "seventh": 7,
 		"8th": 8, "eighth": 8,
 		"9th": 9, "ninth": 9,
+		"10th": 10, "tenth": 10,
 	}
 
 	lowerStr := strings.ToLower(s)
-	num := ordinals[lowerStr]
-	return num
+	num, ok := ordinals[lowerStr]
+	return num, ok
 }
 
 // isCRC32 checks if the given string represents a valid CRC32.

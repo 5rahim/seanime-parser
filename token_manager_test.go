@@ -193,3 +193,25 @@ func TestTokenSequenceFunctions(t *testing.T) {
 	assert.False(t, found)
 
 }
+
+func TestFirstOccurrence(t *testing.T) {
+
+	tm := newTokenManager("01 - 05 - 06")
+	idx := 0
+
+	_, found := tm.tokens.getAtSafe(idx)
+	assert.True(t, found)
+
+	fTkn, found := tm.tokens.getFirstOccurrenceAfter(idx, func(tkn *token) bool {
+		return tkn.isCategory(tokenCatUnknown) && tkn.isKind(tokenKindNumber)
+	})
+	assert.True(t, found)
+	assert.Equal(t, "05", fTkn.getValue())
+
+	fTkn2, found := tm.tokens.getFirstOccurrenceBefore(tm.tokens.getIndexOf(fTkn), func(tkn *token) bool {
+		return tkn.isCategory(tokenCatUnknown) && tkn.isKind(tokenKindNumber)
+	})
+	assert.True(t, found)
+	assert.Equal(t, "01", fTkn2.getValue())
+
+}

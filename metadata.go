@@ -1,27 +1,27 @@
 package seanime_parser
 
-type metadataKind = uint8
+type metadataCategory = uint8
 
 const (
-	metadataKindUnknown metadataKind = iota
-	metadataKindSeason
-	metadataKindEpisodeNumber
-	metadataKindPart
-	metadataKindTitle
-	metadataKindAnimeType
-	metadataKindYear
-	metadataKindAudioTerm
-	metadataKindDeviceCompat
-	metadataKindEpisodeNumberAlt
-	metadataKindEpisodeTitle
-	metadataKindChecksum
-	metadataKindLanguage
-	metadataKindSubtitles
-	metadataKindReleaseVersion
-	metadataKindSource
-	metadataKindVideoResolution
-	metadataKindVideoTerm
-	metadataKindVolumeNumber
+	metadataUnknown metadataCategory = iota
+	metadataSeason
+	metadataEpisodeNumber
+	metadataPart
+	metadataTitle
+	metadataAnimeType
+	metadataYear
+	metadataAudioTerm
+	metadataDeviceCompat
+	metadataEpisodeNumberAlt
+	metadataEpisodeTitle
+	metadataChecksum
+	metadataLanguage
+	metadataSubtitles
+	metadataReleaseVersion
+	metadataSource
+	metadataVideoResolution
+	metadataVideoTerm
+	metadataVolumeNumber
 )
 
 type Metadata struct {

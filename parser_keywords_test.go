@@ -36,6 +36,7 @@ func TestTokenParts(t *testing.T) {
 			tkn, ok = tm.tokens.getAtSafe(1)
 			assert.True(t, ok)
 			assert.Equal(t, tt.expectedTknValues[1], tkn.getValue())
+			assert.True(t, tkn.isMetadataCategory(metadataSeason))
 
 			tkn, ok = tm.tokens.getAtSafe(2)
 			assert.True(t, ok)
@@ -44,6 +45,7 @@ func TestTokenParts(t *testing.T) {
 			tkn, ok = tm.tokens.getAtSafe(3)
 			assert.True(t, ok)
 			assert.Equal(t, tt.expectedTknValues[3], tkn.getValue())
+			assert.True(t, tkn.isMetadataCategory(metadataEpisodeNumber))
 
 			t.Log(tm.tokens.sPrint())
 		})
@@ -56,12 +58,13 @@ func TestKeywordGroups(t *testing.T) {
 		name             string
 		input            string
 		expectedTknValue string
+		keywordCat       keywordCategory
 	}{
-		{"1", "BLU RAY 1080P", "BLU RAY"},
-		{"2", "BLU-RAY 1080P", "BLU-RAY"},
-		{"3", "TV RIP 1080P", "TV RIP"},
-		{"4", "10 bits 1080P", "10 bits"},
-		{"4", "10-bit 1080P", "10-bit"},
+		{"1", "BLU RAY 1080P", "BLU RAY", keywordCatSource},
+		{"2", "BLU-RAY 1080P", "BLU-RAY", keywordCatSource},
+		{"3", "TV RIP 1080P", "TV RIP", keywordCatSource},
+		{"4", "10 bits 1080P", "10 bits", keywordCatVideoTerm},
+		{"4", "10-bit 1080P", "10-bit", keywordCatVideoTerm},
 	}
 
 	for _, tt := range tests {
@@ -74,6 +77,7 @@ func TestKeywordGroups(t *testing.T) {
 
 			assert.True(t, found)
 			assert.Equal(t, tt.expectedTknValue, tkn.getValue())
+			assert.True(t, tkn.isKeywordCategory(tt.keywordCat))
 
 			t.Log(tm.tokens.sPrint())
 		})

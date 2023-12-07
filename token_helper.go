@@ -1,25 +1,38 @@
 package seanime_parser
 
-const tokenIdentifiedAsParts = 0
-const tokenIdentifiedAsKeyword = 1
-
-func (t *token) isIdentified() (int, bool) {
-	if t == nil {
-		return -1, false
-	}
-	if t.IdentifiedKeywordCategory != keywordCatNone {
-		return tokenIdentifiedAsKeyword, true
-	}
-	if t.Parts != nil {
-		return tokenIdentifiedAsParts, true
-	}
-	return -1, false
-}
 func (t *token) getValue() string {
 	if t == nil {
 		return ""
 	}
 	return t.Value
+}
+
+func (t *token) isIdentifiedMetadata() bool {
+	if t == nil {
+		return false
+	}
+	return t.MetadataCategory != metadataUnknown
+}
+
+func (t *token) isMetadataCategory(kind metadataCategory) bool {
+	if t == nil {
+		return false
+	}
+	return t.MetadataCategory == kind
+}
+
+func (t *token) getMetadataCategory() (metadataCategory, bool) {
+	if t == nil {
+		return 0, false
+	}
+	return t.MetadataCategory, t.MetadataCategory != metadataUnknown
+}
+
+func (t *token) getNormalizedValue() string {
+	if t == nil {
+		return ""
+	}
+	return normalize(t.Value)
 }
 
 func (t *token) getCategory() tokenCategory {
@@ -112,6 +125,7 @@ func (t *token) isDotSeparator() bool {
 	}
 	return t.Category == tokenCatSeparator && t.Value == "."
 }
+
 func (t *token) isPlusSeparator() bool {
 	if t == nil {
 		return false
@@ -131,6 +145,34 @@ func (t *token) isEnclosed() bool {
 		return false
 	}
 	return t.Enclosed
+}
+
+func (t *token) isNumberKind() bool {
+	if t == nil {
+		return false
+	}
+	return t.Kind == tokenKindNumber
+}
+
+func (t *token) isNumberLikeKind() bool {
+	if t == nil {
+		return false
+	}
+	return t.Kind == tokenKindNumberLike
+}
+
+func (t *token) isNumberOrLikeKind() bool {
+	if t == nil {
+		return false
+	}
+	return t.isNumberKind() || t.isNumberLikeKind()
+}
+
+func (t *token) isOrdinalNumber() bool {
+	if t == nil {
+		return false
+	}
+	return t.Kind == tokenKindOrdinalNumber
 }
 
 // isFileInfoMetadata checks if the token is classified as file information metadata.

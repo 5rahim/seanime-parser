@@ -26,6 +26,7 @@ func newTokenManager(filename string) *tokenManager {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+// getTokenAfter returns the token that comes after the specified token, along with a boolean indicating if the token was found.
 func (t *tokens) getTokenAfter(tkn *token) (*token, bool) {
 	index := t.getIndexOf(tkn)
 	if index == -1 {
@@ -34,6 +35,26 @@ func (t *tokens) getTokenAfter(tkn *token) (*token, bool) {
 	return t.getAtSafe(index + 1)
 }
 
+// getTokenAfterSD returns the token that comes after the specified token, along with a boolean indicating if the token was found.
+// It searches for the next non-delimiter token in the tokens slice starting from the index of the specified token.
+// It also returns the number of skipped delimiter tokens.
+func (t *tokens) getTokenAfterSD(tkn *token) (*token, bool, int) {
+	index := t.getIndexOf(tkn)
+	if index == -1 {
+		return nil, false, 0
+	}
+	skipped := 0
+	for i := index + 1; i < len(*t); i++ {
+		if !(*t)[i].isDelimiter() {
+			return (*t)[i], true, skipped
+		} else {
+			skipped++
+		}
+	}
+	return nil, false, skipped
+}
+
+// getTokenBefore returns the token that comes before the specified token, along with a boolean indicating if the token was found.
 func (t *tokens) getTokenBefore(tkn *token) (*token, bool) {
 	index := t.getIndexOf(tkn)
 	if index == -1 {
@@ -42,6 +63,28 @@ func (t *tokens) getTokenBefore(tkn *token) (*token, bool) {
 	return t.getAtSafe(index - 1)
 }
 
+// getTokenBeforeSD returns the token that comes before the specified token, along with a boolean indicating if the token was found.
+// It searches for the previous non-delimiter token in the tokens slice starting from the index of the specified token.
+// It also returns the number of skipped delimiter tokens.
+func (t *tokens) getTokenBeforeSD(tkn *token) (*token, bool, int) {
+	index := t.getIndexOf(tkn)
+	if index == -1 {
+		return nil, false, 0
+	}
+	skipped := 0
+	for i := index - 1; i >= 0; i-- {
+		if !(*t)[i].isDelimiter() {
+			return (*t)[i], true, skipped
+		} else {
+			skipped++
+		}
+	}
+	return nil, false, skipped
+}
+
+// isTokenInFirstHalf checks if the specified token is in the first half of the tokens list.
+// It returns true if the token is found and its index is less than or equal to half the length of the list,
+// otherwise it returns false.
 func (t *tokens) isTokenInFirstHalf(tkn *token) bool {
 	index := t.getIndexOf(tkn)
 	if index == -1 {
@@ -50,6 +93,7 @@ func (t *tokens) isTokenInFirstHalf(tkn *token) bool {
 	return index <= len(*t)/2
 }
 
+// isTokenAfterFileMetadata checks if the specified token comes after file info metadata
 func (t *tokens) isTokenAfterFileMetadata(tkn *token) bool {
 	index := t.getIndexOf(tkn)
 	if index == -1 {
@@ -104,6 +148,20 @@ func (t *tokens) insertManyAt(index int, tkns []*token) {
 	*t = append((*t)[:index], append(tkns, (*t)[index:]...)...)
 }
 
+func (t *tokens) insertAfter(index int, tkn token) {
+	if index < 0 || index > len(*t) {
+		return
+	}
+	*t = append((*t)[:index+1], append([]*token{&tkn}, (*t)[index+1:]...)...)
+}
+
+func (t *tokens) insertManyAfter(index int, tkns []*token) {
+	if index < 0 || index > len(*t) {
+		return
+	}
+	*t = append((*t)[:index+1], append(tkns, (*t)[index+1:]...)...)
+}
+
 func (t *tokens) removeAt(index int) {
 	if index < 0 || index > len(*t) {
 		return
@@ -125,6 +183,8 @@ func (t *tokens) overwriteAndInsertManyAt(index int, tkns []*token) {
 	// append takes a slice and follows that with a variadic parameter hence the need for ...
 	*t = append((*t)[:index], append(tkns, (*t)[index:]...)...)
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 func (t *tokens) getAtSafe(index int) (*token, bool) {
 	if index < 0 || index > len(*t) {
@@ -202,25 +262,9 @@ func (t *tokens) getFromToInc(start int, end int) []*token {
 	return (*t)[start : end+1]
 }
 
-func (t *tokens) getFirstCategoryOccurrence(cat tokenCategory) (*token, bool) {
-	for _, tkn := range *t {
-		if tkn.Category == cat {
-			return tkn, true
-		}
-	}
-	return nil, false
-}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-func (t *tokens) getLastCategoryOccurrence(cat tokenCategory) (*token, bool) {
-	for i := len(*t) - 1; i >= 0; i-- {
-		if (*t)[i].Category == cat {
-			return (*t)[i], true
-		}
-	}
-	return nil, false
-}
-
-func (t *tokens) getFirstCategoryOccurrenceAfter(start int, cat tokenCategory) (*token, bool) {
+func (t *tokens) getFirstOccurrenceAfter(start int, pred func(tkn *token) bool) (*token, bool) {
 	if start < 0 {
 		start = -1
 	}
@@ -228,14 +272,14 @@ func (t *tokens) getFirstCategoryOccurrenceAfter(start int, cat tokenCategory) (
 		return nil, false
 	}
 	for i := start + 1; i < len(*t); i++ {
-		if (*t)[i].Category == cat {
+		if pred((*t)[i]) {
 			return (*t)[i], true
 		}
 	}
 	return nil, false
 }
 
-func (t *tokens) getFirstCategoryOccurrenceBefore(start int, cat tokenCategory) (*token, bool) {
+func (t *tokens) getFirstOccurrenceBefore(start int, pred func(tkn *token) bool) (*token, bool) {
 	if start > len(*t) {
 		start = len(*t) + 1
 	}
@@ -243,7 +287,7 @@ func (t *tokens) getFirstCategoryOccurrenceBefore(start int, cat tokenCategory) 
 		return nil, false
 	}
 	for i := start - 1; i >= 0; i-- {
-		if (*t)[i].Category == cat {
+		if pred((*t)[i]) {
 			return (*t)[i], true
 		}
 	}
@@ -385,6 +429,45 @@ func (t *tokens) peekValuesAfter(start int, strs []string) ([]*token, bool) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+func (t *tokens) findWithMetadataKind(kind metadataCategory) (bool, []*token) {
+	_tkns := make([]*token, 0)
+	for _, tkn := range *t {
+		if tkn.MetadataCategory == kind && tkn.isFileInfoMetadata() {
+			_tkns = append(_tkns, tkn)
+		}
+	}
+	if len(_tkns) > 0 {
+		return true, _tkns
+	}
+	return false, nil
+}
+
+func (t *tokens) findWithMetadataCategory(cat tokenCategory) (bool, []*token) {
+	_tkns := make([]*token, 0)
+	for _, tkn := range *t {
+		if tkn.isCategory(cat) && tkn.isFileInfoMetadata() {
+			_tkns = append(_tkns, tkn)
+		}
+	}
+	if len(_tkns) > 0 {
+		return true, _tkns
+	}
+	return false, nil
+}
+
+func (t *tokens) findWithKeywordCategory(cat keywordCategory) (bool, []*token) {
+	_tkns := make([]*token, 0)
+	for _, tkn := range *t {
+		if tkn.IdentifiedKeywordCategory == cat && tkn.isKeyword() {
+			_tkns = append(_tkns, tkn)
+		}
+	}
+	if len(_tkns) > 0 {
+		return true, _tkns
+	}
+	return false, nil
+}
 
 func (t *tokens) sPrint() string {
 	str := "["
