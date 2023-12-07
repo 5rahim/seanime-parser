@@ -132,3 +132,48 @@ func (t *token) isEnclosed() bool {
 	}
 	return t.Enclosed
 }
+
+// isFileInfoMetadata checks if the token is classified as file information metadata.
+// It returns true if the token DOES NOT belong to one of the following identified keyword categories:
+//
+// - keywordCatNone
+// - keywordCatYear
+// - keywordCatReleaseVersion
+// - keywordCatReleaseGroup
+// - keywordCatSeasonPrefix
+// - keywordCatPartPrefix
+// - keywordCatVolumePrefix
+// - keywordCatEpisodePrefix
+func (t *token) isFileInfoMetadata() bool {
+	if t == nil {
+		return false
+	}
+
+	switch t.IdentifiedKeywordCategory {
+	case keywordCatNone:
+		return false
+	case keywordCatYear:
+		return false
+	case keywordCatReleaseVersion:
+		return false
+	case keywordCatReleaseGroup:
+		return false
+	case keywordCatSeasonPrefix:
+		return false
+	case keywordCatPartPrefix:
+		return false
+	case keywordCatVolumePrefix:
+		return false
+	case keywordCatEpisodePrefix:
+		return false
+	default:
+		return true
+	}
+}
+
+func (t *token) isAnimeInfoMetadata() bool {
+	if t == nil {
+		return false
+	}
+	return !t.isFileInfoMetadata()
+}

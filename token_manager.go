@@ -12,7 +12,7 @@ type tokenManager struct {
 	filename       string
 }
 
-func newTokenManager(filename string) tokenManager {
+func newTokenManager(filename string) *tokenManager {
 	tm := tokenManager{
 		tokens:         &tokens{},
 		filename:       filename,
@@ -21,93 +21,7 @@ func newTokenManager(filename string) tokenManager {
 
 	tm.tokens.setTokens(tokenize(strings.TrimSpace(filename)))
 
-	return tm
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-func (tm *tokenManager) identifyKeyword(tkn *token) bool {
-
-	if tkn.Kind == tokenKindCrc32 {
-		tkn.setIdentifiedKeywordCategory(keywordCatFileChecksum)
-		return true
-	}
-
-	if tkn.Kind == tokenKindPossibleVideoRes {
-		tkn.setIdentifiedKeywordCategory(keywordCatVideoResolution)
-		return true
-	}
-
-	// Check if token is a known pre-defined keyword prefix (e.g. "Blu" for "Blu-ray")
-	keywordParts, found := tm.keywordManager.findKeywordPartGroups(tkn.getValue())
-	foundParts := false
-	if found {
-		foundParts = false
-		for _, keywordGroup := range keywordParts {
-			if retTkns, found := tm.tokens.peekValuesAfter(tm.tokens.getIndexOf(tkn), keywordGroup.seqParts); found {
-				// Update token value
-				seqPartsStr := ""
-				for _, t := range retTkns {
-					seqPartsStr += t.getValue()
-				}
-				tkn.setValue(mergeValues(tkn.getValue(), []string{seqPartsStr}))
-				tkn.setIdentifiedKeywordCategory(keywordGroup.category)
-				tkn.setKind(tokenKindWord)
-				// Remove subsequent tokens
-				for _, retTkn := range retTkns {
-					tm.tokens.removeAt(tm.tokens.getIndexOf(retTkn))
-				}
-				foundParts = true
-				break
-			}
-		}
-	}
-
-	if foundParts {
-		return true
-	}
-
-	// Check if token is a known pre-defined standalone keyword (e.g. "60FPS")
-	if len(tkn.getValue()) > 1 {
-		if keyword, found := tm.keywordManager.findStandaloneKeywordByValue(tkn.getValue()); found {
-			tkn.setIdentifiedKeywordCategory(keyword.category)
-			return true
-		}
-	}
-
-	// Test for S01E01
-	if strings.HasPrefix(tkn.getValue(), "S") && len(tkn.getValue()) > 3 {
-		if season, sep, episode, ok := extractSeasonAndEpisode(tkn.getValue()); ok {
-			seasonPrefixTkn := newToken("S")
-			seasonPrefixTkn.setIdentifiedKeywordCategory(keywordCatSeasonPrefix)
-			seasonPrefixTkn.setKind(tokenKindCharacter)
-
-			seasonTkn := newToken(season)
-			seasonTkn.setMetadataKind(metadataKindSeason)
-			seasonTkn.setKind(tokenKindNumber)
-
-			sepTkn := newToken(sep)
-			sepTkn.setIdentifiedKeywordCategory(keywordCatEpisodePrefix)
-			sepTkn.setKind(tokenKindCharacter)
-
-			episodeTkn := newToken(episode)
-			episodeTkn.setMetadataKind(metadataKindEpisodeNumber)
-			if isNumber(episode) {
-				episodeTkn.setKind(tokenKindNumber)
-			} else {
-				episodeTkn.setKind(tokenKindNumberLike)
-			}
-
-			tm.tokens.overwriteAndInsertManyAt(tm.tokens.getIndexOf(tkn), []*token{seasonPrefixTkn, seasonTkn, sepTkn, episodeTkn})
-			return true
-		}
-	}
-
-	//if !ok {
-	//	return []*token{}, false
-	//}
-
-	return false
+	return &tm
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -128,7 +42,30 @@ func (t *tokens) getTokenBefore(tkn *token) (*token, bool) {
 	return t.getAtSafe(index - 1)
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+func (t *tokens) isTokenInFirstHalf(tkn *token) bool {
+	index := t.getIndexOf(tkn)
+	if index == -1 {
+		return false
+	}
+	return index <= len(*t)/2
+}
+
+func (t *tokens) isTokenAfterFileMetadata(tkn *token) bool {
+	index := t.getIndexOf(tkn)
+	if index == -1 {
+		return false
+	}
+	isAfter := false
+
+	for idx, _tkn := range *t {
+		// Check if token is after file info metadata
+		if _tkn.isFileInfoMetadata() && idx != index && idx > index {
+			isAfter = true
+		}
+	}
+
+	return isAfter
+}
 
 func (t *tokens) getIndexOf(tkn *token) int {
 	for i, _tkn := range *t {
@@ -138,6 +75,8 @@ func (t *tokens) getIndexOf(tkn *token) int {
 	}
 	return -1
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 func (t *tokens) setTokens(tkns []*token) {
 	*t = tkns
@@ -263,6 +202,54 @@ func (t *tokens) getFromToInc(start int, end int) []*token {
 	return (*t)[start : end+1]
 }
 
+func (t *tokens) getFirstCategoryOccurrence(cat tokenCategory) (*token, bool) {
+	for _, tkn := range *t {
+		if tkn.Category == cat {
+			return tkn, true
+		}
+	}
+	return nil, false
+}
+
+func (t *tokens) getLastCategoryOccurrence(cat tokenCategory) (*token, bool) {
+	for i := len(*t) - 1; i >= 0; i-- {
+		if (*t)[i].Category == cat {
+			return (*t)[i], true
+		}
+	}
+	return nil, false
+}
+
+func (t *tokens) getFirstCategoryOccurrenceAfter(start int, cat tokenCategory) (*token, bool) {
+	if start < 0 {
+		start = -1
+	}
+	if start+1 > len(*t) {
+		return nil, false
+	}
+	for i := start + 1; i < len(*t); i++ {
+		if (*t)[i].Category == cat {
+			return (*t)[i], true
+		}
+	}
+	return nil, false
+}
+
+func (t *tokens) getFirstCategoryOccurrenceBefore(start int, cat tokenCategory) (*token, bool) {
+	if start > len(*t) {
+		start = len(*t) + 1
+	}
+	if start < 0 {
+		return nil, false
+	}
+	for i := start - 1; i >= 0; i-- {
+		if (*t)[i].Category == cat {
+			return (*t)[i], true
+		}
+	}
+	return nil, false
+}
+
 // getCategorySequenceAfter returns the sequence of tokens in the given categories after the specified start index,
 // along with a boolean indicating if the sequence was found.
 // The skipDelimiters parameter determines whether to skip delimiter tokens when collecting the sequence.
@@ -359,6 +346,12 @@ func (t *tokens) getCategorySequenceBefore(start int, categories []tokenCategory
 
 func (t *tokens) getCategorySequenceBeforeInc(start int, categories []tokenCategory, skipDelimiters bool) ([]*token, bool) {
 	return t.getCategorySequenceBefore(start+1, categories, skipDelimiters)
+}
+
+func (t *tokens) iterate(iterationFunc func(tkn *token, idx int)) {
+	for idx, tkn := range *t {
+		iterationFunc(tkn, idx)
+	}
 }
 
 ////////////////////
