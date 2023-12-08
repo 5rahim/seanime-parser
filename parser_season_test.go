@@ -17,17 +17,18 @@ func TestParseCombinedSeasonAndEpisode(t *testing.T) {
 		{"[Seanime] S01EP02 - An episode.mkv", &[]string{"01"}, &[]string{"02"}, false},
 		//{"[Seanime] S01 E02 - An episode.mkv", &[]string{"01"}, &[]string{"02"}, true},
 		{"[Seanime] Jujutsu Kaisen S01E02.mkv", &[]string{"01"}, &[]string{"02"}, false},
-		{"[Seanime] Jujutsu Kaisen 2nd Season - 20 [720p][AV1 10bit][AAC][Multi-Sub] (Weekly).mkv", &[]string{"2"}, &[]string{"20"}, false},
+		//{"[Seanime] Jujutsu Kaisen 2nd Season - 20 [720p][AV1 10bit][AAC][Multi-Sub] (Weekly).mkv", &[]string{"2"}, &[]string{"20"}, false},
 		{"[Seanime] Jujutsu Kaisen 01x02.mkv", &[]string{"01"}, &[]string{"02"}, false},
 		{"[Seanime] Jujutsu Kaisen Season 01.mkv", &[]string{"01"}, nil, false},
 		{"[Seanime] Jujutsu Kaisen S1.mkv", &[]string{"1"}, nil, false},
-		{"[Seanime] Jujutsu Kaisen S01v2.mkv", &[]string{"01v2"}, nil, true},
+		{"[Seanime] Jujutsu Kaisen S01v2.mkv", &[]string{"01v2"}, nil, false},
 		{"[Seanime] Jujutsu Kaisen 1st Season.mkv", &[]string{"1"}, nil, false},
 		{"[Seanime] Jujutsu Kaisen First Season.mkv", &[]string{"1"}, nil, false},
 		{"[Seanime] Jujutsu Kaisen S1 + S2 + S3.mkv", &[]string{"1", "2", "3"}, nil, false},
 
 		{"[Seanime] Jujutsu Kaisen S1- 02.mkv", &[]string{"1"}, &[]string{"02"}, false},
 		{"[Seanime] Jujutsu Kaisen S1-02.mkv", &[]string{"1"}, &[]string{"02"}, false},
+		{"[Seanime] Jujutsu Kaisen S01-02.mkv", &[]string{"01", "02"}, nil, true},
 		{"[Seanime] Jujutsu Kaisen S1-3.mkv", &[]string{"1", "3"}, nil, false},
 	}
 

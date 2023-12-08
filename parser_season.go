@@ -1,7 +1,6 @@
 package seanime_parser
 
 import (
-	"github.com/davecgh/go-spew/spew"
 	"strconv"
 	"strings"
 )
@@ -79,57 +78,23 @@ func (p *parser) parseSeason() {
 
 							p.tokenManager.tokens.overwriteAndInsertManyAt(p.tokenManager.tokens.getIndexOf(tkn), []*token{seasonPrefixTkn, seasonTkn})
 
-							spew.Dump(seasonTkn)
-
 							// Check range
 							// e.g. S1-3, S01-03, S1 ~ 3, S01 ~ 03
-							if rangeTkns, found, dlSkipped := p.tokenManager.tokens.getCategorySequenceAfter(p.tokenManager.tokens.getIndexOf(seasonTkn), []tokenCategory{
-								tokenCatSeparator, // -
-								tokenCatUnknown,   // 05
-							}, true); found {
+							if nextNumTkn, found, kind := checkNumberRangeAfterToken(p, seasonTkn, firstSeasonIsZeroPadded); found {
 
-								// Check episode
-								if rangeTkns[1].isNumberOrLikeKind() && rangeTkns[0].isDashSeparator() {
-
-									// e.g. S1 - 03, S01- 03
-									if dlSkipped > 0 {
-										if intVal, err := strconv.Atoi(rangeTkns[1].getValue()); err == nil {
-											// e.g. if < 10 -> 01, 02, 03. if > 10 -> 11, 12, 13
-											if (intVal < 10 && isNumberZeroPadded(rangeTkns[1].getValue())) || (intVal > 10) {
-												rangeTkns[1].setMetadataCategory(metadataEpisodeNumber)
-												continue // Skip to next token
-											}
-										} else { // /!\ might need to do some additional checks on the number
-											rangeTkns[1].setMetadataCategory(metadataEpisodeNumber)
-											continue // Skip to next token
-										}
-
-										// e.g. S1-03 (dlSkipped = 0) Where 03 might be an episode. This is not very likely
-									} else if !firstSeasonIsZeroPadded && isNumberZeroPadded(rangeTkns[1].getValue()) {
-										rangeTkns[1].setMetadataCategory(metadataSeason)
-										continue // Skip to next token
-									}
-								}
-
-								if !rangeTkns[1].isNumberKind() {
+								// e.g. S1-3, S01-03
+								if kind == 0 {
+									nextNumTkn.setMetadataCategory(metadataSeason)
 									continue // Skip to next token
 								}
 
-								intVal, err := strconv.Atoi(rangeTkns[1].getValue())
-								if err != nil {
+								// e.g. S01 - 03
+								if kind == 1 {
+									nextNumTkn.setMetadataCategory(metadataEpisodeNumber)
 									continue // Skip to next token
 								}
-
-								if intVal < 10 && (firstSeasonIsZeroPadded && !isNumberZeroPadded(rangeTkns[1].getValue())) {
-									continue // Skip to next token
-								}
-
-								// e.g. S1-3
-								rangeTkns[1].setMetadataCategory(metadataSeason)
-
 							}
 
-							continue // Skip to next token
 						}
 
 					}
@@ -214,57 +179,71 @@ func checkNumberRangeAfterToken(p *parser, tkn *token, prevNumberIsPadded bool) 
 
 	// Check range
 	// e.g. S1-3, S01-03, S1 ~ 3, S01 ~ 03
-	if rangeTkns, ok, dlSkipped := p.tokenManager.tokens.getCategorySequenceAfter(p.tokenManager.tokens.getIndexOf(tkn), []tokenCategory{
-		tokenCatSeparator, // -
-		tokenCatUnknown,   // 05
-	}, true); ok {
-
-		// Check episode
-		if rangeTkns[1].isNumberOrLikeKind() && rangeTkns[0].isDashSeparator() {
+	for {
+		if rangeTkns, ok, dlSkipped := p.tokenManager.tokens.getCategorySequenceAfter(p.tokenManager.tokens.getIndexOf(tkn), []tokenCategory{
+			tokenCatSeparator, // -
+			tokenCatUnknown,   // 05
+		}, true); ok {
 
 			nextNumTkn = rangeTkns[1]
 
-			// e.g. S1 - 03, S01- 03
-			if dlSkipped > 0 {
-				if intVal, err := strconv.Atoi(rangeTkns[1].getValue()); err == nil {
-					// e.g. if < 10 -> 01, 02, 03. if > 10 -> 11, 12, 13
-					if (intVal < 10 && isNumberZeroPadded(rangeTkns[1].getValue())) || (intVal > 10) {
-						rangeTkns[1].setMetadataCategory(metadataEpisodeNumber)
+			// Check episode
+			if rangeTkns[1].isNumberOrLikeKind() && rangeTkns[0].isDashSeparator() {
+
+				println(dlSkipped)
+
+				// e.g. S1 - 03, S01- 03
+				if dlSkipped > 0 {
+					if intVal, err := strconv.Atoi(nextNumTkn.getValue()); err == nil {
+						// e.g. if < 10 -> 01, 02, 03. if > 10 -> 11, 12, 13
+						if (intVal < 10 && isNumberZeroPadded(nextNumTkn.getValue())) || (intVal > 10) {
+							nextNumTkn.setMetadataCategory(metadataEpisodeNumber)
+							kind = 1
+							found = true
+							break
+						}
+					} else { // /!\ might need to do some additional checks on the number
+						nextNumTkn.setMetadataCategory(metadataEpisodeNumber)
 						kind = 1
 						found = true
+						break
 					}
-				} else { // /!\ might need to do some additional checks on the number
-					rangeTkns[1].setMetadataCategory(metadataEpisodeNumber)
+
+					// e.g. S1-03 (dlSkipped = 0) Where 03 might be an episode. This is not very likely
+				} else if !prevNumberIsPadded && isNumberZeroPadded(nextNumTkn.getValue()) {
+					nextNumTkn.setMetadataCategory(metadataSeason)
 					kind = 1
 					found = true
+					break
 				}
-
-				// e.g. S1-03 (dlSkipped = 0) Where 03 might be an episode. This is not very likely
-			} else if !prevNumberIsPadded && isNumberZeroPadded(rangeTkns[1].getValue()) {
-				rangeTkns[1].setMetadataCategory(metadataSeason)
-				kind = 1
-				found = true
 			}
+
+			// Avoid this case: S1-2v2
+			if !nextNumTkn.isNumberKind() {
+				found = false
+				break
+			}
+
+			intVal, err := strconv.Atoi(nextNumTkn.getValue())
+			if err != nil {
+				found = false
+				break
+			}
+
+			// Avoid this case: S01 - 3
+			if intVal < 10 && (prevNumberIsPadded && !isNumberZeroPadded(nextNumTkn.getValue())) {
+				found = false
+				break
+			}
+
+			// e.g. S1-3
+			nextNumTkn.setMetadataCategory(metadataSeason)
+			kind = 0
+			found = true
+			break
+
 		}
-
-		// Avoid this case: S1-2v2
-		if !rangeTkns[1].isNumberKind() {
-			found = false
-		}
-
-		intVal, err := strconv.Atoi(rangeTkns[1].getValue())
-		if err != nil {
-			found = false
-		}
-
-		// Avoid this case: S01 - 3
-		if intVal < 10 && (prevNumberIsPadded && !isNumberZeroPadded(rangeTkns[1].getValue())) {
-			found = false
-		}
-
-		// e.g. S1-3
-		rangeTkns[1].setMetadataCategory(metadataSeason)
-
+		break
 	}
 
 	return nextNumTkn, found, kind

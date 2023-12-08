@@ -308,28 +308,19 @@ func (t *tokens) getCategorySequenceAfter(start int, categories []tokenCategory,
 
 	nbSkipped := 0
 
-	_tkns := make([]*token, 0)
-	if skipDelimiters {
-		for i := start + 1; i < len(*t); i++ {
-			if !(*t)[i].isDelimiter() {
-				_tkns = append(_tkns, (*t)[i])
-			} else {
-				nbSkipped += 1
-				continue
-			}
-		}
-	} else {
-		_tkns = (*t)[start+1:]
-	}
-
 	var collec []*token
-	for i := 0; i < len(categories); i++ {
-		if _tkns[i].isCategory(categories[i]) {
-			uuid, ok := t.getFromUUIDSafe(_tkns[i].UUID)
-			if !ok {
-				break
-			}
-			collec = append(collec, uuid)
+	var cursor int
+	for i := start + 1; i < len(*t); i++ {
+		if len(collec) == len(categories) {
+			break
+		}
+		if skipDelimiters && (*t)[i].isDelimiter() {
+			nbSkipped += 1
+			continue
+		}
+		if (*t)[i].isCategory(categories[cursor]) {
+			collec = append(collec, (*t)[i])
+			cursor++
 		} else {
 			break
 		}
@@ -359,30 +350,19 @@ func (t *tokens) getCategorySequenceBefore(start int, categories []tokenCategory
 
 	nbSkipped := 0
 
-	_tkns := make([]*token, 0)
-	if skipDelimiters {
-		for i := start - 1; i >= 0; i-- {
-			if !(*t)[i].isDelimiter() {
-				_tkns = append(_tkns, (*t)[i])
-			} else {
-				nbSkipped += 1
-				continue
-			}
-		}
-	} else {
-		for i := start - 1; i >= 0; i-- {
-			_tkns = append(_tkns, (*t)[i])
-		}
-	}
-
 	var collec []*token
-	for i := 0; i < len(categories); i++ {
-		if _tkns[i].isCategory(categories[i]) {
-			uuid, ok := t.getFromUUIDSafe(_tkns[i].UUID)
-			if !ok {
-				break
-			}
-			collec = append(collec, uuid)
+	var cursor int
+	for i := start - 1; i >= 0; i-- {
+		if len(collec) == len(categories) {
+			break
+		}
+		if skipDelimiters && (*t)[i].isDelimiter() {
+			nbSkipped += 1
+			continue
+		}
+		if (*t)[i].isCategory(categories[cursor]) {
+			collec = append([]*token{(*t)[i]}, collec...)
+			cursor++
 		} else {
 			break
 		}
@@ -493,11 +473,12 @@ func (t *tokens) sPrint() string {
 func (t *tokens) sDump() string {
 	str := "\n"
 	for _, tkn := range *t {
-		str += fmt.Sprintf("%-12s\t%v, kw: %v, %v\n",
+		str += fmt.Sprintf("%-12s\t%v, kw: %v, %v, m: %v\n",
 			"\""+tkn.getValue()+"\"",
 			tkn.getCategory(),
 			tkn.IdentifiedKeywordCategory,
 			tkn.getKind(),
+			tkn.MetadataCategory,
 		)
 	}
 	str += "\n"
