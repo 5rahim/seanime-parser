@@ -6,28 +6,28 @@ import (
 	"golang.org/x/text/unicode/norm"
 )
 
-type keywordCategory uint8
+type keywordCategory string
 
 const (
-	keywordCatNone keywordCategory = iota
-	keywordCatSeasonPrefix
-	keywordCatAnimeType
-	keywordCatYear
-	keywordCatAudioTerm
-	keywordCatDeviceCompat
-	keywordCatEpisodePrefix
-	keywordCatPartPrefix
-	keywordCatVolumePrefix
-	keywordCatFileChecksum
-	keywordCatFileExtension
-	keywordCatLanguage
-	keywordCatReleaseGroup
-	keywordCatReleaseInformation
-	keywordCatReleaseVersion
-	keywordCatSource
-	keywordCatSubtitles
-	keywordCatVideoResolution
-	keywordCatVideoTerm
+	keywordCatNone               keywordCategory = ""
+	keywordCatSeasonPrefix                       = "seasonPrefix"
+	keywordCatAnimeType                          = "animeType"
+	keywordCatYear                               = "year"
+	keywordCatAudioTerm                          = "audioTerm"
+	keywordCatDeviceCompat                       = "deviceCompat"
+	keywordCatEpisodePrefix                      = "episodePrefix"
+	keywordCatPartPrefix                         = "partPrefix"
+	keywordCatVolumePrefix                       = "volumePrefix"
+	keywordCatFileChecksum                       = "fileChecksum"
+	keywordCatFileExtension                      = "fileExtension"
+	keywordCatLanguage                           = "language"
+	keywordCatReleaseGroup                       = "releaseGroup"
+	keywordCatReleaseInformation                 = "releaseInfo"
+	keywordCatReleaseVersion                     = "releaseVersion"
+	keywordCatSource                             = "source"
+	keywordCatSubtitles                          = "subtitles"
+	keywordCatVideoResolution                    = "videoRes"
+	keywordCatVideoTerm                          = "videoTerm"
 )
 
 type keywordKind uint8
@@ -281,8 +281,12 @@ func newKeywordManager() *keywordManager {
 	km.addGroupParts(
 		keywordCatSubtitles,
 		[]*keywordParts{
+			{prefix: "MULTI", seqParts: []string{" ", "SUB"}},
 			{prefix: "MULTI", seqParts: []string{"-", "SUB"}},
 			{prefix: "MULTI", seqParts: []string{".", "SUB"}},
+			{prefix: "MULTI", seqParts: []string{"-", "SUBS"}},
+			{prefix: "MULTI", seqParts: []string{" ", "SUBS"}},
+			{prefix: "MULTI", seqParts: []string{".", "SUBS"}},
 			{prefix: "MULTI", seqParts: []string{"-", "AUDIO"}},
 			{prefix: "MULTI", seqParts: []string{" ", "AUDIO"}},
 			{prefix: "MULTI", seqParts: []string{".", "AUDIO"}},

@@ -1,6 +1,7 @@
 package seanime_parser
 
 import (
+	"fmt"
 	"strings"
 )
 
@@ -103,7 +104,7 @@ func (t *tokens) isTokenAfterFileMetadata(tkn *token) bool {
 
 	for idx, _tkn := range *t {
 		// Check if token is after file info metadata
-		if _tkn.isFileInfoMetadata() && idx != index && idx > index {
+		if _tkn.isFileInfoMetadata() && idx != index && idx < index {
 			isAfter = true
 		}
 	}
@@ -297,13 +298,15 @@ func (t *tokens) getFirstOccurrenceBefore(start int, pred func(tkn *token) bool)
 // getCategorySequenceAfter returns the sequence of tokens in the given categories after the specified start index,
 // along with a boolean indicating if the sequence was found.
 // The skipDelimiters parameter determines whether to skip delimiter tokens when collecting the sequence.
-func (t *tokens) getCategorySequenceAfter(start int, categories []tokenCategory, skipDelimiters bool) ([]*token, bool) {
+func (t *tokens) getCategorySequenceAfter(start int, categories []tokenCategory, skipDelimiters bool) ([]*token, bool, int) {
 	if start < 0 {
 		start = -1
 	}
 	if start+1 > len(*t) {
-		return []*token{}, false
+		return []*token{}, false, 0
 	}
+
+	nbSkipped := 0
 
 	_tkns := make([]*token, 0)
 	if skipDelimiters {
@@ -311,6 +314,7 @@ func (t *tokens) getCategorySequenceAfter(start int, categories []tokenCategory,
 			if !(*t)[i].isDelimiter() {
 				_tkns = append(_tkns, (*t)[i])
 			} else {
+				nbSkipped += 1
 				continue
 			}
 		}
@@ -332,26 +336,28 @@ func (t *tokens) getCategorySequenceAfter(start int, categories []tokenCategory,
 	}
 
 	if len(collec) == len(categories) {
-		return collec, true
+		return collec, true, nbSkipped
 	}
 
-	return []*token{}, false
+	return []*token{}, false, 0
 }
 
-func (t *tokens) getCategorySequenceAfterInc(start int, categories []tokenCategory, skipDelimiters bool) ([]*token, bool) {
+func (t *tokens) getCategorySequenceAfterInc(start int, categories []tokenCategory, skipDelimiters bool) ([]*token, bool, int) {
 	return t.getCategorySequenceAfter(start-1, categories, skipDelimiters)
 }
 
 // getCategorySequenceBefore returns the sequence of tokens in the given categories before the specified start index,
 // along with a boolean indicating if the sequence was found.
 // The skipDelimiters parameter determines whether to skip delimiter tokens when collecting the sequence.
-func (t *tokens) getCategorySequenceBefore(start int, categories []tokenCategory, skipDelimiters bool) ([]*token, bool) {
+func (t *tokens) getCategorySequenceBefore(start int, categories []tokenCategory, skipDelimiters bool) ([]*token, bool, int) {
 	if start > len(*t) {
 		start = len(*t) + 1
 	}
 	if start < 0 {
-		return []*token{}, false
+		return []*token{}, false, 0
 	}
+
+	nbSkipped := 0
 
 	_tkns := make([]*token, 0)
 	if skipDelimiters {
@@ -359,6 +365,7 @@ func (t *tokens) getCategorySequenceBefore(start int, categories []tokenCategory
 			if !(*t)[i].isDelimiter() {
 				_tkns = append(_tkns, (*t)[i])
 			} else {
+				nbSkipped += 1
 				continue
 			}
 		}
@@ -382,13 +389,13 @@ func (t *tokens) getCategorySequenceBefore(start int, categories []tokenCategory
 	}
 
 	if len(collec) == len(categories) {
-		return collec, true
+		return collec, true, nbSkipped
 	}
 
-	return []*token{}, false
+	return []*token{}, false, 0
 }
 
-func (t *tokens) getCategorySequenceBeforeInc(start int, categories []tokenCategory, skipDelimiters bool) ([]*token, bool) {
+func (t *tokens) getCategorySequenceBeforeInc(start int, categories []tokenCategory, skipDelimiters bool) ([]*token, bool, int) {
 	return t.getCategorySequenceBefore(start+1, categories, skipDelimiters)
 }
 
@@ -430,10 +437,10 @@ func (t *tokens) peekValuesAfter(start int, strs []string) ([]*token, bool) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-func (t *tokens) findWithMetadataKind(kind metadataCategory) (bool, []*token) {
+func (t *tokens) findWithMetadataKind(cat metadataCategory) (bool, []*token) {
 	_tkns := make([]*token, 0)
 	for _, tkn := range *t {
-		if tkn.MetadataCategory == kind && tkn.isFileInfoMetadata() {
+		if tkn.MetadataCategory == cat {
 			_tkns = append(_tkns, tkn)
 		}
 	}
@@ -446,7 +453,7 @@ func (t *tokens) findWithMetadataKind(kind metadataCategory) (bool, []*token) {
 func (t *tokens) findWithMetadataCategory(cat tokenCategory) (bool, []*token) {
 	_tkns := make([]*token, 0)
 	for _, tkn := range *t {
-		if tkn.isCategory(cat) && tkn.isFileInfoMetadata() {
+		if tkn.isCategory(cat) {
 			_tkns = append(_tkns, tkn)
 		}
 	}
@@ -480,5 +487,19 @@ func (t *tokens) sPrint() string {
 		}
 	}
 	str += "]"
+	return str
+}
+
+func (t *tokens) sDump() string {
+	str := "\n"
+	for _, tkn := range *t {
+		str += fmt.Sprintf("%-12s\t%v, kw: %v, %v\n",
+			"\""+tkn.getValue()+"\"",
+			tkn.getCategory(),
+			tkn.IdentifiedKeywordCategory,
+			tkn.getKind(),
+		)
+	}
+	str += "\n"
 	return str
 }

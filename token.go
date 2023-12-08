@@ -19,7 +19,7 @@ const (
 type tokenKind = string
 
 const (
-	tokenKindUnknown          tokenKind = "unknown"
+	tokenKindUnknown          tokenKind = ""
 	tokenKindCharacter        tokenKind = "character"
 	tokenKindWord             tokenKind = "word"
 	tokenKindNumber           tokenKind = "number"

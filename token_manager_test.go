@@ -125,16 +125,17 @@ func TestTokenSequenceFunctions(t *testing.T) {
 	tm := newTokenManager("01 - 05")
 
 	// Test getCategorySequenceAfter
-	_, found := tm.tokens.getCategorySequenceAfter(0, []tokenCategory{
+	_, found, nSkipped := tm.tokens.getCategorySequenceAfter(0, []tokenCategory{
 		tokenCatDelimiter, //
 		tokenCatSeparator, // -
 		tokenCatDelimiter, //
 		tokenCatUnknown,   // 05
 	}, false)
 	assert.True(t, found)
+	assert.Equal(t, 0, nSkipped)
 
 	// Test getCategorySequenceAfterInc
-	_, found = tm.tokens.getCategorySequenceAfterInc(0, []tokenCategory{
+	_, found, nSkipped = tm.tokens.getCategorySequenceAfterInc(0, []tokenCategory{
 		tokenCatUnknown,   // 01
 		tokenCatDelimiter, //
 		tokenCatSeparator, // -
@@ -142,33 +143,37 @@ func TestTokenSequenceFunctions(t *testing.T) {
 		tokenCatUnknown,   // 05
 	}, false)
 	assert.True(t, found)
+	assert.Equal(t, 0, nSkipped)
 
 	// Test getCategorySequenceAfter by skipping delimiters
-	_, found = tm.tokens.getCategorySequenceAfter(0, []tokenCategory{
+	_, found, nSkipped = tm.tokens.getCategorySequenceAfter(0, []tokenCategory{
 		tokenCatSeparator, // -
 		tokenCatUnknown,   // 05
 	}, true)
 	assert.True(t, found)
+	assert.Equal(t, 2, nSkipped)
 
 	// Test getCategorySequenceAfterInc by skipping delimiters
-	_, found = tm.tokens.getCategorySequenceAfterInc(0, []tokenCategory{
+	_, found, nSkipped = tm.tokens.getCategorySequenceAfterInc(0, []tokenCategory{
 		tokenCatUnknown,   // 01
 		tokenCatSeparator, // -
 		tokenCatUnknown,   // 05
 	}, true)
 	assert.True(t, found)
+	assert.Equal(t, 2, nSkipped)
 
 	// Test getCategorySequenceBefore
-	_, found = tm.tokens.getCategorySequenceBefore(4, []tokenCategory{
+	_, found, nSkipped = tm.tokens.getCategorySequenceBefore(4, []tokenCategory{
 		tokenCatDelimiter, //
 		tokenCatSeparator, // -
 		tokenCatDelimiter, //
 		tokenCatUnknown,   // 01
 	}, false)
 	assert.True(t, found)
+	assert.Equal(t, 0, nSkipped)
 
 	// Test getCategorySequenceBeforeInc
-	_, found = tm.tokens.getCategorySequenceBeforeInc(4, []tokenCategory{
+	_, found, nSkipped = tm.tokens.getCategorySequenceBeforeInc(4, []tokenCategory{
 		tokenCatUnknown,   // 05
 		tokenCatDelimiter, //
 		tokenCatSeparator, // -
@@ -176,13 +181,15 @@ func TestTokenSequenceFunctions(t *testing.T) {
 		tokenCatUnknown,   // 01
 	}, false)
 	assert.True(t, found)
+	assert.Equal(t, 0, nSkipped)
 
 	// Test getCategorySequenceBefore
-	_, found = tm.tokens.getCategorySequenceBefore(4, []tokenCategory{
+	_, found, nSkipped = tm.tokens.getCategorySequenceBefore(4, []tokenCategory{
 		tokenCatSeparator, // -
 		tokenCatUnknown,   // 01
 	}, true)
 	assert.True(t, found)
+	assert.Equal(t, 2, nSkipped)
 
 	//
 

@@ -44,7 +44,7 @@ func (t *token) getCategory() tokenCategory {
 
 func (t *token) getIdentifiedKeywordCategory() (keywordCategory, bool) {
 	if t == nil {
-		return 0, false
+		return keywordCatNone, false
 	}
 	return t.IdentifiedKeywordCategory, t.IdentifiedKeywordCategory != keywordCatNone
 }
