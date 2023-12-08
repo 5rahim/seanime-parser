@@ -41,53 +41,115 @@ func (p *parser) parseSeason() {
 		// Combined or separated seasons
 		if strings.HasPrefix(tkn.getNormalizedValue(), "S") {
 
-			if keywords, found := p.tokenManager.keywordManager.findKeywordsBy(func(kw *keyword) bool {
+			keywords, found := p.tokenManager.keywordManager.findKeywordsBy(func(kw *keyword) bool {
 				return kw.isSeasonPrefix() && // Season prefix
 					strings.HasPrefix(tkn.getNormalizedValue(), kw.value) // Token starts with season prefix
-			}); found {
-				for _, keyword := range keywords {
+			})
 
-					// e.g. S01
-					// /!\ This section will hydrate the METADATA
-					if keyword.isCombinedWithNumber() {
+			if !found {
+				continue // Skip to next token
+			}
 
-						// Check if token is after file metadata
-						if p.tokenManager.tokens.isTokenAfterFileMetadata(tkn) {
-							continue // Skip to next token
+			for _, keyword := range keywords {
+
+				// e.g. S01
+				// /!\ This section will hydrate the METADATA
+				if keyword.isCombinedWithNumber() {
+
+					// Check if token is after file metadata
+					if p.tokenManager.tokens.isTokenAfterFileMetadata(tkn) {
+						continue // Skip to next token
+					}
+
+					// Check if prefix is followed by a number or number-like (e.g. 01, 01v2)
+					remaining := strings.TrimPrefix(tkn.getNormalizedValue(), keyword.value)
+
+					if len(remaining) > 0 && isNumberOrLike(remaining) {
+
+						// e.g. S
+						seasonPrefixTkn := newToken(keyword.value)
+						seasonPrefixTkn.setIdentifiedKeywordCategory(keywordCatSeasonPrefix)
+						seasonPrefixTkn.setKind(tokenKindWord)
+
+						// e.g. 01, 1, 3
+						seasonTkn := newToken(tkn.getValue()[len(keyword.value):])
+						seasonTkn.setMetadataCategory(metadataSeason)
+						seasonTkn.setKind(tokenKindNumberLike)
+						if isNumber(remaining) {
+							seasonTkn.setKind(tokenKindNumber)
 						}
 
-						// Check if prefix is followed by a number or number-like (e.g. 01, 01v2)
-						remaining := strings.TrimPrefix(tkn.getNormalizedValue(), keyword.value)
+						firstSeasonIsZeroPadded := isNumberZeroPadded(remaining)
 
-						if len(remaining) > 0 && isNumberOrLike(remaining) {
+						p.tokenManager.tokens.overwriteAndInsertManyAt(p.tokenManager.tokens.getIndexOf(tkn), []*token{seasonPrefixTkn, seasonTkn})
 
-							// e.g. S
-							seasonPrefixTkn := newToken(keyword.value)
-							seasonPrefixTkn.setIdentifiedKeywordCategory(keywordCatSeasonPrefix)
-							seasonPrefixTkn.setKind(tokenKindWord)
-
-							// e.g. 01, 1, 3
-							seasonTkn := newToken(tkn.getValue()[len(keyword.value):])
-							seasonTkn.setMetadataCategory(metadataSeason)
-							seasonTkn.setKind(tokenKindNumberLike)
-							if isNumber(remaining) {
-								seasonTkn.setKind(tokenKindNumber)
+						// Check range
+						// e.g. S1-3, S01-03, S1 ~ 3, S01 ~ 03
+						if nextNumTkn, found, kind := checkNumberRangeAfterToken(p, seasonTkn, firstSeasonIsZeroPadded); found {
+							// e.g. S1-3, S01-03
+							if kind == 0 {
+								nextNumTkn.setMetadataCategory(metadataSeason)
+								continue // Skip to next token
 							}
+							// e.g. S01 - 03
+							if kind == 1 {
+								nextNumTkn.setMetadataCategory(metadataEpisodeNumber)
+								continue // Skip to next token
+							}
+						}
 
-							firstSeasonIsZeroPadded := isNumberZeroPadded(remaining)
+					}
 
-							p.tokenManager.tokens.overwriteAndInsertManyAt(p.tokenManager.tokens.getIndexOf(tkn), []*token{seasonPrefixTkn, seasonTkn})
+				}
+
+				// e.g. Season 01
+				if keyword.isSeparatedWithNumber() {
+
+					// Get next token, by skipping delimiters
+					// Check if next token is a number or number-like
+					if nextTkn, found, _ := p.tokenManager.tokens.getTokenAfterSD(tkn); found &&
+						(nextTkn.isNumberOrLikeKind()) {
+
+						nextTkn.setMetadataCategory(metadataSeason)
+
+						// Check range
+						firstSeasonIsZeroPadded := isNumberZeroPadded(nextTkn.getValue())
+						// e.g. S1-3, S01-03, S1 ~ 3, S01 ~ 03
+						if nextNumTkn, found, kind := checkNumberRangeAfterToken(p, nextTkn, firstSeasonIsZeroPadded); found {
+							// e.g. Season 1-3, Season 01-03
+							if kind == 0 {
+								nextNumTkn.setMetadataCategory(metadataSeason)
+								continue // Skip to next token
+							}
+							// e.g. Season 01 - 03
+							if kind == 1 {
+								nextNumTkn.setMetadataCategory(metadataEpisodeNumber)
+								continue // Skip to next token
+							}
+						}
+
+						continue // Skip to next token
+
+					}
+
+				}
+
+				// e.g. 1st Season, first season
+				if keyword.isOrdinalSuffix() {
+
+					// Get previous token, by skipping delimiters
+					// Check if next token is an ordinal number
+					if nextTkn, found, _ := p.tokenManager.tokens.getTokenBeforeSD(tkn); found &&
+						(nextTkn.isOrdinalNumber()) {
+
+						if num, ok := getNumberFromOrdinal(nextTkn.getValue()); ok {
+							nextTkn.setValue(strconv.Itoa(num))
+							nextTkn.setMetadataCategory(metadataSeason)
+							nextTkn.setKind(tokenKindNumber)
 
 							// Check range
 							// e.g. S1-3, S01-03, S1 ~ 3, S01 ~ 03
-							if nextNumTkn, found, kind := checkNumberRangeAfterToken(p, seasonTkn, firstSeasonIsZeroPadded); found {
-
-								// e.g. S1-3, S01-03
-								if kind == 0 {
-									nextNumTkn.setMetadataCategory(metadataSeason)
-									continue // Skip to next token
-								}
-
+							if nextNumTkn, found, kind := checkNumberRangeAfterToken(p, tkn, false); found {
 								// e.g. S01 - 03
 								if kind == 1 {
 									nextNumTkn.setMetadataCategory(metadataEpisodeNumber)
@@ -95,45 +157,13 @@ func (p *parser) parseSeason() {
 								}
 							}
 
-						}
-
-					}
-
-					// e.g. Season 01
-					if keyword.isSeparatedWithNumber() {
-
-						// Get next token, by skipping delimiters
-						// Check if next token is a number or number-like
-						if nextTkn, found, _ := p.tokenManager.tokens.getTokenAfterSD(tkn); found &&
-							(nextTkn.isNumberOrLikeKind()) {
-
-							nextTkn.setMetadataCategory(metadataSeason)
 							continue // Skip to next token
-
-						}
-
-					}
-
-					// e.g. 1st Season, first season
-					if keyword.isOrdinalSuffix() {
-
-						// Get previous token, by skipping delimiters
-						// Check if next token is an ordinal number
-						if nextTkn, found, _ := p.tokenManager.tokens.getTokenBeforeSD(tkn); found &&
-							(nextTkn.isOrdinalNumber()) {
-
-							if num, ok := getNumberFromOrdinal(nextTkn.getValue()); ok {
-								nextTkn.setValue(strconv.Itoa(num))
-								nextTkn.setMetadataCategory(metadataSeason)
-								nextTkn.setKind(tokenKindNumber)
-								continue // Skip to next token
-							}
-
 						}
 
 					}
 
 				}
+
 			}
 
 		}
@@ -189,8 +219,6 @@ func checkNumberRangeAfterToken(p *parser, tkn *token, prevNumberIsPadded bool) 
 
 			// Check episode
 			if rangeTkns[1].isNumberOrLikeKind() && rangeTkns[0].isDashSeparator() {
-
-				println(dlSkipped)
 
 				// e.g. S1 - 03, S01- 03
 				if dlSkipped > 0 {

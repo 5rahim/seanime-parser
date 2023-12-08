@@ -137,7 +137,10 @@ func (t *token) isDashSeparator() bool {
 	if t == nil {
 		return false
 	}
-	return t.Category == tokenCatSeparator && t.Value == "-"
+	return t.Category == tokenCatSeparator && (t.Value == "-" ||
+		t.Value == "–" ||
+		t.Value == "—" ||
+		t.Value == "―")
 }
 
 func (t *token) isEnclosed() bool {

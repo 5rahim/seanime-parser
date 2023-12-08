@@ -20,6 +20,8 @@ func (p *parser) parse() {
 
 	p.parseSeason()
 
+	p.parseEpisode()
+
 }
 
 func (p *parser) parseKeywords() {
