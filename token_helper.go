@@ -163,6 +163,12 @@ func (t *token) isNumberLikeKind() bool {
 	}
 	return t.Kind == tokenKindNumberLike
 }
+func (t *token) isYear() bool {
+	if t == nil {
+		return false
+	}
+	return t.Kind == tokenKindYear
+}
 
 func (t *token) isNumberOrLikeKind() bool {
 	if t == nil {

@@ -125,3 +125,51 @@ type Metadata struct {
 	// Bool determining if "EpisodeNumberAlt" should be parsed or not.
 	checkAltNumber bool
 }
+
+func getMetadataCategoryFromKeywordPrefix(cat keywordCategory) metadataCategory {
+	switch cat {
+	case keywordCatSeasonPrefix:
+		return metadataSeason
+	case keywordCatEpisodePrefix:
+		return metadataEpisodeNumber
+	case keywordCatPartPrefix:
+		return metadataPart
+	case keywordCatVolumePrefix:
+		return metadataVolumeNumber
+	default:
+		return metadataUnknown
+	}
+}
+
+func getMetadataCategoryFromKeywordCategory(cat keywordCategory) metadataCategory {
+	switch cat {
+	case keywordCatSeasonPrefix:
+		return metadataSeason
+	case keywordCatEpisodePrefix:
+		return metadataEpisodeNumber
+	case keywordCatPartPrefix:
+		return metadataPart
+	case keywordCatVolumePrefix:
+		return metadataVolumeNumber
+	case keywordCatAnimeType:
+		return metadataAnimeType
+	case keywordCatAudioTerm:
+		return metadataAudioTerm
+	case keywordCatDeviceCompat:
+		return metadataDeviceCompat
+	case keywordCatLanguage:
+		return metadataLanguage
+	case keywordCatSubtitles:
+		return metadataSubtitles
+	case keywordCatReleaseVersion:
+		return metadataReleaseVersion
+	case keywordCatSource:
+		return metadataSource
+	case keywordCatVideoResolution:
+		return metadataVideoResolution
+	case keywordCatVideoTerm:
+		return metadataVideoTerm
+	default:
+		return metadataUnknown
+	}
+}

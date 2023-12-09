@@ -175,6 +175,18 @@ func (t *tokens) isLastToken(tkn *token) bool {
 	return t.getIndexOf(tkn) == len(*t)-1
 }
 
+func (t *tokens) foundDashSeparatorBefore(tkn *token) bool {
+	// Check if token before previous token is a dash separator
+	if prevPrevTkn, found, _ := t.getTokenBeforeSD(tkn); found {
+		if !prevPrevTkn.isDashSeparator() {
+			return false
+		}
+	} else {
+		return false
+	}
+	return true
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 func (t *tokens) setTokens(tkns []*token) {

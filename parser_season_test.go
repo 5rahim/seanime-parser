@@ -56,15 +56,43 @@ func TestSeasonAndEpisode(t *testing.T) {
 			}
 
 			if tt.seasons != nil {
-				assertSeasons(t, p, *tt.seasons)
+				assertMetadataExists(t, p, metadataSeason, *tt.seasons)
 			} else {
-				assertNoSeasons(t, p)
+				assertMetadataDoesNotExist(t, p, metadataSeason)
 			}
 
 			if tt.episodes != nil {
-				assertEpisodes(t, p, *tt.episodes)
+				assertMetadataExists(t, p, metadataEpisodeNumber, *tt.episodes)
 			} else {
-				assertNoEpisodes(t, p)
+				assertMetadataDoesNotExist(t, p, metadataEpisodeNumber)
+			}
+		})
+	}
+
+}
+
+func TestPart(t *testing.T) {
+
+	tests := []struct {
+		input string
+		parts *[]string
+		debug bool
+	}{
+		{"[Judas] Spy x Family (Season 1 Part 2) [1080p][HEVC x265 10bit][Dual-Audio][Multi-Subs] (Batch)", &[]string{"2"}, false},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.input, func(t *testing.T) {
+			p := newParser(tt.input)
+			p.parse()
+			if tt.debug {
+				t.Log(p.tokenManager.tokens.sDump())
+			}
+
+			if tt.parts != nil {
+				assertMetadataExists(t, p, metadataPart, *tt.parts)
+			} else {
+				assertMetadataDoesNotExist(t, p, metadataPart)
 			}
 		})
 	}
@@ -91,16 +119,15 @@ func TestEpisodeAlt(t *testing.T) {
 			}
 
 			if tt.episodeAlts != nil {
-				assertEpisodeAlt(t, p, *tt.episodeAlts)
+				assertMetadataExists(t, p, metadataEpisodeNumberAlt, *tt.episodeAlts)
 			} else {
-				found, _ := p.tokenManager.tokens.findWithMetadataKind(metadataEpisodeNumberAlt)
-				assert.False(t, found)
+				assertMetadataDoesNotExist(t, p, metadataEpisodeNumberAlt)
 			}
 
 			if tt.episodes != nil {
-				assertEpisodes(t, p, *tt.episodes)
+				assertMetadataExists(t, p, metadataEpisodeNumber, *tt.episodes)
 			} else {
-				assertNoEpisodes(t, p)
+				assertMetadataDoesNotExist(t, p, metadataEpisodeNumber)
 			}
 		})
 	}
@@ -109,53 +136,16 @@ func TestEpisodeAlt(t *testing.T) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-func assertSeasons(t *testing.T, p *parser, expectedSeasons []string) {
-	found, tkns := p.tokenManager.tokens.findWithMetadataKind(metadataSeason)
+func assertMetadataExists(t *testing.T, p *parser, metadata metadataCategory, expected []string) {
+	found, tkns := p.tokenManager.tokens.findWithMetadataKind(metadata)
 	assert.True(t, found)
-	assert.Len(t, tkns, len(expectedSeasons))
+	assert.Len(t, tkns, len(expected))
 	for i, tkn := range tkns {
-		assert.Equal(t, expectedSeasons[i], tkn.getValue())
+		assert.Equal(t, expected[i], tkn.getValue())
 	}
 }
 
-func assertNoSeasons(t *testing.T, p *parser) {
-	found, _ := p.tokenManager.tokens.findWithMetadataKind(metadataSeason)
-	assert.False(t, found)
-}
-
-func assertEpisodes(t *testing.T, p *parser, expectedEpisodes []string) {
-	found, tkns := p.tokenManager.tokens.findWithMetadataKind(metadataEpisodeNumber)
-	assert.True(t, found)
-	assert.Len(t, tkns, len(expectedEpisodes))
-	for i, tkn := range tkns {
-		assert.Equal(t, expectedEpisodes[i], tkn.getValue())
-	}
-}
-
-func assertOtherEpisodes(t *testing.T, p *parser, expectedEpisodes []string) {
-	found, tkns := p.tokenManager.tokens.findWithMetadataKind(metadataOtherEpisodeNumber)
-	assert.True(t, found)
-	assert.Len(t, tkns, len(expectedEpisodes))
-	for i, tkn := range tkns {
-		assert.Equal(t, expectedEpisodes[i], tkn.getValue())
-	}
-}
-
-func assertEpisodeAlt(t *testing.T, p *parser, expectedEpisodes []string) {
-	found, tkns := p.tokenManager.tokens.findWithMetadataKind(metadataEpisodeNumberAlt)
-	assert.True(t, found)
-	assert.Len(t, tkns, len(expectedEpisodes))
-	for i, tkn := range tkns {
-		assert.Equal(t, expectedEpisodes[i], tkn.getValue())
-	}
-}
-
-func assertNoEpisodes(t *testing.T, p *parser) {
-	found, _ := p.tokenManager.tokens.findWithMetadataKind(metadataEpisodeNumber)
-	assert.False(t, found)
-}
-
-func assertNoOtherEpisodes(t *testing.T, p *parser) {
-	found, _ := p.tokenManager.tokens.findWithMetadataKind(metadataOtherEpisodeNumber)
+func assertMetadataDoesNotExist(t *testing.T, p *parser, metadata metadataCategory) {
+	found, _ := p.tokenManager.tokens.findWithMetadataKind(metadata)
 	assert.False(t, found)
 }

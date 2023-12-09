@@ -1,6 +1,7 @@
 package seanime_parser
 
 import (
+	"strconv"
 	"strings"
 )
 
@@ -35,11 +36,111 @@ func (p *parser) parseEpisode() {
 	}
 
 	// Check combined or separated keywords other than season prefixes
+	// e.g. ED1, ED 1, OVAs 1-3, OVAs 1 ~ 3, OVA1, OVA 1v2
 	p.parseKeywordsWithEpisodes()
 
 	// Check last number before the first opening bracket (if there is one at the beginning [subgroup], then, before the second opening bracket)
-	// -> Check range
+	// e.g. Title - 01
+	p.parseEpisodeBySearching(false)
 
+	// e.g Title 01
+	p.parseEpisodeBySearching(true)
+
+}
+
+// parseEpisodeBySearching parses episode numbers by searching for numbers that are not followed by a season prefix or episode prefix
+// e.g. - 01, 1 [
+func (p *parser) parseEpisodeBySearching(aggressive bool) {
+
+	// Check if we already have an episode number
+	found, _ := p.tokenManager.tokens.findWithMetadataKind(metadataEpisodeNumber)
+	if found {
+		return
+	}
+
+	// Check "- 01 [...]"
+	for {
+		var openingBracketTkn *token
+
+		for _, tkn := range *p.tokenManager.tokens {
+			if tkn.isOpeningBracket() {
+				if p.tokenManager.tokens.getIndexOf(tkn) == 0 {
+					continue
+				}
+				openingBracketTkn = tkn
+				break
+			}
+		}
+
+		if openingBracketTkn == nil {
+			break
+		}
+		// Get previous token
+		numTkn, found, _ := p.tokenManager.tokens.getTokenBeforeSD(openingBracketTkn)
+		if !found {
+			break
+		}
+		// Check if previous token is a number or number-like
+		if !numTkn.isNumberOrLikeKind() || !numTkn.isUnknown() {
+			break
+		}
+		if !aggressive && !p.tokenManager.tokens.foundDashSeparatorBefore(numTkn) {
+			break
+
+		}
+
+		numTkn.setMetadataCategory(metadataEpisodeNumber)
+		return // Found episode number, end
+
+	}
+
+	// Check for last number
+	for {
+		var lastNumTkn *token
+
+		for _, tkn := range *p.tokenManager.tokens {
+			if tkn.isYear() {
+				continue
+			}
+			if tkn.isNumberOrLikeKind() && tkn.isUnknown() {
+				lastNumTkn = tkn
+			}
+		}
+
+		if lastNumTkn == nil {
+			break
+		}
+
+		if !aggressive && !p.tokenManager.tokens.foundDashSeparatorBefore(lastNumTkn) {
+			break
+		}
+
+		// When searching aggressively
+		// Check that the number MIGHT be an episode number
+		// e.g. if < 10 should be zero padded to avoid false positives with e.g. "Title 2"
+		if aggressive {
+			if isNumber(lastNumTkn.getValue()) {
+				intVal, err := strconv.Atoi(lastNumTkn.getValue())
+				if err != nil {
+					break
+				}
+				if intVal < 10 && !isNumberZeroPadded(lastNumTkn.getValue()) {
+					break
+				}
+			}
+		}
+
+		lastNumTkn.setMetadataCategory(metadataEpisodeNumber)
+		return // Found episode number, end
+	}
+
+	//for _, tkn := range *p.tokenManager.tokens {
+	//
+	//	if tkn.isKeyword() || !tkn.isUnknown() { // Don't bother if token is already a keyword
+	//		continue // Skip to next token
+	//	}
+	//
+	//}
 }
 
 // parseKeywordsWithEpisodes parses keywords that are combined or separated with a number AND not a season prefix or episode prefix
@@ -55,7 +156,8 @@ func (p *parser) parseKeywordsWithEpisodes() {
 		keywords, found := p.tokenManager.keywordManager.findKeywordsBy(func(kw *keyword) bool {
 			// Get keywords that are combined or separated with a number AND not a season prefix or episode prefix
 			// e.g. ED1, ED 1
-			return (kw.isCombinedWithNumber() || kw.isSeparatedWithNumber()) && !kw.isSeasonPrefix() && !kw.isEpisodePrefix() &&
+			return (kw.isCombinedWithNumber() || kw.isSeparatedWithNumber()) &&
+				!kw.isSeasonPrefix() && !kw.isEpisodePrefix() && !kw.isVolumePrefix() && !kw.isPartPrefix() && // Skip all these because they are handled in parseSeason()
 				strings.HasPrefix(tkn.getNormalizedValue(), kw.value) // Token value starts with keyword value
 		})
 
