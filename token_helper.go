@@ -119,11 +119,11 @@ func (t *token) isSeparator() bool {
 	return t.Category == tokenCatSeparator
 }
 
-func (t *token) isDotSeparator() bool {
+func (t *token) isDotDelimiter() bool {
 	if t == nil {
 		return false
 	}
-	return t.Category == tokenCatSeparator && t.Value == "."
+	return t.Category == tokenCatDelimiter && t.Value == "."
 }
 
 func (t *token) isPlusSeparator() bool {

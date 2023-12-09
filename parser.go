@@ -16,27 +16,33 @@ func newParser(filename string) *parser {
 
 func (p *parser) parse() {
 
-	p.parseKeywords()
+	p.parseKeywords("normal")
 
 	p.parseSeason()
 
 	p.parseEpisode()
 
+	p.parseKeywords("")
+
 }
 
-func (p *parser) parseKeywords() {
+func (p *parser) parseKeywords(priority string) {
 
 	for _, tkn := range *p.tokenManager.tokens {
 
+		if tkn.isKeyword() { // Don't bother if token is already a keyword
+			continue // Skip to next token
+		}
+
 		// Identify keyword
-		_ = p.identifyKeyword(tkn)
+		_ = p.identifyKeyword(tkn, priority)
 
 	}
 
 }
 
-// identifyKeyword identifies the keyword category of the given token.
-func (p *parser) identifyKeyword(tkn *token) bool {
+// identifyKeyword identifies STANDALONE and multi-PART keywords for the given token
+func (p *parser) identifyKeyword(tkn *token, priority string) bool {
 
 	if tkn.Kind == tokenKindCrc32 {
 		tkn.setIdentifiedKeywordCategory(keywordCatFileChecksum)
@@ -77,9 +83,20 @@ func (p *parser) identifyKeyword(tkn *token) bool {
 		return true
 	}
 
-	// Check if token is a known pre-defined standalone keyword (e.g. "60FPS")
+	// Check if token is a known pre-defined STANDALONE keyword (e.g. "60FPS")
 	if len(tkn.getValue()) > 1 {
 		if keyword, found := p.tokenManager.keywordManager.findStandaloneKeywordByValue(tkn.getValue()); found {
+
+			// When the priority is "normal", we only want to identify STANDALONE keywords that are not an anime type
+			// That is because those are prone to false positives
+			if priority == "normal" && keyword.isAnimeType() {
+				return false
+			}
+
+			if p.tokenManager.keywordManager.isKeywordAmbiguous(keyword) {
+				// TODO: Handle ambiguous keywords
+			}
+
 			tkn.setIdentifiedKeywordCategory(keyword.category)
 			return true
 		}

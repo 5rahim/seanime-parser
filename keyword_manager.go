@@ -1,6 +1,7 @@
 package seanime_parser
 
 import (
+	"slices"
 	"strings"
 
 	"golang.org/x/text/unicode/norm"
@@ -393,6 +394,11 @@ func (km *keywordManager) findKeywordsBy(pred func(kw *keyword) bool) ([]*keywor
 	}
 
 	return kws, true
+}
+func (km *keywordManager) isKeywordAmbiguous(kw *keyword) bool {
+
+	return slices.Contains(km.ambiguousKeywords, kw.value)
+
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

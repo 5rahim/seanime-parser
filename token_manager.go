@@ -22,7 +22,54 @@ func newTokenManager(filename string) *tokenManager {
 
 	tm.tokens.setTokens(tokenize(strings.TrimSpace(filename)))
 
+	tm.mergeDecimals()
+
 	return &tm
+}
+
+func (tm *tokenManager) mergeDecimals() {
+	for _, tkn := range *tm.tokens {
+		if !tkn.isNumberKind() {
+			continue
+		}
+
+		_, _ = tm.tokens.checkNumberWithDecimal(tkn)
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// checkNumberWithDecimal checks if a token (number) is followed by a decimal point and a number.
+// If it is, it will merge the tokens into a single token and return it.
+func (t *tokens) checkNumberWithDecimal(tkn *token) (*token, bool) {
+	if tkn == nil || !tkn.isNumberKind() {
+		return nil, false
+	}
+
+	// Check if token is followed by a decimal point and a number
+	dotTkn, ok := t.getTokenAfter(tkn)
+	if !ok || !dotTkn.isDotDelimiter() {
+		return nil, false
+	}
+
+	numTkn, ok := t.getTokenAfter(dotTkn)
+	if !ok || !numTkn.isNumberKind() || (numTkn.getValue() != "5" && numTkn.getValue() != "05") {
+		return nil, false
+	}
+
+	delTkn, ok := t.getTokenAfter(numTkn)
+	if (!ok || !delTkn.isDelimiter()) && !t.isLastToken(numTkn) { // Delimiter or end of tokens
+		return nil, false
+	}
+
+	// Merge tokens
+	tkn.setValue(tkn.getValue() + "." + numTkn.getValue())
+
+	// Remove dot and number tokens
+	t.removeAt(t.getIndexOf(dotTkn))
+	t.removeAt(t.getIndexOf(numTkn))
+
+	return tkn, true
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -121,6 +168,13 @@ func (t *tokens) getIndexOf(tkn *token) int {
 	return -1
 }
 
+func (t *tokens) isLastToken(tkn *token) bool {
+	if tkn == nil {
+		return false
+	}
+	return t.getIndexOf(tkn) == len(*t)-1
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 func (t *tokens) setTokens(tkns []*token) {
@@ -188,7 +242,7 @@ func (t *tokens) overwriteAndInsertManyAt(index int, tkns []*token) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 func (t *tokens) getAtSafe(index int) (*token, bool) {
-	if index < 0 || index > len(*t) {
+	if index < 0 || index > len(*t)-1 {
 		return nil, false
 	}
 	return (*t)[index], true

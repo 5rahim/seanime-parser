@@ -22,6 +22,7 @@ const (
 	metadataVideoResolution
 	metadataVideoTerm
 	metadataVolumeNumber
+	metadataOtherEpisodeNumber
 )
 
 type Metadata struct {

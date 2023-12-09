@@ -32,6 +32,7 @@ func TestSeasonAndEpisode(t *testing.T) {
 		{"[Seanime] Jujutsu Kaisen S1-02.mkv", &[]string{"1"}, &[]string{"02"}, false},
 		{"[Seanime] Jujutsu Kaisen S1 - 02.mkv", &[]string{"1"}, &[]string{"02"}, false},
 		{"[Seanime] Jujutsu Kaisen Season 01 - 02.mkv", &[]string{"01"}, &[]string{"02"}, false},
+		{"[Seanime] Jujutsu Kaisen S1 - 02.5.mkv", &[]string{"1"}, &[]string{"02.5"}, true},
 
 		{"[Seanime] Jujutsu Kaisen Season 01 - 12.mkv", &[]string{"01"}, &[]string{"12"}, false},
 
@@ -131,6 +132,15 @@ func assertEpisodes(t *testing.T, p *parser, expectedEpisodes []string) {
 	}
 }
 
+func assertOtherEpisodes(t *testing.T, p *parser, expectedEpisodes []string) {
+	found, tkns := p.tokenManager.tokens.findWithMetadataKind(metadataOtherEpisodeNumber)
+	assert.True(t, found)
+	assert.Len(t, tkns, len(expectedEpisodes))
+	for i, tkn := range tkns {
+		assert.Equal(t, expectedEpisodes[i], tkn.getValue())
+	}
+}
+
 func assertEpisodeAlt(t *testing.T, p *parser, expectedEpisodes []string) {
 	found, tkns := p.tokenManager.tokens.findWithMetadataKind(metadataEpisodeNumberAlt)
 	assert.True(t, found)
@@ -142,5 +152,10 @@ func assertEpisodeAlt(t *testing.T, p *parser, expectedEpisodes []string) {
 
 func assertNoEpisodes(t *testing.T, p *parser) {
 	found, _ := p.tokenManager.tokens.findWithMetadataKind(metadataEpisodeNumber)
+	assert.False(t, found)
+}
+
+func assertNoOtherEpisodes(t *testing.T, p *parser) {
+	found, _ := p.tokenManager.tokens.findWithMetadataKind(metadataOtherEpisodeNumber)
 	assert.False(t, found)
 }
