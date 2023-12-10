@@ -39,6 +39,85 @@ func (tm *tokenManager) mergeDecimals() {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+// combineTitle combines all tokens between tknBegin and tknEnd into a single, well formatted title token.
+// e.g. "Violet" "." "Evergarden" -> "Violet Evergarden"
+func (t *tokens) combineTitle(tknBegin *token, tknEnd *token, category metadataCategory) (*token, bool) {
+	// Get all the tokens between tknBeing and tknEnd
+	// If all delimiters are the same, replace with space
+	// If all delimiters are different, keep the minority the same
+	tkns, found := t.getFromToInc(t.getIndexOf(tknBegin), t.getIndexOf(tknEnd))
+	if !found {
+		return nil, false
+	}
+
+	tknsIncludeOpeningParenthesis := false
+	for _, tkn := range tkns {
+		if tkn.getValue() == "(" {
+			tknsIncludeOpeningParenthesis = true
+		}
+	}
+
+	// check if next token is closing parenthesis
+	if nextTkn, found, _ := t.getTokenAfterSD(tknEnd); found &&
+		nextTkn.isClosingBracket() &&
+		nextTkn.getValue() == ")" &&
+		tknsIncludeOpeningParenthesis {
+		tknEnd = nextTkn
+		tkns = append(tkns, nextTkn)
+	}
+
+	// Check if all delimiters are the same
+	delimiters := make(map[string]int)
+	for _, tkn := range tkns {
+		if tkn.isDelimiter() {
+			delimiters[tkn.getValue()]++
+		}
+	}
+	if len(delimiters) == 1 {
+		// Replace all delimiters with space
+		for _, tkn := range tkns {
+			if tkn.isDelimiter() {
+				tkn.setValue(" ")
+			}
+		}
+	} else {
+		for _, tkn := range tkns {
+			if tkn.isDelimiter() {
+				// Replace delimiter with space if it's the majority
+				if delimiters[tkn.getValue()] > len(tkns)/2 {
+					tkn.setValue(" ")
+				}
+			}
+		}
+	}
+
+	for _, tkn := range tkns {
+		if tkn.getValue() == "_" {
+			tkn.setValue(" ")
+		}
+	}
+
+	allValues := ""
+	for _, tkn := range tkns {
+		allValues += tkn.getValue()
+	}
+	combinedTkn := token{
+		UUID:             tknBegin.UUID,
+		Value:            allValues,
+		Kind:             tokenKindWord,
+		Category:         tokenCatKnown,
+		MetadataCategory: category,
+		Enclosed:         tknBegin.isEnclosed(),
+	}
+	t.overwriteAt(t.getIndexOf(tknBegin), combinedTkn)
+
+	start := t.getIndexOf(tknBegin) + 1
+	end := t.getIndexOf(tknEnd)
+	*t = append((*t)[:start], (*t)[end+1:]...)
+
+	return &combinedTkn, true
+}
+
 // checkNumberWithDecimal checks if a token (number) is followed by a decimal point and a number.
 // If it is, it will merge the tokens into a single token and return it.
 func (t *tokens) checkNumberWithDecimal(tkn *token) (*token, bool) {
@@ -418,12 +497,12 @@ func (t *tokens) getFromTo(start int, end int) []*token {
 	return (*t)[start:end]
 }
 
-func (t *tokens) getFromToInc(start int, end int) []*token {
+func (t *tokens) getFromToInc(start int, end int) ([]*token, bool) {
 	// check indices
 	if start < 0 || end < 0 || start > end || start+1 > len(*t) || end+1 > len(*t) {
-		return []*token{}
+		return []*token{}, false
 	}
-	return (*t)[start : end+1]
+	return (*t)[start : end+1], true
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -649,12 +728,13 @@ func (t *tokens) sPrint() string {
 func (t *tokens) sDump() string {
 	str := "\n"
 	for _, tkn := range *t {
-		str += fmt.Sprintf("%-12s\t%v, kw: %v, %v, m: %v\n",
+		str += fmt.Sprintf("%-12s\t%v, kw: %v, %v, m: %v, enclosed: %v\n",
 			"\""+tkn.getValue()+"\"",
 			tkn.getCategory(),
 			tkn.IdentifiedKeywordCategory,
 			tkn.getKind(),
 			tkn.MetadataCategory,
+			tkn.isEnclosed(),
 		)
 	}
 	str += "\n"

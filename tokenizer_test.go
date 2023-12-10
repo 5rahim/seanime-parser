@@ -20,6 +20,9 @@ func testEnclosedDetection(t *testing.T, tkns []*token) {
 func TestEnclosedDetection(t *testing.T) {
 
 	ret := tokenize("[ENCLOSED] ABC ABC ABC (ENCLOSED) [ENCLOSED]")
+	test := tokens{}
+	test.setTokens(ret)
+	println(test.sDump())
 	testEnclosedDetection(t, ret)
 
 	ret = tokenize("[ENCLOSED (ENCLOSED] ABC ABC [ENCLOSED]")
@@ -30,8 +33,6 @@ func TestEnclosedDetection(t *testing.T) {
 
 	ret = tokenize("[ENCLOSED] (ENCLOSED) ABC ABC [ABC ABC")
 	testEnclosedDetection(t, ret)
-
-	t.Log(ret)
 
 }
 

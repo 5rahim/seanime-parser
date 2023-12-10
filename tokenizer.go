@@ -128,8 +128,9 @@ func tokenize(filename string) []*token {
 			continue
 		}
 
-		// We also mark parentheses as enclosed tokens
-		tknIsParenthesis := tkn.getValue() == "(" || tkn.getValue() == ")"
+		// Count parenthesis as enclosed tokens if we are already in an enclosed token sequence
+		// and if the opening bracket is not a parenthesis
+		tknIsParenthesis := (tkn.getValue() == "(" || tkn.getValue() == ")") && openingBracket != "("
 
 		if (tkn.isUnknown() || tknIsParenthesis) && openingBracket != "" {
 			enclosedTknsBuff = append(enclosedTknsBuff, tkn)
@@ -191,7 +192,7 @@ func identifyTokenKinds(tkns []*token) {
 			continue
 		}
 
-		if len(tkn.getValue()) > 1 {
+		if len([]rune(tkn.getValue())) > 1 {
 			tkn.setKind(tokenKindWord)
 		} else {
 			tkn.setKind(tokenKindCharacter)

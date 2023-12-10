@@ -23,10 +23,9 @@ func (p *parser) parseEpisodeTitle() {
 	if !found {
 		return
 	}
-	test := tokens{}
-	test.setTokens(tkns)
-	println("--------- Episode title ------------")
-	println(test.sDump())
+
+	p.tokenManager.tokens.combineTitle(tkns[0], tkns[len(tkns)-1], metadataEpisodeTitle)
+	return
 
 }
 
@@ -36,35 +35,6 @@ func (p *parser) parseTitleIfAllEnclosed() (foundTitle bool) {
 	if !p.tokenManager.tokens.allUnknownTokensAreEnclosed() {
 		return
 	}
-
-	// Get enclosed tokens between parentheses
-	// e.g. "[sub]_(anime title)_[...]"
-	//for {
-	//	// Get first parenthesis token
-	//	parenthesisTkns, found := p.tokenManager.tokens.filter(func(tkn *token) bool {
-	//		return tkn.isOpeningBracket() && tkn.getValue() == "(" && !tkn.isEnclosed()
-	//	})
-	//	if !found {
-	//		break // Next try
-	//	}
-	//	tkns, found := p.tokenManager.tokens.walkAndCollecIf(
-	//		p.tokenManager.tokens.getIndexOf(parenthesisTkns[0])+1,
-	//		func(tkn *token) bool {
-	//			return tkn.isUnknown() && !tkn.isKeyword() && !tkn.isSeparator()
-	//		},
-	//		func(tkn *token) bool {
-	//			return (tkn.isClosingBracket() && tkn.getValue() == ")") || tkn.isKeyword()
-	//		})
-	//	if !found {
-	//		break // Next try
-	//	}
-	//
-	//	test := tokens{}
-	//	test.setTokens(tkns)
-	//	println("--------- Anime title ------------")
-	//	println(test.sDump())
-	//	return true
-	//}
 
 	// Get enclosed tokens before enclosed episode number
 	// e.g. "[sub][anime title][01][...]"
@@ -81,7 +51,7 @@ func (p *parser) parseTitleIfAllEnclosed() (foundTitle bool) {
 		firstOpeningBracketTkn, found := p.tokenManager.tokens.getFirstOccurrenceBefore(
 			p.tokenManager.tokens.getIndexOf(firstEpTkn),
 			func(tkn *token) bool {
-				return tkn.isOpeningBracket() && tkn.getValue() != "("
+				return tkn.isOpeningBracket()
 			})
 		if !found {
 			break // Next try
@@ -90,7 +60,7 @@ func (p *parser) parseTitleIfAllEnclosed() (foundTitle bool) {
 		secondOpeningBracketTkn, found := p.tokenManager.tokens.getFirstOccurrenceBefore(
 			p.tokenManager.tokens.getIndexOf(firstOpeningBracketTkn),
 			func(tkn *token) bool {
-				return tkn.isOpeningBracket() && tkn.getValue() != "("
+				return tkn.isOpeningBracket()
 			})
 		if !found {
 			break // Next try
@@ -104,18 +74,15 @@ func (p *parser) parseTitleIfAllEnclosed() (foundTitle bool) {
 			},
 			func(tkn *token) bool {
 				// Stop when we encounter the first opening bracket or a keyword
-				// e.g. [Mobile_Suit_Gundam_Seed_Destiny_HD_REMASTER][07] -> Mobile Suit Gundam Seed
+				// e.g. [Mobile_Suit_Gundam_Seed_Destiny_HD_REMASTER][07] -> Mobile Suit Gundam Seed Destiny
 				return tkn.UUID == firstOpeningBracketTkn.UUID || tkn.isKeyword()
 			})
 		if !found {
 			break // Next try
 		}
 
-		test := tokens{}
-		test.setTokens(tkns)
-		println("--------- Anime title ------------")
-		println(test.sDump())
-		break
+		p.tokenManager.tokens.combineTitle(tkns[0], tkns[len(tkns)-1], metadataTitle)
+		return true
 	}
 
 	// Get the second enclosed group
@@ -127,6 +94,10 @@ func (p *parser) parseTitleIfAllEnclosed() (foundTitle bool) {
 		})
 		if !found {
 			break // Next try
+		}
+
+		if len(openingBracketTkns) < 2 {
+			break
 		}
 
 		// Get all unknown tokens between the second and third opening brackets
@@ -145,12 +116,8 @@ func (p *parser) parseTitleIfAllEnclosed() (foundTitle bool) {
 			break // Next try
 		}
 
-		test := tokens{}
-		test.setTokens(tkns)
-		println("--------- Anime title ------------")
-		println(test.sDump())
-
-		break
+		p.tokenManager.tokens.combineTitle(tkns[0], tkns[len(tkns)-1], metadataTitle)
+		return true
 	}
 
 	return
@@ -162,6 +129,7 @@ func (p *parser) parseTitle() {
 		return
 	}
 
+	// e.g. [sub] anime title [...]
 	for {
 		// Get first non-enclosed token
 		nonEnclosedTkns, found := p.tokenManager.tokens.filter(func(tkn *token) bool {
@@ -192,11 +160,26 @@ func (p *parser) parseTitle() {
 			break // Next try
 		}
 
-		test := tokens{}
-		test.setTokens(tkns)
-		println("--------- Anime title ------------")
-		println(test.sDump())
+		p.tokenManager.tokens.combineTitle(tkns[0], tkns[len(tkns)-1], metadataTitle)
+		return
+	}
 
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+func (p *parser) parseReleaseGroup() {
+
+	foundTitle, _ := p.tokenManager.tokens.findWithMetadataCategory(metadataTitle)
+
+	// Handle case where all unknown tokens are enclosed
+	for {
+		if !foundTitle {
+			break // Next try
+		}
+
+		// Get all unknown tokens before the title
+		//unknownTkns, found := p.tokenManager.tokens.get
 		break
 	}
 
