@@ -57,6 +57,12 @@ func (t *tokens) combineTitle(tknBegin *token, tknEnd *token, category metadataC
 		}
 	}
 
+	for _, tkn := range tkns {
+		if (tkn.isOpeningBracket() || tkn.isClosingBracket()) && tkn.getValue() != "(" && tkn.getValue() != ")" {
+			tkn.setValue("")
+		}
+	}
+
 	// check if next token is closing parenthesis
 	if nextTkn, found, _ := t.getTokenAfterSD(tknEnd); found &&
 		nextTkn.isClosingBracket() &&
@@ -221,7 +227,9 @@ func (t *tokens) isTokenInFirstHalf(tkn *token) bool {
 }
 
 // isTokenAfterFileMetadata checks if the specified token comes after file info metadata
+// deprecated
 func (t *tokens) isTokenAfterFileMetadata(tkn *token) bool {
+	//return false
 	index := t.getIndexOf(tkn)
 	if index == -1 {
 		return false
@@ -229,8 +237,9 @@ func (t *tokens) isTokenAfterFileMetadata(tkn *token) bool {
 	isAfter := false
 
 	for idx, _tkn := range *t {
-		// Check if token is after file info metadata
-		if _tkn.isFileInfoMetadata() && idx != index && idx < index {
+		// Check if token is after file info metadata token
+		// and if the file info token is not in the first half of the tokens list
+		if _tkn.isFileInfoMetadata() && idx != index && idx < index && !t.isTokenInFirstHalf(_tkn) {
 			isAfter = true
 		}
 	}

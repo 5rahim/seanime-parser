@@ -301,7 +301,7 @@ func newKeywordManager() *keywordManager {
 	km.addGroup(
 		keywordCatSource,
 		keywordKindStandalone,
-		[]string{"BD", "BDRIP", "BLURAY", "BLU-RAY", "DVD", "DVD5", "DVD9",
+		[]string{"BD", "ASF", "BDRIP", "BLURAY", "BLU-RAY", "DVD", "DVD5", "DVD9",
 			"DVD-R2J", "DVDRIP", "DVD-RIP", "R2DVD", "R2J", "R2JDVD",
 			"R2JDVDRIP", "HDTV", "HDTVRIP", "TVRIP", "TV-RIP",
 			"WEBCAST", "WEBRIP"},

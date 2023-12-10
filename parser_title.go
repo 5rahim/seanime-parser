@@ -170,7 +170,7 @@ func (p *parser) parseTitle() {
 
 func (p *parser) parseReleaseGroup() {
 
-	foundTitle, _ := p.tokenManager.tokens.findWithMetadataCategory(metadataTitle)
+	foundTitle, titleTkns := p.tokenManager.tokens.findWithMetadataCategory(metadataTitle)
 
 	// Handle case where all unknown tokens are enclosed
 	for {
@@ -178,9 +178,99 @@ func (p *parser) parseReleaseGroup() {
 			break // Next try
 		}
 
+		titleTkn := titleTkns[0]
+
 		// Get all unknown tokens before the title
-		//unknownTkns, found := p.tokenManager.tokens.get
-		break
+		unknownTkns, found := p.tokenManager.tokens.walkAndCollecIf(
+			0,
+			func(tkn *token) bool {
+				return tkn.isUnknown() && !tkn.isKeyword() && !tkn.isSeparator() && tkn.isEnclosed()
+			},
+			func(tkn *token) bool {
+				return tkn.UUID == titleTkn.UUID
+			})
+		if !found {
+			break // Next try
+		}
+
+		// Found release group
+		if len(unknownTkns) == 1 {
+			unknownTkns[0].setMetadataCategory(metadataReleaseGroup)
+			return
+		}
+
+		// Found longer release group
+		p.tokenManager.tokens.combineTitle(unknownTkns[0], unknownTkns[len(unknownTkns)-1], metadataReleaseGroup)
+		return
+	}
+
+	// If we still haven't found a release group, try to find:
+	// - the first enclosed group of unknown tokens going backwards
+	for {
+
+		// Get all closing brackets
+		closingBracketTkns, found := p.tokenManager.tokens.filter(func(tkn *token) bool {
+			return tkn.isClosingBracket() && tkn.getValue() != ")"
+		})
+		if !found || len(closingBracketTkns) == 1 {
+			break // Next try
+		}
+		lastClosingBracket := closingBracketTkns[len(closingBracketTkns)-1]
+
+		lastOpeningBracket, found := p.tokenManager.tokens.getFirstOccurrenceBefore(
+			p.tokenManager.tokens.getIndexOf(lastClosingBracket),
+			func(tkn *token) bool {
+				return tkn.isOpeningBracket() && isMatchingClosingBracket(tkn.getValue(), lastClosingBracket.getValue())
+			})
+		if !found {
+			break // Next try
+		}
+
+		// Get all tokens between the opening and closing brackets
+		unknownTkns, found := p.tokenManager.tokens.walkAndCollecIf(
+			p.tokenManager.tokens.getIndexOf(lastOpeningBracket)+1,
+			func(tkn *token) bool {
+				return tkn.isUnknown() && !tkn.isKeyword() && !tkn.isSeparator()
+			},
+			func(tkn *token) bool {
+				return tkn.UUID == lastClosingBracket.UUID
+			})
+		if !found {
+			break // Next try
+		}
+
+		// Found release group
+		if len(unknownTkns) == 1 {
+			unknownTkns[0].setMetadataCategory(metadataReleaseGroup)
+			return
+		}
+
+		// Found longer release group
+		p.tokenManager.tokens.combineTitle(unknownTkns[0], unknownTkns[len(unknownTkns)-1], metadataReleaseGroup)
+		return
+	}
+
+	for {
+		// Get all unknown tokens
+		unknownTkns, found := p.tokenManager.tokens.filter(func(tkn *token) bool {
+			return tkn.isUnknown() && !tkn.isKeyword() && !tkn.isSeparator()
+		})
+		if !found {
+			break // Next try
+		}
+
+		unknownTkn := unknownTkns[0]
+		if len(unknownTkns) > 1 {
+			unknownTkn = unknownTkns[len(unknownTkns)-1]
+		}
+
+		if p.tokenManager.tokens.isTokenInFirstHalf(unknownTkn) {
+			break
+		}
+
+		// Found release group
+		unknownTkn.setMetadataCategory(metadataReleaseGroup)
+		return
 	}
 
 }

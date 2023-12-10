@@ -76,12 +76,12 @@ func TestReleaseGroup(t *testing.T) {
 		{"[Seanime]_One_Piece_800-994_(1280×720_Blu-Ray_FLAC)", "Seanime", false},
 		{"Code_Geass_R2_TV_[20_of_25]_[ru_jp]_[HDTV]_[Varies_&_Cuba77_&_AnimeReactor_RU].mkv", "Varies & Cuba77 & AnimeReactor RU", false},
 		{"[Urusai]_Bokura_Ga_Ita_01_[DVD_h264_AC3]_[BFCE1627][Fixed].mkv", "Urusai", false},
-		{"SPY x FAMILY S02E09 The Hand That Connects to the Future 1080p NF WEB-DL AAC2.0 H 264-VARYG", "", false},
-		{"[Jumonji-Giri]_[Shinsen-Subs][ASF]_D.C.II_Da_Capo_II_Ep01_(a1fc58a7).mkv", "Jumonji-Giri", false},
+		{"SPY x FAMILY S02E09 The Hand That Connects to the Future 1080p NF WEB-DL AAC2.0 H 264-VARYG", "VARYG", false},
+		{"[Jumonji-Giri]_[Shinsen-Subs][ASF]_D.C.II_Da_Capo_II_Ep01_(a1fc58a7).mkv", "Jumonji-Giri Shinsen-Subs", false},
 		{"[Hakugetsu&Speed&MGRT][Dragon_Ball_Z_Battle_of_Gods][BDRIP][BIG5][1280x720].mp4", "Hakugetsu&Speed&MGRT", false},
 		{"[Hakugetsu&MGRT][Evangelion 3.0 You Can (Not) Redo][480P][V0].mp4", "Hakugetsu&MGRT", false},
 		{"Violet.Evergarden.The.Movie.1080p.Dual.Audio.BDRip.10.bits.DD.x265-EMBER", "EMBER", false},
-		{"【MMZYSUB】★【Golden Time】[24（END）][GB][720P_MP4]", "MMZYSUB", true},
+		{"【MMZYSUB】★【Golden Time】[24（END）][GB][720P_MP4]", "MMZYSUB", false},
 	}
 
 	for _, tt := range tests {
@@ -89,7 +89,7 @@ func TestReleaseGroup(t *testing.T) {
 			p := newParser(tt.input)
 			p.parse()
 
-			assertMetadataExists(t, p, metadataReleaseVersion, []string{tt.expected})
+			assertMetadataExists(t, p, metadataReleaseGroup, []string{tt.expected})
 
 			if tt.debug {
 				t.Log(p.tokenManager.tokens.sDump())

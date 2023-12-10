@@ -14,6 +14,16 @@ func newParser(filename string) *parser {
 	}
 }
 
+func Parse(filename string) *Metadata {
+
+	p := newParser(filename)
+	p.parse()
+	p.cleanUp()
+
+	return p.metadata
+
+}
+
 func (p *parser) parse() {
 
 	p.parseKeywords("normal")
@@ -26,7 +36,11 @@ func (p *parser) parse() {
 
 	p.parseTitle()
 
+	p.parseReleaseGroup()
+
 	p.parseKeywords("")
+
+	p.collectMetadata()
 
 }
 
@@ -114,6 +128,14 @@ func (p *parser) identifyKeyword(tkn *token, priority string) bool {
 // collectMetadata collects the metadata elements from the parsed tokens.
 // de-duplicates elements
 func (p *parser) collectMetadata() {
+
+	for _, tkn := range *p.tokenManager.tokens {
+
+		if !tkn.isIdentifiedMetadata() {
+			continue
+		}
+
+	}
 
 }
 

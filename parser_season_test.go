@@ -138,10 +138,18 @@ func TestEpisodeAlt(t *testing.T) {
 
 func assertMetadataExists(t *testing.T, p *parser, metadata metadataCategory, expected []string) {
 	found, tkns := p.tokenManager.tokens.findWithMetadataCategory(metadata)
-	assert.True(t, found)
-	assert.Len(t, tkns, len(expected))
-	for i, tkn := range tkns {
-		assert.Equal(t, expected[i], tkn.getValue())
+
+	if expected[0] == "" {
+		assert.False(t, found)
+		return
+	}
+
+	if assert.True(t, found) {
+		if assert.Len(t, tkns, len(expected)) {
+			for i, tkn := range tkns {
+				assert.Equal(t, expected[i], tkn.getValue())
+			}
+		}
 	}
 }
 

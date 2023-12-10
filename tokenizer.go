@@ -209,3 +209,12 @@ func isMatchingClosingBracket(openingBracket string, bracket string) bool {
 	}
 	return false
 }
+
+func isMatchingOpeningBracket(closingBracket string, bracket string) bool {
+	for _, bracketDuo := range brackets {
+		if string(bracketDuo[1]) == closingBracket {
+			return string(bracketDuo[0]) == bracket
+		}
+	}
+	return false
+}
