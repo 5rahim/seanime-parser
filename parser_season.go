@@ -5,6 +5,9 @@ import (
 	"strings"
 )
 
+// parseSeason looks for season/volume/part prefixes and numbers.
+// It will also check for episode numbers.
+// e.g. S01E01, Season 1, S1, 1st Season, 1st Volume, 1st Part, 1st Season - 03, 1st Season - 03v2, 1st Season - 03' etc...
 func (p *parser) parseSeason() {
 
 	for _, tkn := range *p.tokenManager.tokens {
@@ -13,7 +16,7 @@ func (p *parser) parseSeason() {
 			continue // Skip to next token
 		}
 
-		// Parse S01E01
+		// Parse S01E01 by checking if the token follows the pattern
 		if strings.HasPrefix(tkn.getNormalizedValue(), "S") && len(tkn.getValue()) > 3 {
 			// Extract season and episode
 			if season, sep, episode, ok := extractSeasonAndEpisode(tkn.getValue()); ok {
@@ -38,11 +41,25 @@ func (p *parser) parseSeason() {
 				}
 
 				p.tokenManager.tokens.overwriteAndInsertManyAt(p.tokenManager.tokens.getIndexOf(tkn), []*token{seasonPrefixTkn, seasonTkn, sepTkn, episodeTkn})
+
+				episodeIsZeroPadded := isNumberZeroPadded(episodeTkn.getValue())
+
+				// Check range
+				// e.g. S1-3, S01-03, S1 ~ 3, S01 ~ 03
+				if nextNumTkn, found, kind := checkNumberRangeAfterToken(p, seasonTkn, episodeIsZeroPadded); found {
+					// e.g. S1-3, S01-03
+					if kind == 0 {
+						nextNumTkn.setMetadataCategory(metadataEpisodeNumber)
+						p.tokenManager.tokens.checkNumberWithDecimal(nextNumTkn) // Check if number is decimal
+						continue                                                 // Skip to next token
+					}
+				}
+
 				continue // Skip to next token
 			}
 		}
 
-		// Combined or separated seasons
+		// Combined or separated seasons/volumes/parts
 		if strings.HasPrefix(tkn.getNormalizedValue(), "S") ||
 			strings.HasPrefix(tkn.getNormalizedValue(), "P") ||
 			strings.HasPrefix(tkn.getNormalizedValue(), "V") {
@@ -60,7 +77,6 @@ func (p *parser) parseSeason() {
 			for _, keyword := range keywords {
 
 				// e.g. S01
-				// /!\ This section will hydrate the METADATA
 				if keyword.isCombinedWithNumber() {
 
 					metadataCat := getMetadataCategoryFromKeywordPrefix(keyword.category)
@@ -91,8 +107,11 @@ func (p *parser) parseSeason() {
 
 						firstSeasonIsZeroPadded := isNumberZeroPadded(remaining)
 
+						// Overwrite and insert tokens
 						p.tokenManager.tokens.overwriteAndInsertManyAt(p.tokenManager.tokens.getIndexOf(tkn), []*token{seasonPrefixTkn, seasonTkn})
 
+						// Check if the number identified is a decimal number
+						// e.g. "S1" "." "5" -> "S1.5"
 						if isNumber(remaining) { // e.g. S1.5, don't bother if S1v2
 							p.tokenManager.tokens.checkNumberWithDecimal(seasonTkn) // Check if number is decimal
 						}

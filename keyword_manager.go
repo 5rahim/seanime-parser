@@ -94,7 +94,7 @@ func newKeywordManager() *keywordManager {
 	km.addGroup(
 		keywordCatEpisodePrefix,
 		keywordKindCombinedWithNumber,
-		[]string{"E", "\x7B2C", "EP", "EPS", "EPISODE", "EPISODES", "CAPITULO", "EPISODIO", "FOLDE"},
+		[]string{"E", "#", "\x7B2C", "EP", "EPS", "EPISODE", "EPISODES", "CAPITULO", "EPISODIO", "FOLDE"},
 	)
 	km.addGroup(
 		keywordCatEpisodePrefix,
@@ -166,13 +166,10 @@ func newKeywordManager() *keywordManager {
 		keywordCatAudioTerm,
 		keywordKindStandalone,
 		[]string{
-			// Audio channels
 			"2.0CH", "2CH", "5.1", "5.1CH", "DTS", "DTS-ES", "DTS5.1", "TRUEHD5.1",
-			// Audio codec
 			"AAC", "AACX2", "AACX3", "AACX4", "AC3", "EAC3", "E-AC-3", "FLAC",
 			"FLACX2", "FLACX3", "FLACX4", "LOSSLESS", "MP3", "OGG", "VORBIS",
-			"DD2", "DD2.0",
-			// Audio language
+			"DD2", "DD2.0", "DDP", "DD", "HDMA", "DTSHD",
 			"DUALAUDIO", "DUAL-AUDIO",
 		},
 	)
@@ -183,6 +180,8 @@ func newKeywordManager() *keywordManager {
 			{prefix: "2", seqParts: []string{".", "0CH"}},          // 2.0CH
 			{prefix: "5", seqParts: []string{".", "1"}},            // 5.1
 			{prefix: "DTS", seqParts: []string{"-", "ES"}},         // DTS-ES
+			{prefix: "DTS", seqParts: []string{"-", "HD"}},         // DTS-HD
+			{prefix: "DTS", seqParts: []string{"-", "HDMA"}},       // DTS-HDMA
 			{prefix: "DTS5", seqParts: []string{".", "1"}},         // DTS5.1
 			{prefix: "TRUEHD5", seqParts: []string{".", "1"}},      // TRUEHD5.1
 			{prefix: "DUAL", seqParts: []string{"-", "AUDIO"}},     // DUAL-AUDIO
@@ -229,8 +228,11 @@ func newKeywordManager() *keywordManager {
 			{prefix: "10", seqParts: []string{"-", "BIT"}},       // 10-BIT
 			{prefix: "10", seqParts: []string{"-", "BITS"}},      // 10-BITS
 			{prefix: "10", seqParts: []string{" ", "BITS"}},      // 10 BITS
+			{prefix: "10", seqParts: []string{".", "BITS"}},      // 10.BITS
 			{prefix: "H", seqParts: []string{".", "264"}},        // H.264
+			{prefix: "H", seqParts: []string{" ", "264"}},        // H 264
 			{prefix: "H", seqParts: []string{".", "265"}},        // H.265
+			{prefix: "H", seqParts: []string{" ", "265"}},        // H 265
 			{prefix: "X", seqParts: []string{".", "264"}},        // X.264
 			{prefix: "DOLBY", seqParts: []string{" ", "VISION"}}, // DOLBY VISION
 		},
@@ -260,7 +262,7 @@ func newKeywordManager() *keywordManager {
 	km.addGroup(
 		keywordCatLanguage,
 		keywordKindStandalone,
-		[]string{"ENG", "ENGLISH", "ESPANOL", "JAP", "PT-BR", "SPANISH", "VOSTFR", "ESP", "ITA"},
+		[]string{"ENG", "ENGLISH", "ESPANOL", "JAP", "JPN", "PT-BR", "SPANISH", "VOSTFR", "ESP", "ITA"},
 	)
 
 	// Release info

@@ -210,13 +210,13 @@ func TestFirstOccurrence(t *testing.T) {
 	assert.True(t, found)
 
 	fTkn, found := tm.tokens.getFirstOccurrenceAfter(idx, func(tkn *token) bool {
-		return tkn.isCategory(tokenCatUnknown) && tkn.isKind(tokenKindNumber)
+		return tkn.isUnknown() && tkn.isNumberKind()
 	})
 	assert.True(t, found)
 	assert.Equal(t, "05", fTkn.getValue())
 
 	fTkn2, found := tm.tokens.getFirstOccurrenceBefore(tm.tokens.getIndexOf(fTkn), func(tkn *token) bool {
-		return tkn.isCategory(tokenCatUnknown) && tkn.isKind(tokenKindNumber)
+		return tkn.isUnknown() && tkn.isNumberKind()
 	})
 	assert.True(t, found)
 	assert.Equal(t, "01", fTkn2.getValue())

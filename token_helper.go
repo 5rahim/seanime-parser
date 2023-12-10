@@ -150,6 +150,7 @@ func (t *token) isEnclosed() bool {
 	return t.Enclosed
 }
 
+// isNumberKind checks if the token comprises digits only.
 func (t *token) isNumberKind() bool {
 	if t == nil {
 		return false
@@ -157,12 +158,14 @@ func (t *token) isNumberKind() bool {
 	return t.Kind == tokenKindNumber
 }
 
+// isNumberLikeKind checks if the token comprises digits with version identifiers
 func (t *token) isNumberLikeKind() bool {
 	if t == nil {
 		return false
 	}
 	return t.Kind == tokenKindNumberLike
 }
+
 func (t *token) isYear() bool {
 	if t == nil {
 		return false
@@ -170,6 +173,14 @@ func (t *token) isYear() bool {
 	return t.Kind == tokenKindYear
 }
 
+func (t *token) isFileExt() bool {
+	if t == nil {
+		return false
+	}
+	return t.IdentifiedKeywordCategory == keywordCatFileExtension
+}
+
+// isNumberLikeKind checks if the token comprises only digits or digits with version identifiers
 func (t *token) isNumberOrLikeKind() bool {
 	if t == nil {
 		return false
@@ -182,6 +193,22 @@ func (t *token) isOrdinalNumber() bool {
 		return false
 	}
 	return t.Kind == tokenKindOrdinalNumber
+}
+
+func (t *token) isMostlyLatinString() bool {
+	if len(t.getValue()) <= 0 {
+		return false
+	}
+	latinLength := 0
+	nonLatinLength := 0
+	for _, r := range t.getValue() {
+		if isLatinRune(r) {
+			latinLength++
+		} else {
+			nonLatinLength++
+		}
+	}
+	return latinLength > nonLatinLength
 }
 
 // isFileInfoMetadata checks if the token is classified as file information metadata.

@@ -175,6 +175,7 @@ func (t *tokens) isLastToken(tkn *token) bool {
 	return t.getIndexOf(tkn) == len(*t)-1
 }
 
+// e.g. "-{tkn}" or "- {tkn}
 func (t *tokens) foundDashSeparatorBefore(tkn *token) bool {
 	// Check if token before previous token is a dash separator
 	if prevPrevTkn, found, _ := t.getTokenBeforeSD(tkn); found {
@@ -185,6 +186,102 @@ func (t *tokens) foundDashSeparatorBefore(tkn *token) bool {
 		return false
 	}
 	return true
+}
+
+// e.g. "01-{tkn}" or "1 - {tkn}"
+//
+// Returns [0] separator, [1] number or false
+func (t *tokens) checkNumberRangeBefore(tkn *token) ([]*token, bool) {
+	tkns, found, _ := t.getCategorySequenceBefore(t.getIndexOf(tkn), []tokenCategory{
+		tokenCatSeparator,
+		tokenCatUnknown,
+	}, true)
+	if !found || !tkns[1].isNumberKind() {
+		return nil, false
+	}
+	return tkns, true
+}
+
+// e.g. "01-{tkn}" or "1 - {tkn}"
+//
+// Returns [0] separator, [1] number or false
+func (t *tokens) checkNumberRangeAfter(tkn *token) ([]*token, bool) {
+	tkns, found, _ := t.getCategorySequenceAfter(t.getIndexOf(tkn), []tokenCategory{
+		tokenCatSeparator,
+		tokenCatUnknown,
+	}, true)
+	if !found || !tkns[1].isNumberKind() {
+		return nil, false
+	}
+	return tkns, true
+}
+
+// e.g. "[abc][def][ghi].mkv"
+func (t *tokens) allUnknownTokensAreEnclosed() bool {
+	for _, tkn := range *t {
+		if tkn.isFileExt() {
+			continue
+		}
+		if tkn.isUnknown() && !tkn.isEnclosed() && tkn.isMostlyLatinString() && len(tkn.getValue()) > 1 {
+			return false
+		}
+	}
+	return true
+}
+
+func (t *tokens) foundFileInfoMetadata() bool {
+	for _, tkn := range *t {
+		if tkn.isFileInfoMetadata() {
+			return true
+		}
+	}
+	return false
+}
+
+// collectUntil collects all tokens encountered until `pred` is true
+func (t *tokens) collectUntil(start int, pred func(tkn *token) bool) ([]*token, bool) {
+	if start+1 > len(*t)-1 {
+		return nil, false
+	}
+	collec := make([]*token, 0)
+	for idx, tkn := range (*t)[start:] {
+		if pred(tkn) {
+			break
+		}
+		// check if it's the end
+		if fileExtTkn, found := t.getAtSafe(idx + 1); found && fileExtTkn.isFileExt() {
+			break
+		}
+		collec = append(collec, tkn)
+	}
+	if len(collec) == 0 {
+		return nil, false
+	}
+	return collec, true
+}
+
+// walkAndCollecIf collects tokens that satisfy `pred` until `stopIf` returns true
+//
+// Example: Walk until the end
+//
+// tkns, found := walkAndCollecIf(0, func(tkn){ return tkn.isUnknown() }, func(tkn) { return false })
+func (t *tokens) walkAndCollecIf(start int, pred func(tkn *token) bool, stopIf func(tkn *token) bool) ([]*token, bool) {
+	if start+1 > len(*t)-1 {
+		return nil, false
+	}
+	collec := make([]*token, 0)
+	for _, tkn := range (*t)[start:] {
+		if stopIf(tkn) {
+			break
+		}
+		if pred(tkn) {
+			collec = append(collec, tkn)
+		}
+	}
+	if len(collec) == 0 {
+		return nil, false
+	}
+	return collec, true
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -331,6 +428,19 @@ func (t *tokens) getFromToInc(start int, end int) []*token {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+func (t *tokens) filter(pred func(tkn *token) bool) ([]*token, bool) {
+	collec := make([]*token, 0)
+	for _, tkn := range *t {
+		if pred(tkn) {
+			collec = append(collec, tkn)
+		}
+	}
+	if len(collec) == 0 {
+		return nil, false
+	}
+	return collec, true
+}
+
 func (t *tokens) getFirstOccurrenceAfter(start int, pred func(tkn *token) bool) (*token, bool) {
 	if start < 0 {
 		start = -1
@@ -427,7 +537,7 @@ func (t *tokens) getCategorySequenceBefore(start int, categories []tokenCategory
 			continue
 		}
 		if (*t)[i].isCategory(categories[cursor]) {
-			collec = append([]*token{(*t)[i]}, collec...)
+			collec = append(collec, (*t)[i])
 			cursor++
 		} else {
 			break
@@ -483,7 +593,7 @@ func (t *tokens) peekValuesAfter(start int, strs []string) ([]*token, bool) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-func (t *tokens) findWithMetadataKind(cat metadataCategory) (bool, []*token) {
+func (t *tokens) findWithMetadataCategory(cat metadataCategory) (bool, []*token) {
 	_tkns := make([]*token, 0)
 	for _, tkn := range *t {
 		if tkn.MetadataCategory == cat {
@@ -496,7 +606,7 @@ func (t *tokens) findWithMetadataKind(cat metadataCategory) (bool, []*token) {
 	return false, nil
 }
 
-func (t *tokens) findWithMetadataCategory(cat tokenCategory) (bool, []*token) {
+func (t *tokens) findWithTokenCategory(cat tokenCategory) (bool, []*token) {
 	_tkns := make([]*token, 0)
 	for _, tkn := range *t {
 		if tkn.isCategory(cat) {

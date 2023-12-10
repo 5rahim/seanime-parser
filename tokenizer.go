@@ -127,7 +127,11 @@ func tokenize(filename string) []*token {
 			}
 			continue
 		}
-		if tkn.isUnknown() && openingBracket != "" {
+
+		// We also mark parentheses as enclosed tokens
+		tknIsParenthesis := tkn.getValue() == "(" || tkn.getValue() == ")"
+
+		if (tkn.isUnknown() || tknIsParenthesis) && openingBracket != "" {
 			enclosedTknsBuff = append(enclosedTknsBuff, tkn)
 			continue
 		}

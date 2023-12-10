@@ -22,6 +22,10 @@ func (p *parser) parse() {
 
 	p.parseEpisode()
 
+	p.parseEpisodeTitle()
+
+	p.parseTitle()
+
 	p.parseKeywords("")
 
 }
@@ -93,8 +97,20 @@ func (p *parser) identifyKeyword(tkn *token, priority string) bool {
 				return false
 			}
 
-			if p.tokenManager.keywordManager.isKeywordAmbiguous(keyword) {
-				// TODO: Handle ambiguous keywords
+			if priority == "normal" {
+				// when the priority is "normal", we only want to identify STANDALONE keywords that are not ambiguous
+				if p.tokenManager.keywordManager.isKeywordAmbiguous(keyword) {
+					return false
+				}
+			} else {
+				// Priority is low, so we want to identify STANDALONE keywords even if they are ambiguous
+				// We check that they come after the episode number (if any) or the season number (if any)
+				// or not included in the anime title (if any)
+				if p.tokenManager.keywordManager.isKeywordAmbiguous(keyword) {
+					// TODO: Handle ambiguous keywords
+					// -> Check they come after episode number
+					return false
+				}
 			}
 
 			tkn.setIdentifiedKeywordCategory(keyword.category)

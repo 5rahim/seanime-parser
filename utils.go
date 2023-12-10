@@ -33,6 +33,9 @@ func isNumberOrLike(s string) bool {
 }
 
 func isNumberZeroPadded(s string) bool {
+	if len(s) < 2 {
+		return false
+	}
 	if !isNumber(s) && !isNumberLike(s) {
 		return false
 	}
@@ -93,7 +96,7 @@ func isHexadecimalString(s string) bool {
 // isResolution checks if the given string represents a valid resolution.
 // It returns true if the string is a valid resolution, otherwise it returns false.
 func isResolution(s string) bool {
-	found, _ := regexp.Match(`\d{3,4}([pP]|[xX\\u00D7]\d{3,4})$`, []byte(s))
+	found, _ := regexp.Match(`\d{3,4}([pP]|[×xX\\u00D7]\d{3,4})$`, []byte(s))
 	return found
 }
 
@@ -125,6 +128,10 @@ func stringToInt(str string) int {
 		return 0
 	}
 	return i
+}
+
+func isLatinRune(r rune) bool {
+	return unicode.In(r, unicode.Latin)
 }
 
 // findNumberInString searches for the first occurrence of a digit in the given string and returns its index.
