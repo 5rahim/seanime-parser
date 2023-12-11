@@ -40,7 +40,7 @@ type Metadata struct {
 	EpisodeTitle        string   `json:"episode_title,omitempty"`
 	FileChecksum        string   `json:"file_checksum,omitempty"`
 	FileExtension       string   `json:"file_extension,omitempty"`
-	FileName            string   `json:"file_name,omitempty"`
+	FileName            string   `json:"filename,omitempty"`
 	Language            []string `json:"language,omitempty"`
 	ReleaseGroup        string   `json:"release_group,omitempty"`
 	ReleaseInformation  []string `json:"release_information,omitempty"`

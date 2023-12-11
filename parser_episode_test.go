@@ -15,7 +15,7 @@ func TestEpisodes(t *testing.T) {
 		{"Bleach 225", []string{"225"}, false},
 		{"[Conclave-Mendoi]_Mobile_Suit_Gundam_00_S2_-_01v2_[1280x720_H.264_AAC][4863FBE8].mkv", []string{"01v2"}, false},
 		{"NieR:Automata Ver1.1a - 01", []string{"01"}, false},
-		{"NieR:Automata Ver1.1a - Ep01", []string{"01"}, true},
+		{"NieR:Automata Ver1.1a - Ep01", []string{"01"}, false},
 		{"[SubsPlease] Sousou no Frieren - 14", []string{"14"}, false},
 		{"[SubsPlease] Sousou no Frieren - 14 (480p) [6EB72DA5].mkv", []string{"14"}, false},
 		{"[SubsPlease] Sousou no Frieren - 14 480p 10 [6EB72DA5].mkv", []string{"14"}, false},

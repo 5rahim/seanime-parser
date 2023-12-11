@@ -12,6 +12,11 @@ func isNumber(s string) bool {
 	return err == nil
 }
 
+func isDigitsOnly(s string) bool {
+	rgx := regexp.MustCompile(`^\d+$`)
+	return rgx.MatchString(s)
+}
+
 // isNumberLike checks if the provided string matches a specific pattern.
 // It returns true if the string matches the pattern, otherwise false.
 // The pattern is defined as follows:
