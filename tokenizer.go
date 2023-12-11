@@ -16,7 +16,7 @@ var brackets = [][]rune{
 	{'\uFF08', '\uFF09'},
 }
 var separators = []rune{'-', '+', '~', '&', '\u2010', '\u2011', '\u2012', '\u2013', '\u2014', '\u2015'}
-var delimiters = []rune{' ', '_', '.', '|'}
+var delimiters = []rune{' ', '_', '.', '|', ','}
 
 // tokenize
 //

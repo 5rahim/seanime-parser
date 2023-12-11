@@ -156,6 +156,28 @@ func (p *parser) parseEpisodeBySearching(aggressive bool) bool {
 			break
 		}
 
+		// When searching aggressively
+		// Check that the number might really be an episode number
+		// e.g. if {lastNumTkn} < 10, lastNumTkn should be zero padded to avoid false positives like "Title 2"
+		//FIXME False positive: "Evangelion 3.0 You Can (Not) Redo" -> "3.0" is identified as episode number
+		if aggressive {
+			if numTkn.isNumberKind() {
+				intVal, err := strconv.Atoi(numTkn.getValue())
+				if err != nil {
+					break
+				}
+				println(intVal)
+				if intVal < 10 && !isNumberZeroPadded(numTkn.getValue()) {
+					break
+				}
+				// should be isolated
+				if !p.tokenManager.tokens.isIsolated(numTkn) {
+					break
+				}
+			}
+			// in the case of "Title 2v2", we can safely identify "2v2" as an episode number
+		}
+
 		numTkn.setMetadataCategory(metadataEpisodeNumber)
 		return true // Found episode number, end
 
@@ -203,7 +225,12 @@ func (p *parser) parseEpisodeBySearching(aggressive bool) bool {
 				if err != nil {
 					break
 				}
+				println(intVal)
 				if intVal < 10 && !isNumberZeroPadded(lastNumTkn.getValue()) {
+					break
+				}
+				// should be isolated
+				if !p.tokenManager.tokens.isIsolated(lastNumTkn) {
 					break
 				}
 			}
@@ -397,7 +424,8 @@ func (p *parser) parseEpisodeByRangeSeparator(value string) bool {
 
 		// e.g. We found "01 of 24"
 		numTkn.setMetadataCategory(metadataEpisodeNumber)
-		secondNumTkn.setMetadataCategory(metadataEpisodeNumber)
+		ofTkn.setCategory(tokenCatKnown)
+		secondNumTkn.setMetadataCategory(metadataOtherEpisodeNumber)
 		return true
 
 	}

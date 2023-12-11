@@ -30,6 +30,8 @@ func Parse(filename string) *Metadata {
 
 func (p *parser) parse() {
 
+	p.parseFileExtension()
+
 	p.parseKeywords("normal")
 
 	p.parseSeason()
@@ -44,8 +46,21 @@ func (p *parser) parse() {
 
 	p.parseKeywords("")
 
+	p.writeFormattedTitle()
+
 	p.collectMetadata()
 
+}
+
+func (p *parser) parseFileExtension() {
+
+	// Get last token
+	lastTkn := (*p.tokenManager.tokens)[len(*p.tokenManager.tokens)-1]
+
+	_, found := p.tokenManager.keywordManager.findStandaloneKeywordByValue(lastTkn.getValue())
+	if found {
+		lastTkn.setMetadataCategory(metadataFileExtension)
+	}
 }
 
 func (p *parser) parseKeywords(priority string) {
@@ -141,7 +156,7 @@ func (p *parser) collectMetadata() {
 		case keywordCatYear:
 			p.metadata.Year = tkn.getValue()
 		case keywordCatReleaseVersion:
-			p.metadata.ReleaseVersion = append(p.metadata.ReleaseVersion, tkn.getValue())
+			p.metadata.ReleaseVersion = append(p.metadata.ReleaseVersion, strings.Replace(tkn.getNormalizedValue(), "V", "", 1))
 		case keywordCatFileChecksum:
 			p.metadata.FileChecksum = tkn.getValue()
 		case keywordCatVideoResolution:
@@ -162,12 +177,16 @@ func (p *parser) collectMetadata() {
 			p.metadata.Subtitles = append(p.metadata.Subtitles, tkn.getValue())
 		case keywordCatSource:
 			p.metadata.Source = append(p.metadata.Source, tkn.getValue())
-		case keywordCatFileExtension:
-			p.metadata.FileExtension = tkn.getValue()
+		//case keywordCatFileExtension:
+		//p.metadata.FileExtension = tkn.getValue()
+		case keywordCatReleaseInformation:
+			p.metadata.ReleaseInformation = append(p.metadata.ReleaseInformation, tkn.getValue())
 		default:
 		}
 
 		switch tkn.MetadataCategory {
+		case metadataFileExtension:
+			p.metadata.FileExtension = tkn.getValue()
 		case metadataTitle:
 			p.metadata.Title = tkn.getValue()
 		case metadataEpisodeTitle:
@@ -179,9 +198,9 @@ func (p *parser) collectMetadata() {
 		case metadataEpisodeNumberAlt:
 			p.metadata.EpisodeNumberAlt = append(p.metadata.EpisodeNumberAlt, tkn.getValue())
 		case metadataSeason:
-			p.metadata.Season = append(p.metadata.Season, tkn.getValue())
+			p.metadata.SeasonNumber = append(p.metadata.SeasonNumber, tkn.getValue())
 		case metadataPart:
-			p.metadata.Part = append(p.metadata.Part, tkn.getValue())
+			p.metadata.PartNumber = append(p.metadata.PartNumber, tkn.getValue())
 		case metadataVolumeNumber:
 			p.metadata.VolumeNumber = append(p.metadata.VolumeNumber, tkn.getValue())
 		case metadataAnimeType:
@@ -215,6 +234,41 @@ func (p *parser) collectMetadata() {
 
 }
 
+func (p *parser) writeFormattedTitle() {
+	// Get title
+	found, titleTkns := p.tokenManager.tokens.findWithMetadataCategory(metadataTitle)
+	if !found {
+		return
+	}
+	titleTkn := titleTkns[0]
+
+	// Get anime types
+	found, animeTypeTkns := p.tokenManager.tokens.findWithKeywordCategory(keywordCatAnimeType)
+	if !found {
+		p.metadata.FormattedTitle = titleTkn.getValue()
+		return
+	}
+	// Get other episode numbers
+	found, otherEpisodeNumberTkns := p.tokenManager.tokens.findWithMetadataCategory(metadataOtherEpisodeNumber)
+	if !found {
+		//p.metadata.FormattedTitle = titleTkn.getValue()
+		//return
+	}
+
+	title := titleTkn.getValue()
+	for idx, tkn := range animeTypeTkns {
+		title += " " + tkn.getValue()
+		if otherEpisodeNumberTkns != nil && idx < len(otherEpisodeNumberTkns) {
+			title += " " + otherEpisodeNumberTkns[idx].getValue()
+		}
+	}
+
+	p.metadata.FormattedTitle = title
+
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 func (p *parser) cleanUp() {
 
 	if p.metadata.EpisodeNumber != nil {
@@ -224,16 +278,16 @@ func (p *parser) cleanUp() {
 			p.metadata.ReleaseVersion = append(p.metadata.ReleaseVersion, vers)
 		}
 	}
-	if p.metadata.Season != nil {
-		ret, vers := cleanNumbers(p.metadata.Season)
-		p.metadata.Season = ret
+	if p.metadata.SeasonNumber != nil {
+		ret, vers := cleanNumbers(p.metadata.SeasonNumber)
+		p.metadata.SeasonNumber = ret
 		if len(vers) > 0 {
 			p.metadata.ReleaseVersion = append(p.metadata.ReleaseVersion, vers)
 		}
 	}
-	if p.metadata.Part != nil {
-		ret, vers := cleanNumbers(p.metadata.Part)
-		p.metadata.Part = ret
+	if p.metadata.PartNumber != nil {
+		ret, vers := cleanNumbers(p.metadata.PartNumber)
+		p.metadata.PartNumber = ret
 		if len(vers) > 0 {
 			p.metadata.ReleaseVersion = append(p.metadata.ReleaseVersion, vers)
 		}

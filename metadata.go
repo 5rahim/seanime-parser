@@ -24,12 +24,14 @@ const (
 	metadataVolumeNumber
 	metadataOtherEpisodeNumber
 	metadataReleaseGroup
+	metadataFileExtension
 )
 
 type Metadata struct {
-	Season              []string `json:"season,omitempty"`
-	Part                []string `json:"anime_part,omitempty"`
+	SeasonNumber        []string `json:"season_number,omitempty"`
+	PartNumber          []string `json:"part_number,omitempty"`
 	Title               string   `json:"title,omitempty"`
+	FormattedTitle      string   `json:"formatted_title,omitempty"`
 	AnimeType           []string `json:"anime_type,omitempty"`
 	Year                string   `json:"year,omitempty"`
 	AudioTerm           []string `json:"audio_term,omitempty"`
@@ -40,7 +42,7 @@ type Metadata struct {
 	EpisodeTitle        string   `json:"episode_title,omitempty"`
 	FileChecksum        string   `json:"file_checksum,omitempty"`
 	FileExtension       string   `json:"file_extension,omitempty"`
-	FileName            string   `json:"filename,omitempty"`
+	FileName            string   `json:"file_name,omitempty"`
 	Language            []string `json:"language,omitempty"`
 	ReleaseGroup        string   `json:"release_group,omitempty"`
 	ReleaseInformation  []string `json:"release_information,omitempty"`

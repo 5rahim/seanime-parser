@@ -20,9 +20,10 @@ func TestSeanimeParser(t *testing.T) {
 			metadata := seanime_parser.Parse(tt.FileName)
 			assert.NotNil(t, metadata)
 
-			assertMetadataEquals(t, metadata.Season, tt.Season, "Season")
+			assertMetadataEquals(t, metadata.SeasonNumber, tt.SeasonNumber, "Season")
 			assertMetadataEquals(t, metadata.EpisodeNumber, tt.EpisodeNumber, "Episode")
-			assertMetadataEquals(t, metadata.Part, tt.Part, "Part")
+			assertMetadataEquals(t, metadata.OtherEpisodeNumber, tt.OtherEpisodeNumber, "Episode")
+			assertMetadataEquals(t, metadata.PartNumber, tt.PartNumber, "Part")
 			assertMetadataEquals(t, metadata.Title, tt.Title, "Title")
 			assertMetadataEquals(t, metadata.AnimeType, tt.AnimeType, "AnimeType")
 			assertMetadataEquals(t, metadata.Year, tt.Year, "Year")
@@ -41,7 +42,8 @@ func TestSeanimeParser(t *testing.T) {
 			assertMetadataEquals(t, metadata.Subtitles, tt.Subtitles, "Subtitles")
 			assertMetadataEquals(t, metadata.VideoResolution, tt.VideoResolution, "VideoResolution")
 			assertMetadataEquals(t, metadata.VideoTerm, tt.VideoTerm, "VideoTerm")
-			assertMetadataEquals(t, metadata.VolumeNumber, tt.VolumeNumber, "VolumeNumber")
+			assertMetadataEquals(t, metadata.VolumeNumber, tt.VolumeNumber, "Volume")
+			assertMetadataEquals(t, metadata.FormattedTitle, tt.FormattedTitle, "FormattedTitle")
 
 		})
 	}
@@ -49,6 +51,7 @@ func TestSeanimeParser(t *testing.T) {
 }
 
 func assertMetadataEquals(t *testing.T, received interface{}, expected interface{}, kind string) {
+
 	if expected == nil {
 		if received == nil {
 			return

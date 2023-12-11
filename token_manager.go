@@ -215,6 +215,19 @@ func (t *tokens) getTokenBeforeSD(tkn *token) (*token, bool, int) {
 	return nil, false, skipped
 }
 
+// isIsolated checks if the specified token is surrounded by delimiters that are not "."
+func (t *tokens) isIsolated(tkn *token) bool {
+	index := t.getIndexOf(tkn)
+	if index == -1 {
+		return false
+	}
+	prevTkn, found := t.getTokenBefore(tkn)
+	isolatedOnTheLeft := !found || (prevTkn.isDelimiter() && prevTkn.getValue() != ".")
+	nextTkn, found := t.getTokenAfter(tkn)
+	isolatedOnTheRight := !found || (nextTkn.isDelimiter())
+	return isolatedOnTheLeft && isolatedOnTheRight
+}
+
 // isTokenInFirstHalf checks if the specified token is in the first half of the tokens list.
 // It returns true if the token is found and its index is less than or equal to half the length of the list,
 // otherwise it returns false.

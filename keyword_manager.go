@@ -68,7 +68,7 @@ func newKeywordManager() *keywordManager {
 	// The parser will treat these keywords as standalone ambiguous tokens and will not attempt to identify them if
 	// they are found in the first half of the filename.
 	km.ambiguousKeywords = []string{
-		"SP", "ANDROID", "ITA", "ESP", "BD",
+		"SP", "ANDROID", "ITA", "ESP", "BD", "FR",
 	}
 
 	// Season
@@ -238,6 +238,14 @@ func newKeywordManager() *keywordManager {
 		},
 	)
 
+	// Release version
+
+	km.addGroup(
+		keywordCatReleaseVersion,
+		keywordKindStandalone,
+		[]string{"V2", "V3", "V4", "V5"},
+	)
+
 	// Device Compat
 
 	km.addGroup(
@@ -262,7 +270,7 @@ func newKeywordManager() *keywordManager {
 	km.addGroup(
 		keywordCatLanguage,
 		keywordKindStandalone,
-		[]string{"ENG", "ENGLISH", "ESPANOL", "JAP", "JPN", "PT-BR", "SPANISH", "VOSTFR", "ESP", "ITA"},
+		[]string{"ENG", "ENGLISH", "ESPANOL", "JAP", "JPN", "FR", "PT-BR", "SPANISH", "VOSTFR", "ESP", "ITA"},
 	)
 
 	// Release info

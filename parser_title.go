@@ -25,6 +25,7 @@ func (p *parser) parseEpisodeTitle() {
 	}
 
 	p.tokenManager.tokens.combineTitle(tkns[0], tkns[len(tkns)-1], metadataEpisodeTitle)
+
 	return
 
 }
