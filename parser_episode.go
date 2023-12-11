@@ -159,18 +159,17 @@ func (p *parser) parseEpisodeBySearching(aggressive bool) bool {
 		// When searching aggressively
 		// Check that the number might really be an episode number
 		// e.g. if {lastNumTkn} < 10, lastNumTkn should be zero padded to avoid false positives like "Title 2"
-		//FIXME False positive: "Evangelion 3.0 You Can (Not) Redo" -> "3.0" is identified as episode number
 		if aggressive {
 			if numTkn.isNumberKind() {
 				intVal, err := strconv.Atoi(numTkn.getValue())
 				if err != nil {
 					break
 				}
-				println(intVal)
 				if intVal < 10 && !isNumberZeroPadded(numTkn.getValue()) {
 					break
 				}
 				// should be isolated
+				// avoids Evangelion 1.11 You Can (Not) Redo -> 11 being identified as episode number
 				if !p.tokenManager.tokens.isIsolated(numTkn) {
 					break
 				}
@@ -181,6 +180,36 @@ func (p *parser) parseEpisodeBySearching(aggressive bool) bool {
 		numTkn.setMetadataCategory(metadataEpisodeNumber)
 		return true // Found episode number, end
 
+	}
+
+	// Check for first occurrence of unknown number preceded and followed by a dash separator
+	// e.g. "- 01 -"
+	for {
+		for _, numTkn := range *p.tokenManager.tokens {
+			if !numTkn.isUnknown() || !numTkn.isNumberOrLikeKind() {
+				continue // Check next token
+			}
+			// Check dash separator before
+			if !p.tokenManager.tokens.foundDashSeparatorBefore(numTkn) {
+				continue // Check next token
+			}
+			// Check dash separator after
+			if !p.tokenManager.tokens.foundDashSeparatorAfter(numTkn) {
+				continue // Check next token
+			}
+			// Check that it is not a range
+			// e.g. "01 - 03"
+			if _, found := p.tokenManager.tokens.checkNumberRangeBefore(numTkn); found {
+				continue // Check next token
+			}
+			if _, found := p.tokenManager.tokens.checkNumberRangeAfter(numTkn); found {
+				continue // Check next token
+			}
+
+			numTkn.setMetadataCategory(metadataEpisodeNumber)
+			return true // Found episode number, end
+		}
+		break
 	}
 
 	// Check for last unknown number
@@ -218,14 +247,12 @@ func (p *parser) parseEpisodeBySearching(aggressive bool) bool {
 		// When searching aggressively
 		// Check that the number might really be an episode number
 		// e.g. if {lastNumTkn} < 10, lastNumTkn should be zero padded to avoid false positives like "Title 2"
-		//FIXME False positive: "Evangelion 3.0 You Can (Not) Redo" -> "3.0" is identified as episode number
 		if aggressive {
 			if lastNumTkn.isNumberKind() {
 				intVal, err := strconv.Atoi(lastNumTkn.getValue())
 				if err != nil {
 					break
 				}
-				println(intVal)
 				if intVal < 10 && !isNumberZeroPadded(lastNumTkn.getValue()) {
 					break
 				}

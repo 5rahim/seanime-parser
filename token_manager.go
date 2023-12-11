@@ -216,6 +216,9 @@ func (t *tokens) getTokenBeforeSD(tkn *token) (*token, bool, int) {
 }
 
 // isIsolated checks if the specified token is surrounded by delimiters that are not "."
+// e.g. tkn.Value = 01
+// e.g. " 01.mkv" -> true, " 01[" -> false, " 01 " -> true
+// e.g. "1.01 " -> false
 func (t *tokens) isIsolated(tkn *token) bool {
 	index := t.getIndexOf(tkn)
 	if index == -1 {
@@ -224,7 +227,7 @@ func (t *tokens) isIsolated(tkn *token) bool {
 	prevTkn, found := t.getTokenBefore(tkn)
 	isolatedOnTheLeft := !found || (prevTkn.isDelimiter() && prevTkn.getValue() != ".")
 	nextTkn, found := t.getTokenAfter(tkn)
-	isolatedOnTheRight := !found || (nextTkn.isDelimiter())
+	isolatedOnTheRight := !found || (nextTkn.isDelimiter() || nextTkn.isOpeningBracket())
 	return isolatedOnTheLeft && isolatedOnTheRight
 }
 
@@ -280,13 +283,22 @@ func (t *tokens) isLastToken(tkn *token) bool {
 func (t *tokens) foundDashSeparatorBefore(tkn *token) bool {
 	// Check if token before previous token is a dash separator
 	if prevPrevTkn, found, _ := t.getTokenBeforeSD(tkn); found {
-		if !prevPrevTkn.isDashSeparator() {
-			return false
+		if prevPrevTkn.isDashSeparator() {
+			return true
 		}
-	} else {
-		return false
 	}
-	return true
+	return false
+}
+
+// e.g. "{tkn}-" or "{tkn}-
+func (t *tokens) foundDashSeparatorAfter(tkn *token) bool {
+	// Check if token before previous token is a dash separator
+	if prevPrevTkn, found, _ := t.getTokenAfterSD(tkn); found {
+		if prevPrevTkn.isDashSeparator() {
+			return true
+		}
+	}
+	return false
 }
 
 // e.g. "01-{tkn}" or "1 - {tkn}"
@@ -511,12 +523,12 @@ func (t *tokens) getToInc(index int) []*token {
 	return (*t)[:index+1]
 }
 
-func (t *tokens) getFromTo(start int, end int) []*token {
+func (t *tokens) getFromTo(start int, end int) ([]*token, bool) {
 	// check indices
 	if start < 0 || end < 0 || start > end || start > len(*t) || end > len(*t) {
-		return []*token{}
+		return []*token{}, false
 	}
-	return (*t)[start:end]
+	return (*t)[start:end], true
 }
 
 func (t *tokens) getFromToInc(start int, end int) ([]*token, bool) {

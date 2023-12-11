@@ -14,7 +14,7 @@
   {
     "file_name": "[TaigaSubs]_Toradora!_(2008)_-_01v2_-_Tiger_and_Dragon_[1280x720_H.264_FLAC][1234ABCD].mkv",
     "title": "Toradora!",
-    "formatted_title": "Toradora!",
+    "formatted_title": "Toradora! (2008)",
     "anime_year": "2008",
     "audio_term": [
       "FLAC"
@@ -273,7 +273,7 @@
   {
     "file_name": "[Taka]_Fullmetal_Alchemist_(2009)_04_[720p][40F2A957].mp4",
     "title": "Fullmetal Alchemist",
-    "formatted_title": "Fullmetal Alchemist",
+    "formatted_title": "Fullmetal Alchemist (2009)",
     "anime_year": "2009",
     "episode_number": [
       "04"
@@ -302,10 +302,10 @@
     ]
   },
   {
+    "file_name": "[ValdikSS]_First_Squad_The_Morment_Of_Truth_[720x576_h264_dvdscr_eng_hardsub].mkv",
     "title": "First Squad The Morment Of Truth",
     "formatted_title": "First Squad The Morment Of Truth",
     "file_extension": "mkv",
-    "file_name": "[ValdikSS]_First_Squad_The_Morment_Of_Truth_[720x576_h264_dvdscr_eng_hardsub].mkv",
     "language": [
       "eng"
     ],
@@ -319,6 +319,7 @@
     ]
   },
   {
+    "file_name": "Code_Geass_R2_TV_[20_of_25]_[ru_jp]_[HDTV]_[Varies_&_Cuba77_&_AnimeReactor_RU].mkv",
     "title": "Code Geass R2 TV",
     "formatted_title": "Code Geass R2 TV",
     "episode_number": [
@@ -328,21 +329,20 @@
       "25"
     ],
     "file_extension": "mkv",
-    "file_name": "Code_Geass_R2_TV_[20_of_25]_[ru_jp]_[HDTV]_[Varies_&_Cuba77_&_AnimeReactor_RU].mkv",
     "release_group": "Varies & Cuba77 & AnimeReactor RU",
     "source": [
       "HDTV"
     ]
   },
   {
+    "file_name": "Evangelion_1.11_You_Are_(Not)_Alone_(2009)_[1080p,BluRay,x264,DTS-ES]_-_THORA.mkv",
     "title": "Evangelion 1.11 You Are (Not) Alone",
-    "formatted_title": "Evangelion 1.11 You Are (Not) Alone",
+    "formatted_title": "Evangelion 1.11 You Are (Not) Alone (2009)",
     "anime_year": "2009",
     "audio_term": [
       "DTS-ES"
     ],
     "file_extension": "mkv",
-    "file_name": "Evangelion_1.11_You_Are_(Not)_Alone_(2009)_[1080p,BluRay,x264,DTS-ES]_-_THORA.mkv",
     "release_group": "THORA",
     "source": [
       "BluRay"
@@ -353,13 +353,13 @@
     ]
   },
   {
+    "file_name": "Evangelion_1.11_You_Are_(Not)_Alone_[1080p,BluRay,x264,DTS-ES]_-_THORA.mkv",
     "title": "Evangelion 1.11 You Are (Not) Alone",
     "formatted_title": "Evangelion 1.11 You Are (Not) Alone",
     "audio_term": [
       "DTS-ES"
     ],
     "file_extension": "mkv",
-    "file_name": "Evangelion_1.11_You_Are_(Not)_Alone_[1080p,BluRay,x264,DTS-ES]_-_THORA.mkv",
     "release_group": "THORA",
     "source": [
       "BluRay"
@@ -370,10 +370,251 @@
     ]
   },
   {
+    "file_name": "Eve no Jikan 2 [88F4F7F0].mkv",
     "title": "Eve no Jikan 2",
     "formatted_title": "Eve no Jikan 2",
     "file_checksum": "88F4F7F0",
+    "file_extension": "mkv"
+  },
+  {
+    "file_name": "Gin'iro_no_Kami_no_Agito_(2006)_[1080p,BluRay,x264,DTS]_-_THORA.mkv",
+    "title": "Gin'iro no Kami no Agito",
+    "formatted_title": "Gin'iro no Kami no Agito (2006)",
+    "anime_year": "2006",
+    "audio_term": [
+      "DTS"
+    ],
     "file_extension": "mkv",
-    "file_name": "Eve no Jikan 2 [88F4F7F0].mkv"
+    "release_group": "THORA",
+    "source": [
+      "BluRay"
+    ],
+    "video_resolution": "1080p",
+    "video_term": [
+      "x264"
+    ]
+  },
+  {
+    "file_name": "Magical Girl Lyrical Nanoha A's - 01.DVD[H264.AAC][DGz][7A8A7769].mkv",
+    "title": "Magical Girl Lyrical Nanoha A's",
+    "formatted_title": "Magical Girl Lyrical Nanoha A's",
+    "audio_term": [
+      "AAC"
+    ],
+    "episode_number": [
+      "01"
+    ],
+    "file_checksum": "7A8A7769",
+    "file_extension": "mkv",
+    "release_group": "DGz",
+    "source": [
+      "DVD"
+    ],
+    "video_term": [
+      "H264"
+    ]
+  },
+  {
+    "file_name": "Mobile_Suit_Gundam_00_Season_2_Ep07_A_Reunion_and_a_Parting_[1080p,BluRay,x264]_-_THORA.mkv",
+    "season_number": [
+      "2"
+    ],
+    "title": "Mobile Suit Gundam 00",
+    "formatted_title": "Mobile Suit Gundam 00",
+    "episode_number": [
+      "07"
+    ],
+    "episode_title": "A Reunion and a Parting",
+    "file_extension": "mkv",
+    "release_group": "THORA",
+    "source": [
+      "BluRay"
+    ],
+    "video_resolution": "1080p",
+    "video_term": [
+      "x264"
+    ]
+  },
+  {
+    "file_name": "Noein_[01_of_24]_[ru_jp]_[bodlerov_&_torrents_ru].mkv",
+    "title": "Noein",
+    "formatted_title": "Noein",
+    "episode_number": [
+      "01"
+    ],
+    "other_episode_number": [
+      "24"
+    ],
+    "file_extension": "mkv",
+    "release_group": "bodlerov & torrents ru"
+  },
+  {
+    "file_name": "ponyo_on_the_cliff_by_the_sea[h264.dts][niizk].mkv",
+    "title": "ponyo on the cliff by the sea",
+    "formatted_title": "ponyo on the cliff by the sea",
+    "audio_term": [
+      "dts"
+    ],
+    "file_extension": "mkv",
+    "release_group": "niizk",
+    "video_term": [
+      "h264"
+    ]
+  },
+  {
+    "file_name": "[Seto_Otaku]_AIKa_ZERO_OVA_-_01_[BD][1920x1080_H264-Flac][6730D40A].mkv",
+    "title": "AIKa ZERO OVA",
+    "formatted_title": "AIKa ZERO OVA",
+    "audio_term": [
+      "Flac"
+    ],
+    "episode_number": [
+      "01"
+    ],
+    "file_checksum": "6730D40A",
+    "file_extension": "mkv",
+    "release_group": "Seto Otaku",
+    "source": [
+      "BD"
+    ],
+    "video_resolution": "1920x1080",
+    "video_term": [
+      "H264"
+    ]
+  },
+  {
+    "file_name": "[a4e]R.O.D_the_TV_01[divx5.2.1].mkv",
+    "title": "R.O.D the TV",
+    "formatted_title": "R.O.D the TV",
+    "episode_number": [
+      "01"
+    ],
+    "file_extension": "mkv",
+    "release_group": "a4e",
+    "video_term": [
+      "divx5"
+    ]
+  },
+  {
+    "file_name": "Ghost_in_the_Shell_Stand_Alone_Complex_2nd_GIG_Ep05v2_EXCAVATION_[720p,HDTV,x264,AAC_5.1]_-_THORA.mkv",
+    "title": "Ghost in the Shell Stand Alone Complex 2nd GIG",
+    "formatted_title": "Ghost in the Shell Stand Alone Complex 2nd GIG",
+    "audio_term": [
+      "AAC",
+      "5.1"
+    ],
+    "episode_number": [
+      "05"
+    ],
+    "episode_title": "EXCAVATION",
+    "file_extension": "mkv",
+    "release_group": "THORA",
+    "release_version": [
+      "2"
+    ],
+    "source": [
+      "HDTV"
+    ],
+    "video_resolution": "720p",
+    "video_term": [
+      "x264"
+    ]
+  },
+  {
+    "file_name": "Fate_Stay_Night_Ep05_The_Two_Magi_Part1_[720p,BluRay,x264]_-_THORA.mkv",
+    "title": "Fate Stay Night",
+    "formatted_title": "Fate Stay Night",
+    "episode_number": [
+      "05"
+    ],
+    "part_number": [
+      "1"
+    ],
+    "episode_title": "The Two Magi",
+    "file_extension": "mkv",
+    "release_group": "THORA",
+    "source": [
+      "BluRay"
+    ],
+    "video_resolution": "720p",
+    "video_term": [
+      "x264"
+    ]
+  },
+  {
+    "file_name": "[RaX]Mezzo(DSA)_-_05_-_[x264_ogg]_[585d9971].mkv",
+    "title": "Mezzo",
+    "formatted_title": "Mezzo (DSA)",
+    "audio_term": [
+      "ogg"
+    ],
+    "episode_number": [
+      "05"
+    ],
+    "file_checksum": "585d9971",
+    "file_extension": "mkv",
+    "release_group": "RaX",
+    "video_term": [
+      "x264"
+    ]
+  },
+  {
+    "file_name": "[FuktLogik][Sayonara_Zetsubou_Sensei][01][DVDRip][x264_AC3].mkv",
+    "title": "Sayonara Zetsubou Sensei",
+    "formatted_title": "Sayonara Zetsubou Sensei",
+    "audio_term": [
+      "AC3"
+    ],
+    "episode_number": [
+      "01"
+    ],
+    "file_extension": "mkv",
+    "release_group": "FuktLogik",
+    "source": [
+      "DVDRip"
+    ],
+    "video_term": [
+      "x264"
+    ]
+  },
+  {
+    "file_name": "[Ayu]_Kiddy_Grade_2_-_Pilot_[H264_AC3][650B731B].mkv",
+    "title": "Kiddy Grade 2 - Pilot",
+    "formatted_title": "Kiddy Grade 2 - Pilot",
+    "audio_term": [
+      "AC3"
+    ],
+    "file_checksum": "650B731B",
+    "file_extension": "mkv",
+    "release_group": "Ayu",
+    "video_term": [
+      "H264"
+    ]
+  },
+  {
+    "file_name": "[Darksoul-Subs] Tatakau Shisho - The Book of Bantorra [848x480 XVID_MP3].mkv",
+    "title": "Tatakau Shisho - The Book of Bantorra",
+    "formatted_title": "Tatakau Shisho - The Book of Bantorra",
+    "audio_term": [
+      "MP3"
+    ],
+    "file_extension": "mkv",
+    "release_group": "Darksoul-Subs",
+    "video_resolution": "848x480",
+    "video_term": [
+      "XVID"
+    ]
+  },
+  {
+    "file_name": "[ACX]Neon_Genesis_Evangelion_-_Platinum_-_06_-_Showdown_in_Tokyo_3_[SaintDeath]_[CBDB8577].mkv",
+    "title": "Neon Genesis Evangelion - Platinum",
+    "formatted_title": "Neon Genesis Evangelion - Platinum",
+    "episode_number": [
+      "06"
+    ],
+    "episode_title": "Showdown in Tokyo 3",
+    "file_checksum": "CBDB8577",
+    "file_extension": "mkv",
+    "release_group": "ACX"
   }
 ]

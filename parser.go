@@ -241,11 +241,36 @@ func (p *parser) writeFormattedTitle() {
 		return
 	}
 	titleTkn := titleTkns[0]
+	title := titleTkn.getValue()
+
+	// Add content between parenthesis
+	openingParenTkn, found, _ := p.tokenManager.tokens.getTokenAfterSD(titleTkn)
+	if found && openingParenTkn.isOpeningBracket() && openingParenTkn.getValue() == "(" {
+		closingParenTkn, found := p.tokenManager.tokens.getFirstOccurrenceAfter(
+			p.tokenManager.tokens.getIndexOf(openingParenTkn),
+			func(tkn *token) bool {
+				return tkn.getValue() == ")"
+			})
+		if found && closingParenTkn.isClosingBracket() && closingParenTkn.getValue() == ")" {
+			inbetweenTkns, found := p.tokenManager.tokens.getFromTo(p.tokenManager.tokens.getIndexOf(openingParenTkn)+1, p.tokenManager.tokens.getIndexOf(closingParenTkn))
+			if found {
+				title += " ("
+				for idx, tkn := range inbetweenTkns {
+					title += tkn.getValue()
+					if idx < len(inbetweenTkns)-1 {
+						title += " "
+					}
+				}
+				title += ")"
+				println(title)
+			}
+		}
+	}
 
 	// Get anime types
 	found, animeTypeTkns := p.tokenManager.tokens.findWithKeywordCategory(keywordCatAnimeType)
 	if !found {
-		p.metadata.FormattedTitle = titleTkn.getValue()
+		p.metadata.FormattedTitle = title
 		return
 	}
 	// Get other episode numbers
@@ -255,7 +280,6 @@ func (p *parser) writeFormattedTitle() {
 		//return
 	}
 
-	title := titleTkn.getValue()
 	for idx, tkn := range animeTypeTkns {
 		title += " " + tkn.getValue()
 		if otherEpisodeNumberTkns != nil && idx < len(otherEpisodeNumberTkns) {
