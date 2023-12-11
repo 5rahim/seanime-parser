@@ -50,6 +50,56 @@ func TestSeanimeParser(t *testing.T) {
 
 }
 
+func TestSeanimeParserIsolated(t *testing.T) {
+
+	data := getData()
+	assert.NotNil(t, data)
+
+	filename := "Hayate no Gotoku 2nd Season 24 (Blu-Ray 1080p) [Chihiro]"
+
+	for _, tt := range data {
+
+		if tt.FileName != filename {
+			continue
+		}
+
+		t.Run(tt.FileName, func(t *testing.T) {
+
+			metadata, tokens := seanime_parser.ParseAndDebug(tt.FileName)
+			assert.NotNil(t, metadata)
+
+			println(tokens.Sdump())
+
+			assertMetadataEquals(t, metadata.SeasonNumber, tt.SeasonNumber, "Season")
+			assertMetadataEquals(t, metadata.EpisodeNumber, tt.EpisodeNumber, "Episode")
+			assertMetadataEquals(t, metadata.OtherEpisodeNumber, tt.OtherEpisodeNumber, "Episode")
+			assertMetadataEquals(t, metadata.PartNumber, tt.PartNumber, "Part")
+			assertMetadataEquals(t, metadata.Title, tt.Title, "Title")
+			assertMetadataEquals(t, metadata.AnimeType, tt.AnimeType, "AnimeType")
+			assertMetadataEquals(t, metadata.Year, tt.Year, "Year")
+			assertMetadataEquals(t, metadata.AudioTerm, tt.AudioTerm, "AudioTerm")
+			assertMetadataEquals(t, metadata.DeviceCompatibility, tt.DeviceCompatibility, "DeviceCompatibility")
+			assertMetadataEquals(t, metadata.EpisodeNumberAlt, tt.EpisodeNumberAlt, "EpisodeNumberAlt")
+			assertMetadataEquals(t, metadata.EpisodeTitle, tt.EpisodeTitle, "EpisodeTitle")
+			assertMetadataEquals(t, metadata.FileChecksum, tt.FileChecksum, "FileChecksum")
+			assertMetadataEquals(t, metadata.FileExtension, tt.FileExtension, "FileExtension")
+			assertMetadataEquals(t, metadata.FileName, tt.FileName, "FileName")
+			assertMetadataEquals(t, metadata.Language, tt.Language, "Language")
+			assertMetadataEquals(t, metadata.ReleaseGroup, tt.ReleaseGroup, "ReleaseGroup")
+			assertMetadataEquals(t, metadata.ReleaseInformation, tt.ReleaseInformation, "ReleaseInformation")
+			assertMetadataEquals(t, metadata.ReleaseVersion, tt.ReleaseVersion, "ReleaseVersion")
+			assertMetadataEquals(t, metadata.Source, tt.Source, "Source")
+			assertMetadataEquals(t, metadata.Subtitles, tt.Subtitles, "Subtitles")
+			assertMetadataEquals(t, metadata.VideoResolution, tt.VideoResolution, "VideoResolution")
+			assertMetadataEquals(t, metadata.VideoTerm, tt.VideoTerm, "VideoTerm")
+			assertMetadataEquals(t, metadata.VolumeNumber, tt.VolumeNumber, "Volume")
+			assertMetadataEquals(t, metadata.FormattedTitle, tt.FormattedTitle, "FormattedTitle")
+
+		})
+	}
+
+}
+
 func assertMetadataEquals(t *testing.T, received interface{}, expected interface{}, kind string) {
 
 	if expected == nil {

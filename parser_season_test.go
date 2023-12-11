@@ -52,7 +52,7 @@ func TestSeasonAndEpisode(t *testing.T) {
 			p := newParser(tt.input)
 			p.parse()
 			if tt.debug {
-				t.Log(p.tokenManager.tokens.sDump())
+				t.Log(p.tokenManager.tokens.Sdump())
 			}
 
 			if tt.seasons != nil {
@@ -86,7 +86,7 @@ func TestPart(t *testing.T) {
 			p := newParser(tt.input)
 			p.parse()
 			if tt.debug {
-				t.Log(p.tokenManager.tokens.sDump())
+				t.Log(p.tokenManager.tokens.Sdump())
 			}
 
 			if tt.parts != nil {
@@ -115,7 +115,7 @@ func TestEpisodeAlt(t *testing.T) {
 			p := newParser(tt.input)
 			p.parse()
 			if tt.debug {
-				t.Log(p.tokenManager.tokens.sDump())
+				t.Log(p.tokenManager.tokens.Sdump())
 			}
 
 			if tt.episodeAlts != nil {

@@ -1,23 +1,31 @@
 package seanime_parser
 
+import "slices"
+
 func (p *parser) parseEpisodeTitle() {
 
 	// Get all tokens after the last episode number token and before an opening bracket/file info metadata/EOF
 	found, epTkns := p.tokenManager.tokens.findWithMetadataCategory(metadataEpisodeNumber)
 	if !found {
-		return
+		return // Stop if no episode number found
 	}
+
+	// Get the last episode number token
 	lastEpTkn := epTkns[0]
 	if len(epTkns) > 0 {
 		lastEpTkn = epTkns[len(epTkns)-1]
 	}
 
+	// Get all unknown tokens between the last episode number token and an opening bracket/file info metadata/EOF
+	// e.g. "... `01` -> "episode title" -| `[` ... ]
 	tkns, found := p.tokenManager.tokens.walkAndCollecIf(
 		p.tokenManager.tokens.getIndexOf(lastEpTkn)+1,
 		func(tkn *token) bool {
+			// Collect every unknown token, not a keyword, not a separator
 			return tkn.isUnknown() && !tkn.isKeyword() && !tkn.isSeparator()
 		},
 		func(tkn *token) bool {
+			// Stop when we encounter an opening bracket or a keyword
 			return (tkn.isOpeningBracket() && tkn.getValue() == "[") || tkn.isKeyword()
 		})
 	if !found {
@@ -25,6 +33,13 @@ func (p *parser) parseEpisodeTitle() {
 	}
 
 	p.tokenManager.tokens.combineTitle(tkns[0], tkns[len(tkns)-1], metadataEpisodeTitle)
+
+	// If the episode title is between parentheses, then consider it a ReleaseGroup
+	// FIXME might lead to false positives
+	_newTkn := p.tokenManager.tokens.getFromUUID(tkns[0].UUID)
+	if p.tokenManager.tokens.isBetweenParentheses(_newTkn) {
+		_newTkn.setMetadataCategory(metadataReleaseGroup)
+	}
 
 	return
 
@@ -48,7 +63,7 @@ func (p *parser) parseTitleIfAllEnclosed() (foundTitle bool) {
 		firstEpTkn := epTkns[0]
 
 		// Get the first and second opening bracket going backwards
-		// e.g. `[` <- anime title ] `[` <- 01 ][ ... ]
+		// e.g. `[` <- "anime title" ] `[` <- 01 ][ ... ]
 		firstOpeningBracketTkn, found := p.tokenManager.tokens.getFirstOccurrenceBefore(
 			p.tokenManager.tokens.getIndexOf(firstEpTkn),
 			func(tkn *token) bool {
@@ -102,7 +117,7 @@ func (p *parser) parseTitleIfAllEnclosed() (foundTitle bool) {
 		}
 
 		// Get all unknown tokens between the second and third opening brackets
-		// e.g. [ sub ]`[` -> "anime" -> "title" -> `]` [ ... ]
+		// e.g. [ sub ] `[` -> "anime" -> "title" -> `]` [ ... ]
 		tkns, found := p.tokenManager.tokens.walkAndCollecIf(
 			p.tokenManager.tokens.getIndexOf(openingBracketTkns[1])+1,
 			func(tkn *token) bool {
@@ -124,10 +139,19 @@ func (p *parser) parseTitleIfAllEnclosed() (foundTitle bool) {
 	return
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+// Parse title
+// ---------------------------------------------------------------------------------------------------------------------
+
+// DEVOTE
+// FIXME Evangelion 1.0 You Are [Not] Alone, fails because of "[Not]"'
+// One solution would be to check if "[unknown]" is isolated, and if it is, add it to the title and continue until next opening bracket
+
 func (p *parser) parseTitle() {
 
+	// First try to find the title if all unknown tokens are enclosed
 	if found := p.parseTitleIfAllEnclosed(); found {
-		return
+		return // Stop if title found
 	}
 
 	// e.g. [sub] anime title [...]
@@ -172,6 +196,10 @@ func (p *parser) parseTitle() {
 func (p *parser) parseReleaseGroup() {
 
 	foundTitle, titleTkns := p.tokenManager.tokens.findWithMetadataCategory(metadataTitle)
+	foundReleaseGroup, _ := p.tokenManager.tokens.findWithMetadataCategory(metadataReleaseGroup)
+	if foundReleaseGroup {
+		return // Stop if release group already found
+	}
 
 	// Handle case where all unknown tokens are enclosed
 	for {
@@ -216,39 +244,52 @@ func (p *parser) parseReleaseGroup() {
 		if !found || len(closingBracketTkns) == 1 {
 			break // Next try
 		}
-		lastClosingBracket := closingBracketTkns[len(closingBracketTkns)-1]
 
-		lastOpeningBracket, found := p.tokenManager.tokens.getFirstOccurrenceBefore(
-			p.tokenManager.tokens.getIndexOf(lastClosingBracket),
-			func(tkn *token) bool {
-				return tkn.isOpeningBracket() && isMatchingClosingBracket(tkn.getValue(), lastClosingBracket.getValue())
-			})
-		if !found {
-			break // Next try
-		}
+		slices.Reverse(closingBracketTkns)
 
-		// Get all tokens between the opening and closing brackets
-		unknownTkns, found := p.tokenManager.tokens.walkAndCollecIf(
-			p.tokenManager.tokens.getIndexOf(lastOpeningBracket)+1,
-			func(tkn *token) bool {
-				return tkn.isUnknown() && !tkn.isKeyword() && !tkn.isSeparator()
-			},
-			func(tkn *token) bool {
-				return tkn.UUID == lastClosingBracket.UUID
-			})
-		if !found {
-			break // Next try
-		}
+		// Go through all closing brackets going backwards
+		// e.g.
+		// 		-[ ... `]` <-(3) [              `]` <-(2) [ known `]` <-(1)
+		// 		-[ ... `]`       [ |- "unknown" `]` <-(!) [ known `]`
+		// 		Release group found: "unknown"
+		for _, lastClosingBracket := range closingBracketTkns {
 
-		// Found release group
-		if len(unknownTkns) == 1 {
-			unknownTkns[0].setMetadataCategory(metadataReleaseGroup)
+			// Get matching opening bracket going backwards
+			// e.g. `[` <- ... <--<- ]
+			lastOpeningBracket, found := p.tokenManager.tokens.getFirstOccurrenceBefore(
+				p.tokenManager.tokens.getIndexOf(lastClosingBracket),
+				func(tkn *token) bool {
+					return tkn.isOpeningBracket() && isMatchingClosingBracket(tkn.getValue(), lastClosingBracket.getValue())
+				})
+			if !found {
+				continue // Next try
+			}
+
+			// Get all tokens between the opening and closing brackets
+			unknownTkns, found := p.tokenManager.tokens.walkAndCollecIf(
+				p.tokenManager.tokens.getIndexOf(lastOpeningBracket)+1,
+				func(tkn *token) bool {
+					return tkn.isUnknown() && !tkn.isKeyword() && !tkn.isSeparator()
+				},
+				func(tkn *token) bool {
+					return tkn.UUID == lastClosingBracket.UUID
+				})
+			if !found {
+				continue // Next try
+			}
+
+			// Found release group
+			if len(unknownTkns) == 1 {
+				unknownTkns[0].setMetadataCategory(metadataReleaseGroup)
+				return
+			}
+
+			// Found longer release group
+			p.tokenManager.tokens.combineTitle(unknownTkns[0], unknownTkns[len(unknownTkns)-1], metadataReleaseGroup)
 			return
 		}
 
-		// Found longer release group
-		p.tokenManager.tokens.combineTitle(unknownTkns[0], unknownTkns[len(unknownTkns)-1], metadataReleaseGroup)
-		return
+		break
 	}
 
 	for {

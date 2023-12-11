@@ -616,5 +616,225 @@
     "file_checksum": "CBDB8577",
     "file_extension": "mkv",
     "release_group": "ACX"
+  },
+  {
+    "file_name": "[Himatsubushi]_Sora_no_Woto_-_01_-_H264_-_720p_-_E83AD672.mkv",
+    "title": "Sora no Woto",
+    "formatted_title": "Sora no Woto",
+    "episode_number": [
+      "01"
+    ],
+    "file_checksum": "E83AD672",
+    "file_extension": "mkv",
+    "release_group": "Himatsubushi",
+    "video_resolution": "720p",
+    "video_term": [
+      "H264"
+    ]
+  },
+  {
+    "file_name": "[EroGaKi-Team]_Nurse_Witch_Komugi-chan_Magikarte_02.5_[902BB314].mkv",
+    "title": "Nurse Witch Komugi-chan Magikarte",
+    "formatted_title": "Nurse Witch Komugi-chan Magikarte",
+    "episode_number": [
+      "02.5"
+    ],
+    "file_checksum": "902BB314",
+    "file_extension": "mkv",
+    "release_group": "EroGaKi-Team"
+  },
+  {
+    "file_name": "Ookiku Furikabutte S2 - 09 (Central Anime) [BD841253].mkv",
+    "title": "Ookiku Furikabutte",
+    "formatted_title": "Ookiku Furikabutte",
+    "season_number": [
+      "2"
+    ],
+    "episode_number": [
+      "09"
+    ],
+    "file_checksum": "BD841253",
+    "file_extension": "mkv",
+    "release_group": "Central Anime"
+  },
+  {
+    "file_name": "[HorribleSubs] HEROMAN - 10_(XviD_AnimeSenshi).mkv",
+    "title": "HEROMAN",
+    "formatted_title": "HEROMAN",
+    "episode_number": [
+      "10"
+    ],
+    "file_extension": "mkv",
+    "release_group": "HorribleSubs",
+    "video_term": [
+      "XviD"
+    ]
+  },
+  {
+    "file_name": "Detective Conan - 316-317 [DCTP][2411959B].mkv",
+    "title": "Detective Conan",
+    "formatted_title": "Detective Conan",
+    "episode_number": [
+      "316",
+      "317"
+    ],
+    "file_checksum": "2411959B",
+    "file_extension": "mkv",
+    "release_group": "DCTP"
+  },
+  {
+    "file_name": "[N LogN Fansubs] Angel Beats (9).mkv",
+    "title": "Angel Beats",
+    "formatted_title": "Angel Beats",
+    "episode_number": [
+      "9"
+    ],
+    "file_extension": "mkv",
+    "release_group": "N LogN Fansubs"
+  },
+  {
+    "file_name": "To_Aru_Kagaku_no_Railgun_13-15_[BD_1080p][AtsA]",
+    "title": "To Aru Kagaku no Railgun",
+    "formatted_title": "To Aru Kagaku no Railgun",
+    "episode_number": [
+      "13",
+      "15"
+    ],
+    "release_group": "AtsA",
+    "source": [
+      "BD"
+    ],
+    "video_resolution": "1080p"
+  },
+  {
+    "file_name": "Juuousei_-_01_[Black_Sheep][HDTV_H264_AAC][803DA487].mkv",
+    "title": "Juuousei",
+    "formatted_title": "Juuousei",
+    "audio_term": [
+      "AAC"
+    ],
+    "episode_number": [
+      "01"
+    ],
+    "file_checksum": "803DA487",
+    "file_extension": "mkv",
+    "release_group": "Black Sheep",
+    "source": [
+      "HDTV"
+    ],
+    "video_term": [
+      "H264"
+    ]
+  },
+  {
+    "file_name": "[RNA]_Sakura_Taisen_New_York_NY_Ep_2_[1590D378].avi",
+    "title": "Sakura Taisen New York NY",
+    "formatted_title": "Sakura Taisen New York NY",
+    "episode_number": [
+      "2"
+    ],
+    "file_checksum": "1590D378",
+    "file_extension": "avi",
+    "release_group": "RNA"
+  },
+  {
+    "file_name": "Hayate no Gotoku 2nd Season 24 (Blu-Ray 1080p) [Chihiro]",
+    "title": "Hayate no Gotoku",
+    "formatted_title": "Hayate no Gotoku",
+    "season_number": [
+      "2"
+    ],
+    "episode_number": [
+      "24"
+    ],
+    "release_group": "Chihiro",
+    "source": [
+      "Blu-Ray"
+    ],
+    "video_resolution": "1080p"
+  },
+  {
+    "file_name": "[BluDragon] Blue Submarine No.6 (DVD, R2, Dual Audio) V3",
+    "title": "Blue Submarine No.6",
+    "formatted_title": "Blue Submarine No.6",
+    "audio_term": [
+      "Dual Audio"
+    ],
+    "release_group": "BluDragon",
+    "release_version": [
+      "3"
+    ],
+    "source": [
+      "DVD"
+    ]
+  },
+  {
+    "file_name": "Chrono Crusade ep. 1-5",
+    "title": "Chrono Crusade",
+    "formatted_title": "Chrono Crusade",
+    "episode_number": [
+      "1",
+      "5"
+    ]
+  },
+  {
+    "file_name": "[gg]_Kimi_ni_Todoke_2nd_Season_-_00_[BF735BC4].mkv",
+    "title": "Kimi ni Todoke",
+    "formatted_title": "Kimi ni Todoke",
+    "season_number": [
+      "2"
+    ],
+    "anime_title": "Kimi ni Todoke",
+    "episode_number": [
+      "00"
+    ],
+    "file_checksum": "BF735BC4",
+    "file_extension": "mkv",
+    "release_group": "gg"
+  },
+  {
+    "file_name": "K-ON!_Ep03_Training!_[1080p,BluRay,x264]_-_THORA.mkv",
+    "title": "K-ON!",
+    "formatted_title": "K-ON!",
+    "episode_number": [
+      "03"
+    ],
+    "episode_title": "Training!",
+    "file_extension": "mkv",
+    "release_group": "THORA",
+    "source": [
+      "BluRay"
+    ],
+    "video_resolution": "1080p",
+    "video_term": [
+      "x264"
+    ]
+  },
+  {
+    "file_name": "K-ON!!_Ep08_Career_Plan!_[1080p,BluRay,x264]_-_THORA.mkv",
+    "title": "K-ON!!",
+    "formatted_title": "K-ON!!",
+    "episode_number": [
+      "08"
+    ],
+    "episode_title": "Career Plan!",
+    "file_extension": "mkv",
+    "release_group": "THORA",
+    "source": [
+      "BluRay"
+    ],
+    "video_resolution": "1080p",
+    "video_term": [
+      "x264"
+    ]
+  },
+  {
+    "file_name": "[SFW]_Queen's_Blade_S2",
+    "title": "Queen's Blade",
+    "formatted_title": "Queen's Blade",
+    "season_number": [
+      "2"
+    ],
+    "release_group": "SFW"
   }
 ]

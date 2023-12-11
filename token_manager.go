@@ -149,6 +149,7 @@ func (t *tokens) checkNumberWithDecimal(tkn *token) (*token, bool) {
 
 	// Merge tokens
 	tkn.setValue(tkn.getValue() + "." + numTkn.getValue())
+	tkn.setKind(tokenKindNumberLike)
 
 	// Remove dot and number tokens
 	t.removeAt(t.getIndexOf(dotTkn))
@@ -213,6 +214,19 @@ func (t *tokens) getTokenBeforeSD(tkn *token) (*token, bool, int) {
 		}
 	}
 	return nil, false, skipped
+}
+
+// isBetweenParentheses checks if the specified token is between parentheses
+func (t *tokens) isBetweenParentheses(tkn *token) bool {
+	index := t.getIndexOf(tkn)
+	if index == -1 {
+		return false
+	}
+	prevTkn, found, _ := t.getTokenBeforeSD(tkn)
+	leftP := found && prevTkn.isOpeningBracket() && prevTkn.getValue() == "("
+	nextTkn, found, _ := t.getTokenAfterSD(tkn)
+	rightP := found && nextTkn.isClosingBracket() && nextTkn.getValue() == ")"
+	return leftP && rightP
 }
 
 // isIsolated checks if the specified token is surrounded by delimiters that are not "."
@@ -759,7 +773,7 @@ func (t *tokens) sPrint() string {
 	return str
 }
 
-func (t *tokens) sDump() string {
+func (t *tokens) Sdump() string {
 	str := "\n"
 	for _, tkn := range *t {
 		str += fmt.Sprintf("%-12s\t%v, kw: %v, %v, m: %v, enclosed: %v\n",

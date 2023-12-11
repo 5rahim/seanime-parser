@@ -72,20 +72,21 @@ func newKeywordManager() *keywordManager {
 	}
 
 	// Season
+	// Order matters
 
-	km.addGroup(
+	km.addGroup( // First look for ordinal suffix (e.g. "2nd Season")
+		keywordCatSeasonPrefix,
+		keywordKindOrdinalSuffix,
+		[]string{"SEASON", "SAISON", "SEASONS", "SAISONS"},
+	)
+	km.addGroup( // Then look for combined with number (e.g. "S01")
 		keywordCatSeasonPrefix,
 		keywordKindCombinedWithNumber,
 		[]string{"S"},
 	)
-	km.addGroup(
+	km.addGroup( // Then look for separated with number (e.g. "Season 01")
 		keywordCatSeasonPrefix,
 		keywordKindSeparatedWithNumber,
-		[]string{"SEASON", "SAISON", "SEASONS", "SAISONS"},
-	)
-	km.addGroup(
-		keywordCatSeasonPrefix,
-		keywordKindOrdinalSuffix,
 		[]string{"SEASON", "SAISON", "SEASONS", "SAISONS"},
 	)
 

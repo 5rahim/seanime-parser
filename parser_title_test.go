@@ -44,7 +44,7 @@ func TestTitle(t *testing.T) {
 			assertMetadataExists(t, p, metadataTitle, []string{tt.expected})
 
 			if tt.debug {
-				t.Log(p.tokenManager.tokens.sDump())
+				t.Log(p.tokenManager.tokens.Sdump())
 			}
 		})
 	}
@@ -92,7 +92,7 @@ func TestReleaseGroup(t *testing.T) {
 			assertMetadataExists(t, p, metadataReleaseGroup, []string{tt.expected})
 
 			if tt.debug {
-				t.Log(p.tokenManager.tokens.sDump())
+				t.Log(p.tokenManager.tokens.Sdump())
 			}
 		})
 	}

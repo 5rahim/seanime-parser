@@ -43,7 +43,7 @@ func TestEpisodes(t *testing.T) {
 			assertMetadataExists(t, p, metadataEpisodeNumber, tt.expectedTknValue)
 
 			if tt.debug {
-				t.Log(p.tokenManager.tokens.sDump())
+				t.Log(p.tokenManager.tokens.Sdump())
 			}
 		})
 	}
@@ -76,7 +76,7 @@ func TestOtherEpisodes(t *testing.T) {
 			assertMetadataExists(t, p, metadataOtherEpisodeNumber, tt.expectedTknValue)
 
 			if tt.debug {
-				t.Log(p.tokenManager.tokens.sDump())
+				t.Log(p.tokenManager.tokens.Sdump())
 			}
 		})
 	}

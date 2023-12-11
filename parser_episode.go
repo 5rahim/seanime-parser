@@ -7,64 +7,70 @@ import (
 
 func (p *parser) parseEpisode() {
 
-	foundEpisode := false
-
 	// Check alt episode number or range //TODO
 	// e.g. 01 (12)
-	for {
-		found, tkns := p.tokenManager.tokens.findWithMetadataCategory(metadataEpisodeNumber)
-		if !found {
-			break
-		}
-
-		foundEpisode = true
-
-		last := tkns[len(tkns)-1]
-
-		nextTkns, found, _ := p.tokenManager.tokens.getCategorySequenceAfter(p.tokenManager.tokens.getIndexOf(last), []tokenCategory{
-			tokenCatOpeningBracket, // (
-			tokenCatUnknown,        // 12
-			tokenCatClosingBracket, // )
-		}, true)
-		if !found {
-
-			{ // Check range after found episode
-				if len(tkns) != 1 {
-					break
-				}
-				// Check range
-				rangeTkns, foundRange := p.tokenManager.tokens.checkNumberRangeAfter(last)
-				if !foundRange {
-					break
-				}
-				rangeTkns[1].setMetadataCategory(metadataEpisodeNumber)
-			}
-			break
-		}
-
-		if nextTkns[0].getValue() != "(" || !nextTkns[1].isNumberKind() || nextTkns[2].getValue() != ")" {
-			break
-		}
-
-		// Update token
-		nextTkns[1].setMetadataCategory(metadataEpisodeNumberAlt)
-		break
+	if found := p.parseKnownEpisodeAltNumber(); found {
+		return // Stop if an episode number is found (even if the alt number is not found)
 	}
 
 	// Search by alt episode number
 	// We check if any unknown number token is followed by "({number})", e.g. {tkn} (14)
+	if found := p.parseEpisodeBySearchingForAltNumber(); found {
+		return // Stop if an episode number with alt number is found
+	}
+
+	// Check combined or separated keywords other than season prefixes
+	// e.g. Ep1, ED1, ED 1, OVAs 1-3, OVAs 1 ~ 3, OVA1, OVA 1v2
+	if found := p.parseKeywordsWithEpisodes(); found {
+		return // Stop if an episode number (e.g. Ep1) is found, not an OVA, ED, OP, ...
+	}
+
+	// e.g. 01 of 24
+	if found := p.parseEpisodeByRangeSeparator("OF"); found {
+		return // Stop if an episode number is found
+	}
+
+	// Check last number before the first opening bracket (if there is one at the beginning [subgroup], then, before the second opening bracket)
+	// e.g. Title - 01
+	if found := p.parseEpisodeBySearching(false); found {
+		return // Stop if an episode number is found
+	}
+
+	// e.g. [12]
+	if found := p.parseEpisodeByEnclosedNumber(); found {
+		return // Stop if an episode number is found
+	}
+
+	// e.g Title 01
+	if found := p.parseEpisodeBySearching(true); found {
+		return // Stop if an episode number is found
+	}
+
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// Searching for alt episode number
+// ---------------------------------------------------------------------------------------------------------------------
+
+func (p *parser) parseEpisodeBySearchingForAltNumber() bool {
 	for _, numTkn := range *p.tokenManager.tokens {
+
 		if !numTkn.isNumberOrLikeKind() || !numTkn.isUnknown() {
 			continue // Check next token
 		}
+
+		// Check if token is followed by "({number})", e.g. {tkn} (14)
 		nextTkns, found, _ := p.tokenManager.tokens.getCategorySequenceAfter(p.tokenManager.tokens.getIndexOf(numTkn), []tokenCategory{
 			tokenCatOpeningBracket, // (
 			tokenCatUnknown,        // 12
 			tokenCatClosingBracket, // )
 		}, true)
+
 		if !found {
 			continue // Check next token
 		}
+
+		// Verify that the sequence is correct
 		if nextTkns[0].getValue() != "(" || !nextTkns[1].isNumberKind() || nextTkns[2].getValue() != ")" {
 			continue
 		}
@@ -72,44 +78,59 @@ func (p *parser) parseEpisode() {
 		// Update tokens
 		numTkn.setMetadataCategory(metadataEpisodeNumber)
 		nextTkns[1].setMetadataCategory(metadataEpisodeNumberAlt)
-		foundEpisode = true
-		break
+		return true
 	}
-
-	if foundEpisode {
-		return
-	}
-
-	// Check combined or separated keywords other than season prefixes
-	// e.g. ED1, ED 1, OVAs 1-3, OVAs 1 ~ 3, OVA1, OVA 1v2
-	if foundEpisode := p.parseKeywordsWithEpisodes(); foundEpisode {
-		return // Stop if we find the actual episode number (e.g. Ep01) (not keyword number like OVA 1)
-	}
-
-	// e.g. 01 of 24
-	if found := p.parseEpisodeByRangeSeparator("OF"); found {
-		return
-	}
-
-	// Check last number before the first opening bracket (if there is one at the beginning [subgroup], then, before the second opening bracket)
-	// e.g. Title - 01
-	if found := p.parseEpisodeBySearching(false); found {
-		return
-	}
-
-	// e.g. [12]
-	if found := p.parseEpisodeByEnclosedNumber(); found {
-		return
-	}
-
-	// e.g Title 01
-	if found := p.parseEpisodeBySearching(true); found {
-		return
-	}
-
+	return false
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// parseKnownEpisodeAltNumber parses the alt episode number if an episode number already exists.
+func (p *parser) parseKnownEpisodeAltNumber() (foundEpisode bool) {
+	found, tkns := p.tokenManager.tokens.findWithMetadataCategory(metadataEpisodeNumber)
+	if !found {
+		return false
+	}
+
+	// We found an episode number anyway
+	foundEpisode = true
+
+	last := tkns[len(tkns)-1]
+
+	// Check if token is followed by "({number})", e.g. {tkn} (14)
+	nextTkns, found, _ := p.tokenManager.tokens.getCategorySequenceAfter(p.tokenManager.tokens.getIndexOf(last), []tokenCategory{
+		tokenCatOpeningBracket, // (
+		tokenCatUnknown,        // 12
+		tokenCatClosingBracket, // )
+	}, true)
+	if !found {
+
+		// Check range after found episode
+		{
+			if len(tkns) != 1 {
+				return
+			}
+			// Check range
+			rangeTkns, foundRange := p.tokenManager.tokens.checkNumberRangeAfter(last)
+			if !foundRange {
+				return
+			}
+			rangeTkns[1].setMetadataCategory(metadataEpisodeNumber)
+		}
+
+		return
+	}
+
+	if nextTkns[0].getValue() != "(" || !nextTkns[1].isNumberKind() || nextTkns[2].getValue() != ")" {
+		return
+	}
+
+	// Update token
+	nextTkns[1].setMetadataCategory(metadataEpisodeNumberAlt)
+	return
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// Searching by patterns
+// ---------------------------------------------------------------------------------------------------------------------
 
 // parseEpisodeBySearching parses the episode number by searching for different patterns.
 func (p *parser) parseEpisodeBySearching(aggressive bool) bool {
@@ -179,37 +200,33 @@ func (p *parser) parseEpisodeBySearching(aggressive bool) bool {
 
 		numTkn.setMetadataCategory(metadataEpisodeNumber)
 		return true // Found episode number, end
-
 	}
 
 	// Check for first occurrence of unknown number preceded and followed by a dash separator
 	// e.g. "- 01 -"
-	for {
-		for _, numTkn := range *p.tokenManager.tokens {
-			if !numTkn.isUnknown() || !numTkn.isNumberOrLikeKind() {
-				continue // Check next token
-			}
-			// Check dash separator before
-			if !p.tokenManager.tokens.foundDashSeparatorBefore(numTkn) {
-				continue // Check next token
-			}
-			// Check dash separator after
-			if !p.tokenManager.tokens.foundDashSeparatorAfter(numTkn) {
-				continue // Check next token
-			}
-			// Check that it is not a range
-			// e.g. "01 - 03"
-			if _, found := p.tokenManager.tokens.checkNumberRangeBefore(numTkn); found {
-				continue // Check next token
-			}
-			if _, found := p.tokenManager.tokens.checkNumberRangeAfter(numTkn); found {
-				continue // Check next token
-			}
-
-			numTkn.setMetadataCategory(metadataEpisodeNumber)
-			return true // Found episode number, end
+	for _, numTkn := range *p.tokenManager.tokens {
+		if !numTkn.isUnknown() || !numTkn.isNumberOrLikeKind() {
+			continue // Check next token
 		}
-		break
+		// Check dash separator before
+		if !p.tokenManager.tokens.foundDashSeparatorBefore(numTkn) {
+			continue // Check next token
+		}
+		// Check dash separator after
+		if !p.tokenManager.tokens.foundDashSeparatorAfter(numTkn) {
+			continue // Check next token
+		}
+		// Check that it is not a range
+		// e.g. "01 - 03"
+		if _, found := p.tokenManager.tokens.checkNumberRangeBefore(numTkn); found {
+			continue // Check next token
+		}
+		if _, found := p.tokenManager.tokens.checkNumberRangeAfter(numTkn); found {
+			continue // Check next token
+		}
+
+		numTkn.setMetadataCategory(metadataEpisodeNumber)
+		return true // Found episode number, end
 	}
 
 	// Check for last unknown number
@@ -273,6 +290,10 @@ func (p *parser) parseEpisodeBySearching(aggressive bool) bool {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+// ---------------------------------------------------------------------------------------------------------------------
+// Keywords
+// ---------------------------------------------------------------------------------------------------------------------
+
 // parseKeywordsWithEpisodes parses keywords that are combined or separated with a number.
 // It does not handle season/volume/part prefixes (keywordCatSeasonPrefix, ...) as those are handled by parseSeason.
 //
@@ -281,6 +302,8 @@ func (p *parser) parseEpisodeBySearching(aggressive bool) bool {
 // keywordKindSeparatedWithNumber
 //
 // e.g. Ep1, ED1, ED 1, OVAs 1-3, OVAs 1 ~ 3, OVA1, OVA 1v2
+//
+// "foundEpisode" is set to true if an actual episode number is found. (not an OVA, ED, OP, ...)
 func (p *parser) parseKeywordsWithEpisodes() (foundEpisode bool) {
 
 	for _, tkn := range *p.tokenManager.tokens {
@@ -400,11 +423,15 @@ func (p *parser) parseKeywordsWithEpisodes() (foundEpisode bool) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+// ---------------------------------------------------------------------------------------------------------------------
+// Enclosed episode number
+// ---------------------------------------------------------------------------------------------------------------------
+
 func (p *parser) parseEpisodeByEnclosedNumber() bool {
 
-	if !p.tokenManager.tokens.allUnknownTokensAreEnclosed() {
-		return false
-	}
+	//if !p.tokenManager.tokens.allUnknownTokensAreEnclosed() {
+	//	return false
+	//}
 
 	for _, numTkn := range *p.tokenManager.tokens {
 		if !numTkn.isUnknown() || !numTkn.isNumberOrLikeKind() || !numTkn.isEnclosed() {
@@ -431,6 +458,10 @@ func (p *parser) parseEpisodeByEnclosedNumber() bool {
 	return false
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+// Searching by range separator
+// ---------------------------------------------------------------------------------------------------------------------
+
 func (p *parser) parseEpisodeByRangeSeparator(value string) bool {
 
 	for _, numTkn := range *p.tokenManager.tokens {
@@ -451,7 +482,7 @@ func (p *parser) parseEpisodeByRangeSeparator(value string) bool {
 
 		// e.g. We found "01 of 24"
 		numTkn.setMetadataCategory(metadataEpisodeNumber)
-		ofTkn.setCategory(tokenCatKnown)
+		ofTkn.setCategory(tokenCatKnown) // Set category to known to avoid incorrect episode title parsing
 		secondNumTkn.setMetadataCategory(metadataOtherEpisodeNumber)
 		return true
 

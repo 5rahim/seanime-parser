@@ -28,6 +28,16 @@ func Parse(filename string) *Metadata {
 
 }
 
+func ParseAndDebug(filename string) (*Metadata, *tokens) {
+
+	p := newParser(filename)
+	p.parse()
+	p.cleanUp()
+
+	return p.metadata, p.tokenManager.tokens
+
+}
+
 func (p *parser) parse() {
 
 	p.parseFileExtension()
@@ -54,11 +64,14 @@ func (p *parser) parse() {
 
 func (p *parser) parseFileExtension() {
 
+	if *p.tokenManager.tokens == nil || len(*p.tokenManager.tokens) < 2 {
+		return
+	}
 	// Get last token
 	lastTkn := (*p.tokenManager.tokens)[len(*p.tokenManager.tokens)-1]
-
-	_, found := p.tokenManager.keywordManager.findStandaloneKeywordByValue(lastTkn.getValue())
-	if found {
+	dotTkn := (*p.tokenManager.tokens)[len(*p.tokenManager.tokens)-2]
+	kwd, found := p.tokenManager.keywordManager.findStandaloneKeywordByValue(lastTkn.getValue())
+	if dotTkn.getValue() == "." && found && (kwd.isFileExtension() || kwd.isVideoTerm()) {
 		lastTkn.setMetadataCategory(metadataFileExtension)
 	}
 }
@@ -244,29 +257,41 @@ func (p *parser) writeFormattedTitle() {
 	title := titleTkn.getValue()
 
 	// Add content between parenthesis
-	openingParenTkn, found, _ := p.tokenManager.tokens.getTokenAfterSD(titleTkn)
-	if found && openingParenTkn.isOpeningBracket() && openingParenTkn.getValue() == "(" {
-		closingParenTkn, found := p.tokenManager.tokens.getFirstOccurrenceAfter(
-			p.tokenManager.tokens.getIndexOf(openingParenTkn),
-			func(tkn *token) bool {
-				return tkn.getValue() == ")"
-			})
-		if found && closingParenTkn.isClosingBracket() && closingParenTkn.getValue() == ")" {
-			inbetweenTkns, found := p.tokenManager.tokens.getFromTo(p.tokenManager.tokens.getIndexOf(openingParenTkn)+1, p.tokenManager.tokens.getIndexOf(closingParenTkn))
-			if found {
-				title += " ("
-				for idx, tkn := range inbetweenTkns {
-					title += tkn.getValue()
-					if idx < len(inbetweenTkns)-1 {
-						title += " "
+parenLoop:
+	for {
+		openingParenTkn, found, _ := p.tokenManager.tokens.getTokenAfterSD(titleTkn)
+		if found && openingParenTkn.isOpeningBracket() && openingParenTkn.getValue() == "(" {
+			closingParenTkn, found := p.tokenManager.tokens.getFirstOccurrenceAfter(
+				p.tokenManager.tokens.getIndexOf(openingParenTkn),
+				func(tkn *token) bool {
+					return tkn.getValue() == ")"
+				})
+			if found && closingParenTkn.isClosingBracket() && closingParenTkn.getValue() == ")" {
+				inbetweenTkns, found := p.tokenManager.tokens.getFromTo(p.tokenManager.tokens.getIndexOf(openingParenTkn)+1, p.tokenManager.tokens.getIndexOf(closingParenTkn))
+				_inbetweenTkns := make([]*token, 0)
+				for _, tkn := range inbetweenTkns {
+					if !tkn.isYear() && !tkn.isUnknown() {
+						break parenLoop
 					}
+					_inbetweenTkns = append(_inbetweenTkns, tkn)
 				}
-				title += ")"
-				println(title)
+				if len(_inbetweenTkns) == 0 {
+					break parenLoop
+				}
+				if found {
+					title += " ("
+					for idx, tkn := range _inbetweenTkns {
+						title += tkn.getValue()
+						if idx < len(_inbetweenTkns)-1 {
+							title += " "
+						}
+					}
+					title += ")"
+				}
 			}
 		}
+		break
 	}
-
 	// Get anime types
 	found, animeTypeTkns := p.tokenManager.tokens.findWithKeywordCategory(keywordCatAnimeType)
 	if !found {
@@ -340,12 +365,12 @@ func cleanNumber(number string) (string, string) {
 	if isDigitsOnly(number) {
 		return number, ""
 	}
-	sepIdx := strings.IndexByte(number, '.')
-	if sepIdx != -1 {
-		number = number[:sepIdx]
-		return number, "2"
-	}
-	sepIdx = strings.IndexByte(number, 'v')
+	//sepIdx := strings.IndexByte(number, '.')
+	//if sepIdx != -1 {
+	//	number = number[:sepIdx]
+	//	return number, "2"
+	//}
+	sepIdx := strings.IndexByte(number, 'v')
 	if sepIdx != -1 {
 		s := number
 		number = number[:sepIdx]
