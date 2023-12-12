@@ -174,7 +174,7 @@ func newKeywordManager() *keywordManager {
 		keywordCatAudioTerm,
 		keywordKindStandalone,
 		[]string{
-			"2CH", "DTS", "DTS-ES", "DTS5.1", "TRUEHD5.1",
+			"2CH", "DTS", "DTS-ES", "DTS5.1", "TRUEHD5.1", "5.1",
 			"AAC", "AACX2", "AACX3", "AACX4", "AC3", "EAC3", "E-AC-3", "FLAC",
 			"FLACX2", "FLACX3", "FLACX4", "LOSSLESS", "MP3", "OGG", "VORBIS",
 			"DD2", "DD2.0", "DDP", "DD", "HDMA", "DTSHD",

@@ -137,5 +137,43 @@
       "release_group": "Ruberia"
     },
     "reason": "37 is considered as title because it is the first part of the file name"
+  },
+  {
+    "expected": {
+      "file_name": "Episode 14 Ore no Imouto ga Konnani Kawaii Wake ga Nai. (saison 2) VOSTFR",
+      "title": "Ore no Imouto ga Konnani Kawaii Wake ga Nai.",
+      "formatted_title": "Ore no Imouto ga Konnani Kawaii Wake ga Nai.",
+      "season_number": [
+        "2"
+      ],
+      "episode_number": [
+        "14"
+      ],
+      "language": [
+        "VOSTFR"
+      ]
+    },
+    "failing_parts": {
+      "episode_title": "Ore no Imouto ga Konnani Kawaii Wake ga Nai. (saison 2) VOSTFR",
+      "title": null,
+      "formatted_title": null
+    },
+    "reason": "Title is placed after the episode number"
+  },
+  {
+    "expected": {
+      "file_name": "[Hiryuu] Maji de Watashi ni Koi Shinasai!! - 02 [720].mkv",
+      "title": "Maji de Watashi ni Koi Shinasai!!",
+      "formatted_title": "Maji de Watashi ni Koi Shinasai!!",
+      "episode_number": [
+        "02"
+      ],
+      "file_extension": "mkv",
+      "release_group": "Hiryuu"
+    },
+    "failing_parts": {
+      "video_resolution": "720"
+    },
+    "reason": "Missing 'p' after the video resolution"
   }
 ]

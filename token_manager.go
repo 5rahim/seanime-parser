@@ -138,12 +138,12 @@ func (t *tokens) checkNumberWithDecimal(tkn *token) (*token, bool) {
 	}
 
 	numTkn, ok := t.getTokenAfter(dotTkn)
-	if !ok || !numTkn.isNumberKind() || (numTkn.getValue() != "5" && numTkn.getValue() != "05") {
+	if !ok || !numTkn.isNumberKind() {
 		return nil, false
 	}
 
 	delTkn, ok := t.getTokenAfter(numTkn)
-	if (!ok || !delTkn.isDelimiter()) && !t.isLastToken(numTkn) { // Delimiter or end of tokens
+	if (!ok || !(delTkn.isDelimiter() || !delTkn.isOpeningBracket() || !delTkn.isClosingBracket() || !delTkn.isSeparator())) && !t.isLastToken(numTkn) { // Delimiter or end of tokens
 		return nil, false
 	}
 

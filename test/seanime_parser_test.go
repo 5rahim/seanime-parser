@@ -3,10 +3,13 @@ package test
 import (
 	"github.com/goccy/go-json"
 	"github.com/stretchr/testify/assert"
+	"golang.org/x/text/unicode/norm"
 	"log"
 	"os"
 	"seanime-parser"
+	"strings"
 	"testing"
+	"unicode"
 )
 
 func TestSeanimeParser(t *testing.T) {
@@ -15,7 +18,9 @@ func TestSeanimeParser(t *testing.T) {
 	assert.NotNil(t, data)
 
 	for _, tt := range data {
-		t.Run(tt.FileName, func(t *testing.T) {
+		t.Run(removeNonLatin(tt.FileName), func(t *testing.T) {
+
+			println("\n" + tt.FileName + "\n")
 
 			metadata := seanime_parser.Parse(tt.FileName)
 			assert.NotNil(t, metadata)
@@ -52,10 +57,12 @@ func TestSeanimeParser(t *testing.T) {
 
 func TestSeanimeParserIsolated(t *testing.T) {
 
+	f := norm.Form(3)
+
 	data := getData()
 	assert.NotNil(t, data)
 
-	filename := "[Nubles] Space Battleship Yamato 2199 (2012) episode 18 (720p 8 bit AAC)[BA70BA9C]"
+	filename := "[모에-Raws] Abarenbou Rikishi!! Matsutarou #04 (ABC 1280x720 x264 AAC).mp4"
 
 	for _, tt := range data {
 
@@ -63,7 +70,7 @@ func TestSeanimeParserIsolated(t *testing.T) {
 			continue
 		}
 
-		t.Run(tt.FileName, func(t *testing.T) {
+		t.Run(string(f.Bytes([]byte(tt.FileName))), func(t *testing.T) {
 
 			metadata, tokens := seanime_parser.ParseAndDebug(tt.FileName)
 			assert.NotNil(t, metadata)
@@ -128,4 +135,13 @@ func getData() []*seanime_parser.Metadata {
 	}
 
 	return metadata
+}
+
+func removeNonLatin(s string) string {
+	return strings.Map(func(r rune) rune {
+		if r > unicode.MaxLatin1 {
+			return -1
+		}
+		return r
+	}, s)
 }

@@ -1,6 +1,7 @@
 package seanime_parser
 
 import (
+	"slices"
 	"strconv"
 	"strings"
 )
@@ -283,6 +284,10 @@ func (p *parser) parseEpisodeBySearching(aggressive bool) bool {
 				if !p.tokenManager.tokens.isIsolated(lastNumTkn) {
 					break
 				}
+			} else if lastNumTkn.isNumberLikeKind() {
+				if !isReasonableEpisodeNumber(lastNumTkn.getValue()) {
+					break
+				}
 			}
 			// in the case of "Title 2v2", we can safely identify "2v2" as an episode number
 		}
@@ -357,7 +362,7 @@ func (p *parser) parseKeywordsWithEpisodes() (foundEpisode bool) {
 						numberTkn.setKind(tokenKindNumber)
 					}
 
-					firstNumberIsZeroPadded := isNumberZeroPadded(remaining)
+					//firstNumberIsZeroPadded := isNumberZeroPadded(remaining)
 
 					// Overwrite token and insert new tokens
 					// "ED1" -> "ED", "1"
@@ -370,14 +375,22 @@ func (p *parser) parseKeywordsWithEpisodes() (foundEpisode bool) {
 
 					// Check range
 					// e.g. ED1-3, ED01-03, ED1 ~ 3, ED01 ~ 03
-					if nextNumTkn, found, kind := checkNumberRangeAfterToken(p, numberTkn, firstNumberIsZeroPadded); found {
+					if rangeTkns, found := p.tokenManager.tokens.checkNumberRangeAfter(numberTkn, false); found {
 						// e.g. ED1-3, ED01-03
-						if kind == 0 {
-							nextNumTkn.setMetadataCategory(metadataOtherEpisodeNumber)
-							p.tokenManager.tokens.checkNumberWithDecimal(nextNumTkn) // Check if number is decimal
-							break keywordLoop                                        // Skip to next token
+						rangeTkns[1].setMetadataCategory(metadataOtherEpisodeNumber)
+						if keyword.isEpisodePrefix() {
+							rangeTkns[1].setMetadataCategory(metadataEpisodeNumber)
 						}
+						break keywordLoop // Skip to next token
 					}
+					//if nextNumTkn, found, kind := checkNumberRangeAfterToken(p, numberTkn, firstNumberIsZeroPadded); found {
+					//	// e.g. ED1-3, ED01-03
+					//	if kind == 0 {
+					//		nextNumTkn.setMetadataCategory(metadataOtherEpisodeNumber)
+					//		p.tokenManager.tokens.checkNumberWithDecimal(nextNumTkn) // Check if number is decimal
+					//		break keywordLoop                                        // Skip to next token
+					//	}
+					//}
 
 					break keywordLoop // Skip to next token
 
@@ -495,4 +508,36 @@ func (p *parser) parseEpisodeByRangeSeparator(value string) bool {
 	}
 	return false
 
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// e.g.
+//   - 01 -> true
+//   - 1 -> true
+//   - 1v2 -> true
+//   - 1.1 -> true
+//   - 1.11 -> false
+func isReasonableEpisodeNumber(s string) bool {
+	if slices.Contains([]string{"3.0", "1.11"}, s) {
+		return false
+	}
+	if isDigitsOnly(s) {
+		return true
+	}
+	if isNumber(s) {
+		return true
+	}
+	index := strings.IndexByte(s, '.')
+	if index == -1 {
+		return true
+	}
+	decimalIntVal, err := strconv.Atoi(s[index+1:])
+	if err == nil {
+		return false
+	}
+	if decimalIntVal > 5 {
+		return false
+	}
+	return true
 }

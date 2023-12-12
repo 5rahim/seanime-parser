@@ -62,7 +62,7 @@
     ],
     "file_checksum": "C83164B9",
     "file_extension": "mkv",
-    "release_group": "BakaWolf-m 3 3 w",
+    "release_group": "BakaWolf-m 3.3 w",
     "video_term": [
       "H.264"
     ]
@@ -801,7 +801,6 @@
     "season_number": [
       "2"
     ],
-    "anime_title": "Kimi ni Todoke",
     "episode_number": [
       "00"
     ],
@@ -1564,10 +1563,7 @@
     "part_number": [
       "1"
     ],
-    "episode_title": "A Dim Light Amid Despair / Humanity's Comeback",
-    "anime_season": [
-      "01"
-    ]
+    "episode_title": "A Dim Light Amid Despair / Humanity's Comeback"
   },
   {
     "file_name": "The Irregular at Magic High School - S01E01- Enrollment Part I.mkv",
@@ -1783,5 +1779,371 @@
     ],
     "video_resolution": "720p",
     "release_group": "Watakushi"
+  },
+  {
+    "file_name": "[Zom-B] Machine-Doll wa Kizutsukanai - 01 - Facing ''Cannibal Candy'' I (kuroi, FFF remux) [B99C8DED].mkv",
+    "title": "Machine-Doll wa Kizutsukanai",
+    "formatted_title": "Machine-Doll wa Kizutsukanai",
+    "episode_number": [
+      "01"
+    ],
+    "episode_title": "Facing ''Cannibal Candy'' I",
+    "file_checksum": "B99C8DED",
+    "release_group": "Zom-B",
+    "release_information": [
+      "remux"
+    ],
+    "file_extension": "mkv"
+  },
+  {
+    "file_name": "The iDOLM@STER 765 Pro to Iu Monogatari.mkv",
+    "title": "The iDOLM@STER",
+    "formatted_title": "The iDOLM@STER",
+    "episode_number": [
+      "765"
+    ],
+    "episode_title": "Pro to Iu Monogatari",
+    "file_extension": "mkv"
+  },
+  {
+    "file_name": "[Yuurisan-Subs]_Darker_than_Black_-_Gemini_of_the_Meteor_-_01v2_[65274FDE].patch.7z",
+    "title": "Darker than Black - Gemini of the Meteor",
+    "formatted_title": "Darker than Black - Gemini of the Meteor",
+    "episode_number": [
+      "01"
+    ],
+    "file_checksum": "65274FDE",
+    "release_group": "Yuurisan-Subs",
+    "release_information": [
+      "patch"
+    ],
+    "release_version": [
+      "2"
+    ]
+  },
+  {
+    "file_name": "[Coalgirls]_Fate_Zero_OVA3.5_(1280x720_Blu-ray_FLAC)_[5F5AD026].mkv",
+    "title": "Fate Zero",
+    "formatted_title": "Fate Zero OVA 3.5",
+    "anime_type": [
+      "OVA"
+    ],
+    "audio_term": [
+      "FLAC"
+    ],
+    "episode_number": [
+      "3.5"
+    ],
+    "file_checksum": "5F5AD026",
+    "source": [
+      "Blu-ray"
+    ],
+    "video_resolution": "1280x720",
+    "release_group": "Coalgirls",
+    "file_extension": "mkv"
+  },
+  {
+    "file_name": "[GrimRipper] Koi Kaze [Dual Audio] Ep01 (c13cefe0).mkv",
+    "title": "Koi Kaze",
+    "formatted_title": "Koi Kaze",
+    "audio_term": [
+      "Dual Audio"
+    ],
+    "episode_number": [
+      "01"
+    ],
+    "file_checksum": "c13cefe0",
+    "release_group": "GrimRipper",
+    "file_extension": "mkv"
+  },
+  {
+    "file_name": "[HorribleSubs] Gintama - 111C [1080p].mkv",
+    "title": "Gintama",
+    "formatted_title": "Gintama",
+    "episode_number": [
+      "111C"
+    ],
+    "video_resolution": "1080p",
+    "release_group": "HorribleSubs",
+    "file_extension": "mkv"
+  },
+  {
+    "file_name": "[SpoonSubs]_Hidamari_Sketch_x365_-_04.1_(DVD)[B6CE8458].mkv",
+    "title": "Hidamari Sketch x365",
+    "formatted_title": "Hidamari Sketch x365",
+    "file_checksum": "B6CE8458",
+    "release_group": "SpoonSubs",
+    "source": [
+      "DVD"
+    ],
+    "episode_number": [
+      "04.1"
+    ],
+    "file_extension": "mkv"
+  },
+  {
+    "file_name": "[Hatsuyuki]_Kuroko_no_Basuke_S3_-_01_(51)_[720p][10bit][619C57A0].mkv",
+    "season_number": [
+      "3"
+    ],
+    "title": "Kuroko no Basuke",
+    "formatted_title": "Kuroko no Basuke",
+    "episode_number": [
+      "01"
+    ],
+    "episode_number_alt": [
+      "51"
+    ],
+    "file_checksum": "619C57A0",
+    "release_group": "Hatsuyuki",
+    "video_resolution": "720p",
+    "video_term": [
+      "10bit"
+    ],
+    "file_extension": "mkv"
+  },
+  {
+    "file_name": "[Elysium]Sora.no.Woto.EP07.5(BD.720p.AAC)[C37580F8].mkv",
+    "title": "Sora no Woto",
+    "formatted_title": "Sora no Woto",
+    "audio_term": [
+      "AAC"
+    ],
+    "episode_number": [
+      "07.5"
+    ],
+    "file_checksum": "C37580F8",
+    "release_group": "Elysium",
+    "source": [
+      "BD"
+    ],
+    "video_resolution": "720p",
+    "file_extension": "mkv"
+  },
+  {
+    "file_name": "[Zurako] Sora no Woto - 07.5 - Drinking Party - Fortress Battle (BD 1080p AAC) [F7DF16F7].mkv",
+    "title": "Sora no Woto",
+    "formatted_title": "Sora no Woto",
+    "audio_term": [
+      "AAC"
+    ],
+    "episode_number": [
+      "07.5"
+    ],
+    "episode_title": "Drinking Party - Fortress Battle",
+    "file_checksum": "F7DF16F7",
+    "release_group": "Zurako",
+    "source": [
+      "BD"
+    ],
+    "video_resolution": "1080p",
+    "file_extension": "mkv"
+  },
+  {
+    "file_name": "[Hiryuu] Maji de Watashi ni Koi Shinasai!! - 02 [720].mkv",
+    "title": "Maji de Watashi ni Koi Shinasai!!",
+    "formatted_title": "Maji de Watashi ni Koi Shinasai!!",
+    "episode_number": [
+      "02"
+    ],
+    "file_extension": "mkv",
+    "release_group": "Hiryuu"
+  },
+  {
+    "file_name": "[Kira-Fansub] Uchuu no Stellvia ep 14 (BD H264 1280x960 24fps AAC) [06EE7355].mkv",
+    "title": "Uchuu no Stellvia",
+    "formatted_title": "Uchuu no Stellvia",
+    "audio_term": [
+      "AAC"
+    ],
+    "episode_number": [
+      "14"
+    ],
+    "file_checksum": "06EE7355",
+    "release_group": "Kira-Fansub",
+    "source": [
+      "BD"
+    ],
+    "video_resolution": "1280x960",
+    "video_term": [
+      "H264",
+      "24fps"
+    ],
+    "file_extension": "mkv"
+  },
+  {
+    "file_name": "[ANE] Yosuga no Sora - Ep01 Preview (Yorihime ver) [BDRip 1080p x264 FLAC].mkv",
+    "title": "Yosuga no Sora",
+    "formatted_title": "Yosuga no Sora",
+    "anime_type": [
+      "Preview"
+    ],
+    "episode_title": "Preview",
+    "audio_term": [
+      "FLAC"
+    ],
+    "episode_number": [
+      "01"
+    ],
+    "file_extension": "mkv",
+    "release_group": "ANE",
+    "source": [
+      "BDRip"
+    ],
+    "video_resolution": "1080p",
+    "video_term": [
+      "x264"
+    ]
+  },
+  {
+    "file_name": "[B-G_&_m.3.3.w]_Myself_Yourself_12.DVD(H.264_DD2.0)_[CB2B37F1].mkv",
+    "title": "Myself Yourself",
+    "formatted_title": "Myself Yourself",
+    "audio_term": [
+      "DD2.0"
+    ],
+    "episode_number": [
+      "12"
+    ],
+    "file_checksum": "CB2B37F1",
+    "release_group": "B-G & m.3.3.w",
+    "source": [
+      "DVD"
+    ],
+    "video_term": [
+      "H.264"
+    ],
+    "file_extension": "mkv"
+  },
+  {
+    "file_name": "The.Animatrix.08.A.Detective.Story.720p.BluRay.DTS.x264-ESiR.mkv",
+    "title": "The Animatrix",
+    "formatted_title": "The Animatrix",
+    "episode_number": [
+      "08"
+    ],
+    "episode_title": "A Detective Story",
+    "audio_term": [
+      "DTS"
+    ],
+    "file_extension": "mkv",
+    "source": [
+      "BluRay"
+    ],
+    "video_resolution": "720p",
+    "video_term": [
+      "x264"
+    ],
+    "release_group": "ESiR"
+  },
+  {
+    "file_name": "[DmonHiro] Oreshura #01v2 - The Start Of High School Life Is A War Zone [BD, 720p] [211375E6].mkv",
+    "title": "Oreshura",
+    "formatted_title": "Oreshura",
+    "episode_number": [
+      "01"
+    ],
+    "episode_title": "The Start Of High School Life Is A War Zone",
+    "file_checksum": "211375E6",
+    "release_group": "DmonHiro",
+    "release_version": [
+      "2"
+    ],
+    "source": [
+      "BD"
+    ],
+    "video_resolution": "720p",
+    "file_extension": "mkv"
+  },
+  {
+    "file_name": "[모에-Raws] Abarenbou Rikishi!! Matsutarou #04 (ABC 1280x720 x264 AAC).mp4",
+    "title": "Abarenbou Rikishi!! Matsutarou",
+    "formatted_title": "Abarenbou Rikishi!! Matsutarou",
+    "audio_term": [
+      "AAC"
+    ],
+    "episode_number": [
+      "04"
+    ],
+    "file_extension": "mp4",
+    "release_group": "모에-Raws",
+    "video_resolution": "1280x720",
+    "video_term": [
+      "x264"
+    ]
+  },
+  {
+    "file_name": "[바카-Raws] Nekomonogatari (Black) #1-4 (BS11 1280x720 x264 AAC).mp4",
+    "title": "Nekomonogatari (Black)",
+    "formatted_title": "Nekomonogatari (Black)",
+    "audio_term": [
+      "AAC"
+    ],
+    "episode_number": [
+      "1",
+      "4"
+    ],
+    "file_extension": "mp4",
+    "release_group": "바카-Raws",
+    "video_resolution": "1280x720",
+    "video_term": [
+      "x264"
+    ]
+  },
+  {
+    "file_name": "[NinjaPanda] Tiger & Bunny #01 All's well that ends well. (v3, 1080p Hi10P, DA AAC) [4A9AB85F].mkv",
+    "title": "Tiger & Bunny",
+    "formatted_title": "Tiger & Bunny",
+    "episode_number": [
+      "01"
+    ],
+    "episode_title": "All's well that ends well",
+    "file_checksum": "4A9AB85F",
+    "release_group": "NinjaPanda",
+    "release_version": [
+      "3"
+    ],
+    "video_resolution": "1080p",
+    "video_term": [
+      "Hi10P"
+    ],
+    "audio_term": [
+      "AAC"
+    ],
+    "file_extension": "mkv"
+  },
+  {
+    "file_name": "Neko no Ongaeshi - [HQR.remux-DualAudio][NTV.1280x692.h264](0CDC2145).mkv",
+    "title": "Neko no Ongaeshi",
+    "formatted_title": "Neko no Ongaeshi",
+    "audio_term": [
+      "DualAudio"
+    ],
+    "file_checksum": "0CDC2145",
+    "file_extension": "mkv",
+    "release_information": [
+      "remux"
+    ],
+    "video_resolution": "1280x692",
+    "video_term": [
+      "h264"
+    ],
+    "release_group": "NTV"
+  },
+  {
+    "file_name": "[ReDone] Memories Off 3.5 - 04 (DVD 10-bit).mkv",
+    "title": "Memories Off 3.5",
+    "formatted_title": "Memories Off 3.5",
+    "episode_number": [
+      "04"
+    ],
+    "file_extension": "mkv",
+    "release_group": "ReDone",
+    "source": [
+      "DVD"
+    ],
+    "video_term": [
+      "10-bit"
+    ]
   }
 ]
