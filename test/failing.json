@@ -1,9 +1,141 @@
 [
   {
-    "file_name": "Evangelion_1.0_You_Are_[Not]_Alone_(1080p)_[@Home]",
-    "title": "Evangelion 1.0 You Are [Not] Alone",
-    "formatted_title": "Evangelion 1.0 You Are [Not] Alone",
-    "release_group": "@Home",
-    "video_resolution": "1080p"
+    "issue": 1,
+    "expected": {
+      "file_name": "Evangelion_1.0_You_Are_[Not]_Alone_(1080p)_[@Home]",
+      "title": "Evangelion 1.0 You Are [Not] Alone",
+      "formatted_title": "Evangelion 1.0 You Are [Not] Alone",
+      "release_group": "@Home",
+      "video_resolution": "1080p"
+    },
+    "failing_parts": {
+      "title": "Evangelion 1.0 You Are",
+      "formatted_title": "Evangelion 1.0 You Are"
+    },
+    "reason": "Square brackets used in the title"
+  },
+  {
+    "issue": 1,
+    "expected": {
+      "file_name": "[FFF] Futsuu no Joshikousei ga [Locodol] Yatte Mita. - 01 [BAD09C76].mkv",
+      "title": "Futsuu no Joshikousei ga [Locodol] Yatte Mita",
+      "formatted_title": "Futsuu no Joshikousei ga [Locodol] Yatte Mita",
+      "episode_number": [
+        "01"
+      ],
+      "file_checksum": "BAD09C76",
+      "file_extension": "mkv",
+      "release_group": "FFF"
+    },
+    "failing_parts": {
+      "title": "Futsuu no Joshikousei ga",
+      "formatted_title": "Futsuu no Joshikousei ga"
+    },
+    "reason": "Square brackets used in the title"
+  },
+  {
+    "expected": {
+      "file_name": "[Keroro].148.[Xvid.mp3].[FE68D5F1].avi",
+      "title": "Keroro",
+      "formatted_title": "Keroro",
+      "episode_number": [
+        "148"
+      ],
+      "audio_term": [
+        "mp3"
+      ],
+      "file_checksum": "FE68D5F1",
+      "file_extension": "avi",
+      "video_term": [
+        "Xvid"
+      ]
+    },
+    "failing_parts": {
+      "title": "148",
+      "formatted_title": "148",
+      "episode_number": null,
+      "release_group": "Keroro"
+    },
+    "reason": "Title is considered as release group because of enclosing brackets"
+  },
+  {
+    "expected": {
+      "file_name": "[Rakuda].Gift.~eternal.rainbow~.01.dvd.h.264.vorbis.mkv",
+      "title": "Gift ~eternal rainbow~",
+      "formatted_title": "Gift ~eternal rainbow~",
+      "audio_term": [
+        "vorbis"
+      ],
+      "episode_number": [
+        "01"
+      ],
+      "file_extension": "mkv",
+      "release_group": "Rakuda",
+      "source": [
+        "dvd"
+      ],
+      "video_term": [
+        "h.264"
+      ]
+    },
+    "failing_parts": {
+      "title": "Gift ~eternal rainbow",
+      "formatted_title": "Gift ~eternal rainbow"
+    },
+    "reason": "Algorithm does not include the last character of the title if it is a separator (tilde, dash,...)"
+  },
+  {
+    "expected": {
+      "file_name": "「K」 Image Blu-ray WHITE & BLACK - Main (BD 1280x720 AVC AAC).mp4",
+      "title": "K",
+      "formatted_title": "K",
+      "audio_term": [
+        "AAC"
+      ],
+      "file_extension": "mp4",
+      "source": [
+        "Blu-ray",
+        "BD"
+      ],
+      "video_resolution": "1280x720",
+      "video_term": [
+        "AVC"
+      ]
+    },
+    "failing_parts": {
+      "title": "Image",
+      "formatted_title": "Image",
+      "release_group": "K"
+    },
+    "reason": "Title is considered as release group because of enclosing brackets"
+  },
+  {
+    "expected": {
+      "file_name": "37 [Ruberia]_Death_Note_-_37v2_[FINAL]_[XviD][6FA7D273].avi",
+      "title": "37 [Ruberia] Death Note",
+      "formatted_title": "37 [Ruberia] Death Note",
+      "episode_number": [
+        "37"
+      ],
+      "file_checksum": "6FA7D273",
+      "file_extension": "avi",
+      "release_group": "Ruberia",
+      "release_information": [
+        "FINAL"
+      ],
+      "release_version": [
+        "2"
+      ],
+      "video_term": [
+        "XviD"
+      ]
+    },
+    "failing_parts": {
+      "title": "37",
+      "formatted_title": "37",
+      "episode_number": null,
+      "release_group": "Ruberia"
+    },
+    "reason": "37 is considered as title because it is the first part of the file name"
   }
 ]

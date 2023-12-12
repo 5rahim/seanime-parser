@@ -16,6 +16,7 @@ func TestExtractSeasonAndEpisode(t *testing.T) {
 		{"valid input2", "S01E02v2", "01", "E", "02v2", true},
 		{"valid input3", "s2e3", "2", "e", "3", true},
 		{"valid input4", "03x04", "03", "x", "04", true},
+		{"invalid input5", "1x04", "1", "x", "04", true},
 		{"invalid input1", "abc", "", "", "", false},
 		{"invalid input2", "3x4", "", "", "", false},
 	}

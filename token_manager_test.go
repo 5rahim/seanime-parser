@@ -80,7 +80,7 @@ func TestTokenFunctions(t *testing.T) {
 	tokensList = setUp()
 
 	// Test getFromTo function
-	tokensFromTo := tokensList.getFromTo(1, 3)
+	tokensFromTo, _ := tokensList.getFromTo(1, 3)
 	assert.Len(t, tokensFromTo, 2)
 	assert.Equal(t, "B", tokensFromTo[0].getValue())
 	assert.Equal(t, "C", tokensFromTo[1].getValue())

@@ -25,7 +25,7 @@ func isDigitsOnly(s string) bool {
 //   - The string may have an optional 'v' followed by a single digit. (e.g. 03v2)
 //   - The string may end with an optional single quote ('). (e.g. 04')
 func isNumberLike(s string) bool {
-	rgx := regexp.MustCompile(`^(?i)\d+((x(\d{1,2}))|(v\d))?(')?$`)
+	rgx := regexp.MustCompile(`^(?i)\d+((x(\d{1,2}))|(v\d)|[abc])?(')?$`)
 	return rgx.MatchString(s)
 }
 

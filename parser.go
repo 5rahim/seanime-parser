@@ -104,6 +104,11 @@ func (p *parser) identifyKeyword(tkn *token, priority string) bool {
 		return true
 	}
 
+	if tkn.Kind == tokenKindYear && tkn.isEnclosed() {
+		tkn.setIdentifiedKeywordCategory(keywordCatYear)
+		return true
+	}
+
 	// Check if token is a known pre-defined keyword prefix (e.g. "Blu" for "Blu-ray")
 	keywordParts, found := p.tokenManager.keywordManager.findKeywordPartGroups(tkn.getValue())
 	foundParts := false
@@ -144,6 +149,7 @@ func (p *parser) identifyKeyword(tkn *token, priority string) bool {
 			}
 
 			// when the priority is "normal", we only want to identify STANDALONE keywords that are not ambiguous
+			// e.g. Do not flag "Ita" as a keyword in "Bokura Ga Ita"
 			if priority == "normal" && p.tokenManager.keywordManager.isKeywordAmbiguous(keyword) {
 				return false
 			}
@@ -256,18 +262,22 @@ func (p *parser) writeFormattedTitle() {
 	titleTkn := titleTkns[0]
 	title := titleTkn.getValue()
 
-	// Add content between parenthesis
+	// Add content between parentheses
 parenLoop:
 	for {
+		// Get opening parenthesis directly after after title token
 		openingParenTkn, found, _ := p.tokenManager.tokens.getTokenAfterSD(titleTkn)
 		if found && openingParenTkn.isOpeningBracket() && openingParenTkn.getValue() == "(" {
+			// Get closing parenthesis after opening parenthesis
 			closingParenTkn, found := p.tokenManager.tokens.getFirstOccurrenceAfter(
 				p.tokenManager.tokens.getIndexOf(openingParenTkn),
 				func(tkn *token) bool {
 					return tkn.getValue() == ")"
 				})
 			if found && closingParenTkn.isClosingBracket() && closingParenTkn.getValue() == ")" {
+				// Get tokens between parentheses
 				inbetweenTkns, found := p.tokenManager.tokens.getFromTo(p.tokenManager.tokens.getIndexOf(openingParenTkn)+1, p.tokenManager.tokens.getIndexOf(closingParenTkn))
+				// Check if tokens between parentheses are only years or unknowns
 				_inbetweenTkns := make([]*token, 0)
 				for _, tkn := range inbetweenTkns {
 					if !tkn.isYear() && !tkn.isUnknown() {
@@ -384,6 +394,13 @@ func cleanNumber(number string) (string, string) {
 	if sepIdx != -1 {
 		number = number[:sepIdx]
 		return number, "2"
+	}
+	for _, letter := range []rune{'a', 'b', 'c'} {
+		sepIdx = strings.IndexByte(number, byte(letter))
+		if sepIdx != -1 {
+			number = number[:sepIdx]
+			return number, string(letter)
+		}
 	}
 	return number, ""
 }

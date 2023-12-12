@@ -55,7 +55,7 @@ func TestSeanimeParserIsolated(t *testing.T) {
 	data := getData()
 	assert.NotNil(t, data)
 
-	filename := "Hayate no Gotoku 2nd Season 24 (Blu-Ray 1080p) [Chihiro]"
+	filename := "[Nubles] Space Battleship Yamato 2199 (2012) episode 18 (720p 8 bit AAC)[BA70BA9C]"
 
 	for _, tt := range data {
 

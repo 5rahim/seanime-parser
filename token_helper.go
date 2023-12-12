@@ -119,6 +119,20 @@ func (t *token) isSeparator() bool {
 	return t.Category == tokenCatSeparator
 }
 
+func (t *token) isWordKind() bool {
+	if t == nil {
+		return false
+	}
+	return t.Kind == tokenKindWord
+}
+
+func (t *token) isCRC32() bool {
+	if t == nil {
+		return false
+	}
+	return t.Kind == tokenKindCrc32
+}
+
 func (t *token) isDotDelimiter() bool {
 	if t == nil {
 		return false

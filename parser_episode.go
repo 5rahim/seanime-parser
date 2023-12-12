@@ -108,8 +108,9 @@ func (p *parser) parseKnownEpisodeAltNumber() (foundEpisode bool) {
 			if len(tkns) != 1 {
 				return
 			}
-			// Check range
-			rangeTkns, foundRange := p.tokenManager.tokens.checkNumberRangeAfter(last)
+			// Check range, e.g. 01-03
+			// making sure that the range has no delimiters
+			rangeTkns, foundRange := p.tokenManager.tokens.checkNumberRangeAfter(last, false)
 			if !foundRange {
 				return
 			}
@@ -164,11 +165,16 @@ func (p *parser) parseEpisodeBySearching(aggressive bool) bool {
 		}
 
 		// Check we find a range before
-		// e.g. "1 - {numTkn} [...]"
-		if rangeTkns, found := p.tokenManager.tokens.checkNumberRangeBefore(numTkn); found {
-			rangeTkns[1].setMetadataCategory(metadataEpisodeNumber)
-			numTkn.setMetadataCategory(metadataEpisodeNumber)
-			return true // Found episode number, end
+		// e.g. "01-{numTkn} [...]"
+		// making sure that the range has no delimiters
+		if rangeTkns, found := p.tokenManager.tokens.checkNumberRangeBefore(numTkn, false); found {
+			// Make sure that there is no number range before the range
+			// e.g. Avoid this "009-1-02 [...]", where "1-02" is considered as a range
+			if _, found := p.tokenManager.tokens.checkNumberRangeBefore(rangeTkns[1], false); !found {
+				rangeTkns[1].setMetadataCategory(metadataEpisodeNumber)
+				numTkn.setMetadataCategory(metadataEpisodeNumber)
+				return true // Found episode number, end
+			}
 		}
 
 		// If we are not searching aggressively, check if there is a dash separator before the number
@@ -217,11 +223,11 @@ func (p *parser) parseEpisodeBySearching(aggressive bool) bool {
 			continue // Check next token
 		}
 		// Check that it is not a range
-		// e.g. "01 - 03"
-		if _, found := p.tokenManager.tokens.checkNumberRangeBefore(numTkn); found {
+		// e.g. "01-03"
+		if _, found := p.tokenManager.tokens.checkNumberRangeBefore(numTkn, false); found {
 			continue // Check next token
 		}
-		if _, found := p.tokenManager.tokens.checkNumberRangeAfter(numTkn); found {
+		if _, found := p.tokenManager.tokens.checkNumberRangeAfter(numTkn, false); found {
 			continue // Check next token
 		}
 
@@ -249,7 +255,7 @@ func (p *parser) parseEpisodeBySearching(aggressive bool) bool {
 
 		// Check we find a range before
 		// e.g. "1 - {lastNumTkn} [...]"
-		if rangeTkns, found := p.tokenManager.tokens.checkNumberRangeBefore(lastNumTkn); found {
+		if rangeTkns, found := p.tokenManager.tokens.checkNumberRangeBefore(lastNumTkn, false); found {
 			rangeTkns[1].setMetadataCategory(metadataEpisodeNumber)
 			lastNumTkn.setMetadataCategory(metadataEpisodeNumber)
 			return true // Found episode number, end

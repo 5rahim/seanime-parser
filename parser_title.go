@@ -1,8 +1,13 @@
 package seanime_parser
 
-import "slices"
+import (
+	"github.com/samber/lo"
+	"slices"
+)
 
 func (p *parser) parseEpisodeTitle() {
+
+	episodeShouldBeEnclosed := p.tokenManager.tokens.allUnknownTokensAreEnclosed()
 
 	// Get all tokens after the last episode number token and before an opening bracket/file info metadata/EOF
 	found, epTkns := p.tokenManager.tokens.findWithMetadataCategory(metadataEpisodeNumber)
@@ -21,6 +26,11 @@ func (p *parser) parseEpisodeTitle() {
 	tkns, found := p.tokenManager.tokens.walkAndCollecIf(
 		p.tokenManager.tokens.getIndexOf(lastEpTkn)+1,
 		func(tkn *token) bool {
+			// If all unknown tokens are NOT enclosed, then we don't want to collect an episode title that is enclosed
+			// e.g. This avoids collecting "MBS" in "Anime title - 05 (MBS 1080p)" as an episode title
+			if !episodeShouldBeEnclosed && tkn.isEnclosed() {
+				return false
+			}
 			// Collect every unknown token, not a keyword, not a separator
 			return tkn.isUnknown() && !tkn.isKeyword() && !tkn.isSeparator()
 		},
@@ -30,6 +40,17 @@ func (p *parser) parseEpisodeTitle() {
 		})
 	if !found {
 		return
+	}
+
+	// Check anime type in the episode title tokens
+	// e.g. "Episode title OVA", we don't remove "OVA" from the title, but add it as an anime type
+	for _, tkn := range tkns {
+		if kwd, found := p.tokenManager.keywordManager.findStandaloneKeywordByValue(tkn.getValue()); found {
+			if kwd.isAnimeType() { // if keyword is an anime type, add it to the metadata
+				// set it directly to the struct because the token will be removed from the list
+				p.metadata.AnimeType = append(p.metadata.AnimeType, tkn.getValue())
+			}
+		}
 	}
 
 	p.tokenManager.tokens.combineTitle(tkns[0], tkns[len(tkns)-1], metadataEpisodeTitle)
@@ -55,15 +76,15 @@ func (p *parser) parseTitleIfAllEnclosed() (foundTitle bool) {
 	// Get enclosed tokens before enclosed episode number
 	// e.g. "[sub][anime title][01][...]"
 	for {
-		// Get first episode number token
+		// Get first episode number token (first because we are going backwards, and it could be a range)
 		found, epTkns := p.tokenManager.tokens.findWithMetadataCategory(metadataEpisodeNumber)
 		if !found {
 			break // Next try
 		}
 		firstEpTkn := epTkns[0]
 
-		// Get the first and second opening bracket going backwards
-		// e.g. `[` <- "anime title" ] `[` <- 01 ][ ... ]
+		// Get the first and second opening bracket going backwards from the episode number token
+		// e.g. [ ... ] `[` <-(!) 01 ][ ... ]
 		firstOpeningBracketTkn, found := p.tokenManager.tokens.getFirstOccurrenceBefore(
 			p.tokenManager.tokens.getIndexOf(firstEpTkn),
 			func(tkn *token) bool {
@@ -72,17 +93,25 @@ func (p *parser) parseTitleIfAllEnclosed() (foundTitle bool) {
 		if !found {
 			break // Next try
 		}
-		// Get second opening bracket going backwards
-		secondOpeningBracketTkn, found := p.tokenManager.tokens.getFirstOccurrenceBefore(
-			p.tokenManager.tokens.getIndexOf(firstOpeningBracketTkn),
-			func(tkn *token) bool {
-				return tkn.isOpeningBracket()
-			})
-		if !found {
-			break // Next try
+
+		// FIX for "[sub][anime title] 01 [...]", the second opening bracket will be that of the subgroup
+		// so instead, we need to check if the firstEpTkn is enclosed, and if it is, then we get the second opening bracket
+		secondOpeningBracketTkn := firstOpeningBracketTkn
+		if firstEpTkn.isEnclosed() {
+			// Get second opening bracket going backwards
+			// e.g. `[` <-(!) ... <- ] <- `[` 01 ][ ... ]
+			secondOpeningBracketTkn, found = p.tokenManager.tokens.getFirstOccurrenceBefore(
+				p.tokenManager.tokens.getIndexOf(firstOpeningBracketTkn),
+				func(tkn *token) bool {
+					return tkn.isOpeningBracket()
+				})
+			if !found {
+				break // Next try
+			}
 		}
+
 		// Get all unknown tokens between the two opening brackets
-		// e.g. `[` -> "anime" -> "title" ] `[` 01 ][ ... ]
+		// e.g. `[` -> "anime" -> "title" ] -| `[` 01 ][ ... ]
 		tkns, found := p.tokenManager.tokens.walkAndCollecIf(
 			p.tokenManager.tokens.getIndexOf(secondOpeningBracketTkn)+1,
 			func(tkn *token) bool {
@@ -91,7 +120,11 @@ func (p *parser) parseTitleIfAllEnclosed() (foundTitle bool) {
 			func(tkn *token) bool {
 				// Stop when we encounter the first opening bracket or a keyword
 				// e.g. [Mobile_Suit_Gundam_Seed_Destiny_HD_REMASTER][07] -> Mobile Suit Gundam Seed Destiny
-				return tkn.UUID == firstOpeningBracketTkn.UUID || tkn.isKeyword()
+				if firstEpTkn.isEnclosed() {
+					return tkn.UUID == firstOpeningBracketTkn.UUID || tkn.isKeyword()
+				} else {
+					return tkn.isClosingBracket()
+				}
 			})
 		if !found {
 			break // Next try
@@ -112,7 +145,7 @@ func (p *parser) parseTitleIfAllEnclosed() (foundTitle bool) {
 			break // Next try
 		}
 
-		if len(openingBracketTkns) < 2 {
+		if len(openingBracketTkns) < 3 {
 			break
 		}
 
@@ -154,6 +187,48 @@ func (p *parser) parseTitle() {
 		return // Stop if title found
 	}
 
+	// e.g. "[sub] anime title ep01"
+	for {
+		// Get first episode number token (first because we are going backwards, and it could be a range)
+		found, epTkns := p.tokenManager.tokens.findWithMetadataCategory(metadataEpisodeNumber)
+		if !found {
+			break // Next try
+		}
+		firstEpTkn := epTkns[0]
+
+		// 1st strategy: Get all unknown tokens before the episode number token until a closing bracket is found or SoF
+		// e.g. "[sub `]` |- "anime title" <- `ep01`"
+		// e.g. "|- "anime title" <- `ep01`"
+		tkns, found := p.tokenManager.tokens.walkBackAndCollecIf(
+			p.tokenManager.tokens.getIndexOf(firstEpTkn)-1,
+			func(tkn *token) bool {
+				return tkn.isUnknown() && !tkn.isKeyword() && !tkn.isSeparator()
+			},
+			func(tkn *token) bool {
+				return tkn.isClosingBracket() && tkn.getValue() == "]"
+			})
+		if !found {
+			break // Next try
+		}
+
+		// Check anime type in the title tokens
+		// e.g. "Anime title OVA", we don't remove "OVA" from the title, but add it as an anime type
+		for _, tkn := range tkns {
+			if kwd, found := p.tokenManager.keywordManager.findStandaloneKeywordByValue(tkn.getValue()); found {
+				if kwd.isAnimeType() { // if keyword is an anime type, add it to the metadata
+					// set it directly to the struct because the token will be removed from the list
+					p.metadata.AnimeType = append(p.metadata.AnimeType, tkn.getValue())
+				}
+			}
+		}
+		// Reverse the tokens because we were going backwards
+		slices.Reverse(tkns)
+
+		p.tokenManager.tokens.combineTitle(tkns[0], tkns[len(tkns)-1], metadataTitle)
+		return
+
+	}
+
 	// e.g. [sub] anime title [...]
 	for {
 		// Get first non-enclosed token
@@ -180,9 +255,21 @@ func (p *parser) parseTitle() {
 		if !found {
 			break // Next try
 		}
+
 		// Title should not be after file info metadata like 1080p
 		if p.tokenManager.tokens.isTokenAfterFileMetadata(tkns[0]) {
 			break // Next try
+		}
+
+		// Check anime type
+		// e.g. "Anime title OVA", we don't remove "OVA" from the title, but add it as an anime type
+		for _, tkn := range tkns {
+			if kwd, found := p.tokenManager.keywordManager.findStandaloneKeywordByValue(tkn.getValue()); found {
+				if kwd.isAnimeType() { // if keyword is an anime type, add it to the metadata
+					// set it directly to the struct because the token will be removed from the list
+					p.metadata.AnimeType = append(p.metadata.AnimeType, tkn.getValue())
+				}
+			}
 		}
 
 		p.tokenManager.tokens.combineTitle(tkns[0], tkns[len(tkns)-1], metadataTitle)
@@ -241,7 +328,7 @@ func (p *parser) parseReleaseGroup() {
 		closingBracketTkns, found := p.tokenManager.tokens.filter(func(tkn *token) bool {
 			return tkn.isClosingBracket() && tkn.getValue() != ")"
 		})
-		if !found || len(closingBracketTkns) == 1 {
+		if !found {
 			break // Next try
 		}
 
@@ -269,12 +356,24 @@ func (p *parser) parseReleaseGroup() {
 			unknownTkns, found := p.tokenManager.tokens.walkAndCollecIf(
 				p.tokenManager.tokens.getIndexOf(lastOpeningBracket)+1,
 				func(tkn *token) bool {
-					return tkn.isUnknown() && !tkn.isKeyword() && !tkn.isSeparator()
+					// Get all non-separator tokens
+					return !tkn.isSeparator()
 				},
 				func(tkn *token) bool {
 					return tkn.UUID == lastClosingBracket.UUID
 				})
 			if !found {
+				continue // Next try
+			}
+
+			// If we only get a single character, then it's probably not a release group
+			if len(unknownTkns) == 1 && len([]rune(unknownTkns[0].getValue())) == 1 {
+				continue // Next try
+			}
+			// If we find a keyword, then it's probably not a release group
+			if lo.ContainsBy(unknownTkns, func(tkn *token) bool {
+				return tkn.isKeyword() || tkn.isCRC32()
+			}) {
 				continue // Next try
 			}
 
@@ -295,7 +394,7 @@ func (p *parser) parseReleaseGroup() {
 	for {
 		// Get all unknown tokens
 		unknownTkns, found := p.tokenManager.tokens.filter(func(tkn *token) bool {
-			return tkn.isUnknown() && !tkn.isKeyword() && !tkn.isSeparator()
+			return tkn.isUnknown() && !tkn.isKeyword() && !tkn.isSeparator() && tkn.isWordKind()
 		})
 		if !found {
 			break // Next try

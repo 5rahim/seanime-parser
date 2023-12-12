@@ -238,8 +238,15 @@ func (t *tokens) isIsolated(tkn *token) bool {
 	if index == -1 {
 		return false
 	}
+
 	prevTkn, found := t.getTokenBefore(tkn)
+	// Previous token should be non-existent OR a delimiter that is not "."
 	isolatedOnTheLeft := !found || (prevTkn.isDelimiter() && prevTkn.getValue() != ".")
+
+	prevPrevTkn, found := t.getTokenBefore(prevTkn)
+	// Previous previous token should be non-existent OR a non-number token
+	isolatedOnTheLeft = !found || (prevTkn.getValue() == "." && !prevPrevTkn.isNumberKind()) || prevTkn.getValue() != "."
+
 	nextTkn, found := t.getTokenAfter(tkn)
 	isolatedOnTheRight := !found || (nextTkn.isDelimiter() || nextTkn.isOpeningBracket())
 	return isolatedOnTheLeft && isolatedOnTheRight
@@ -316,27 +323,33 @@ func (t *tokens) foundDashSeparatorAfter(tkn *token) bool {
 }
 
 // e.g. "01-{tkn}" or "1 - {tkn}"
+// When rangeWithDelimiters is true, the function will ignore delimiters when checking for a number range
+// So, "01 - {tkn}" and "01-{tkn} will return true,
+// When it's false, the function will return false for "01 - {tkn}" and true for "01-{tkn}
 //
 // Returns [0] separator, [1] number or false
-func (t *tokens) checkNumberRangeBefore(tkn *token) ([]*token, bool) {
+func (t *tokens) checkNumberRangeBefore(tkn *token, rangeWithDelimiters bool) ([]*token, bool) {
 	tkns, found, _ := t.getCategorySequenceBefore(t.getIndexOf(tkn), []tokenCategory{
 		tokenCatSeparator,
 		tokenCatUnknown,
-	}, true)
+	}, rangeWithDelimiters)
 	if !found || !tkns[1].isNumberKind() {
 		return nil, false
 	}
 	return tkns, true
 }
 
-// e.g. "01-{tkn}" or "1 - {tkn}"
+// e.g. "{tkn}-02" or "{tkn} - 02"
+// When rangeWithDelimiters is true, the function will ignore delimiters when checking for a number range
+// So, "01 - {tkn}" and "01-{tkn} will return true,
+// When it's false, the function will return false for "01 - {tkn}" and true for "01-{tkn}
 //
 // Returns [0] separator, [1] number or false
-func (t *tokens) checkNumberRangeAfter(tkn *token) ([]*token, bool) {
+func (t *tokens) checkNumberRangeAfter(tkn *token, rangeWithDelimiters bool) ([]*token, bool) {
 	tkns, found, _ := t.getCategorySequenceAfter(t.getIndexOf(tkn), []tokenCategory{
 		tokenCatSeparator,
 		tokenCatUnknown,
-	}, true)
+	}, rangeWithDelimiters)
 	if !found || !tkns[1].isNumberKind() {
 		return nil, false
 	}
@@ -349,7 +362,7 @@ func (t *tokens) allUnknownTokensAreEnclosed() bool {
 		if tkn.isFileExt() {
 			continue
 		}
-		if tkn.isUnknown() && !tkn.isEnclosed() && tkn.isMostlyLatinString() && len(tkn.getValue()) > 1 {
+		if tkn.isUnknown() && !tkn.isEnclosed() && len([]rune(tkn.getValue())) > 1 {
 			return false
 		}
 	}
@@ -391,13 +404,33 @@ func (t *tokens) collectUntil(start int, pred func(tkn *token) bool) ([]*token, 
 //
 // Example: Walk until the end
 //
-// tkns, found := walkAndCollecIf(0, func(tkn){ return tkn.isUnknown() }, func(tkn) { return false })
+//	tkns, found := walkAndCollecIf(0, func(tkn){ return tkn.isUnknown() }, func(tkn) { return false })
 func (t *tokens) walkAndCollecIf(start int, pred func(tkn *token) bool, stopIf func(tkn *token) bool) ([]*token, bool) {
 	if start+1 > len(*t)-1 {
 		return nil, false
 	}
 	collec := make([]*token, 0)
 	for _, tkn := range (*t)[start:] {
+		if stopIf(tkn) {
+			break
+		}
+		if pred(tkn) {
+			collec = append(collec, tkn)
+		}
+	}
+	if len(collec) == 0 {
+		return nil, false
+	}
+	return collec, true
+}
+
+func (t *tokens) walkBackAndCollecIf(start int, pred func(tkn *token) bool, stopIf func(tkn *token) bool) ([]*token, bool) {
+	if start-1 < 0 {
+		return nil, false
+	}
+	collec := make([]*token, 0)
+	for i := start; i >= 0; i-- {
+		tkn := (*t)[i]
 		if stopIf(tkn) {
 			break
 		}

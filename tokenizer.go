@@ -163,6 +163,16 @@ func tokenize(filename string) []*token {
 func identifyTokenKinds(tkns []*token) {
 	for _, tkn := range tkns {
 
+		if isCRC32(tkn.getValue()) {
+			tkn.setKind(tokenKindCrc32)
+			continue
+		}
+
+		if isResolution(tkn.getValue()) {
+			tkn.setKind(tokenKindPossibleVideoRes)
+			continue
+		}
+
 		if isNumber(tkn.getValue()) {
 			if isYearNumber(tkn.getValue()) {
 				tkn.setKind(tokenKindYear)
@@ -179,16 +189,6 @@ func identifyTokenKinds(tkns []*token) {
 
 		if isOrdinalNumber(tkn.getValue()) {
 			tkn.setKind(tokenKindOrdinalNumber)
-			continue
-		}
-
-		if isCRC32(tkn.getValue()) {
-			tkn.setKind(tokenKindCrc32)
-			continue
-		}
-
-		if isResolution(tkn.getValue()) {
-			tkn.setKind(tokenKindPossibleVideoRes)
 			continue
 		}
 

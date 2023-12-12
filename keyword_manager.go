@@ -68,7 +68,7 @@ func newKeywordManager() *keywordManager {
 	// The parser will treat these keywords as standalone ambiguous tokens and will not attempt to identify them if
 	// they are found in the first half of the filename.
 	km.ambiguousKeywords = []string{
-		"SP", "ANDROID", "ITA", "ESP", "BD", "FR",
+		"SP", "ANDROID", "ITA", "ESP", "FR", "JP", "EN", "RU", "CH",
 	}
 
 	// Season
@@ -161,13 +161,20 @@ func newKeywordManager() *keywordManager {
 			"ED", "ENDING", "NCED", "NCOP", "OPED", "OP", "OPENING", "PREVIEW", "PV", "EVENT", "TOKUTEN", "LOGO", "CM", "SPOT", "MENU"},
 	)
 
+	km.addGroupParts(
+		keywordCatReleaseGroup,
+		[]*keywordParts{
+			{prefix: "CENTRAL", seqParts: []string{" ", "ANIME"}},
+		},
+	)
+
 	// Audio Term
 
 	km.addGroup(
 		keywordCatAudioTerm,
 		keywordKindStandalone,
 		[]string{
-			"2.0CH", "2CH", "5.1", "5.1CH", "DTS", "DTS-ES", "DTS5.1", "TRUEHD5.1",
+			"2CH", "DTS", "DTS-ES", "DTS5.1", "TRUEHD5.1",
 			"AAC", "AACX2", "AACX3", "AACX4", "AC3", "EAC3", "E-AC-3", "FLAC",
 			"FLACX2", "FLACX3", "FLACX4", "LOSSLESS", "MP3", "OGG", "VORBIS",
 			"DD2", "DD2.0", "DDP", "DD", "HDMA", "DTSHD",
@@ -180,6 +187,7 @@ func newKeywordManager() *keywordManager {
 		[]*keywordParts{
 			{prefix: "2", seqParts: []string{".", "0CH"}},          // 2.0CH
 			{prefix: "5", seqParts: []string{".", "1"}},            // 5.1
+			{prefix: "5", seqParts: []string{".", "1ch"}},          // 5.1ch
 			{prefix: "DTS", seqParts: []string{"-", "ES"}},         // DTS-ES
 			{prefix: "DTS", seqParts: []string{"-", "HD"}},         // DTS-HD
 			{prefix: "DTS", seqParts: []string{"-", "HDMA"}},       // DTS-HDMA
@@ -244,7 +252,7 @@ func newKeywordManager() *keywordManager {
 	km.addGroup(
 		keywordCatReleaseVersion,
 		keywordKindStandalone,
-		[]string{"V2", "V3", "V4", "V5"},
+		[]string{"V0", "V1", "V2", "V3", "V4", "V5"},
 	)
 
 	// Device Compat
@@ -271,7 +279,7 @@ func newKeywordManager() *keywordManager {
 	km.addGroup(
 		keywordCatLanguage,
 		keywordKindStandalone,
-		[]string{"ENG", "ENGLISH", "ESPANOL", "JAP", "JPN", "FR", "PT-BR", "SPANISH", "VOSTFR", "ESP", "ITA"},
+		[]string{"ENG", "ENGLISH", "ESPANOL", "JAP", "JP", "EN", "JPN", "FR", "PT-BR", "SPANISH", "VOSTFR", "ESP", "ITA", "RU", "CHT", "CHS", "CH"},
 	)
 
 	// Release info
@@ -280,7 +288,7 @@ func newKeywordManager() *keywordManager {
 		keywordCatReleaseInformation,
 		keywordKindStandalone,
 		[]string{"REMASTER", "REMASTERED", "UNCENSORED", "UNCUT", "TS", "VFR",
-			"WIDESCREEN", "WS", "BATCH", "COMPLETE", "PATCH", "REMUX"},
+			"WIDESCREEN", "WS", "BATCH", "COMPLETE", "PATCH", "REMUX", "FINAL"},
 	)
 
 	km.addGroup(
