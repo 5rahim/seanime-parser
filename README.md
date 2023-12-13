@@ -23,18 +23,18 @@ go get -u github.com/5rahim/seanime_parser
  [ReDone] Memories Off 3.5 - 04 (DVD 10-bit)                                             | ✅              | ❌       | ❌       
  Byousoku 5 Centimeter [Blu-Ray][1920x1080 H.264][2.0ch AAC][SOFTSUBS]                   | ✅              | ❌       | ❌       
  37 [Ruberia]_Death_Note_-_37v2_[FINAL]_[XviD][6FA7D273]                                 | ✅              | ❌       | ❌       
- S01E05 - Episode title.mkv                                                              | ✅              | ❔       | ❌       
  [Judas] Aharen-san wa Hakarenai - S01E06v2.mkv                                          | ✅              | ✅       | ❌       
+ S01E05 - Episode title.mkv                                                              | ✅              | ❔       | ❌       
 
 # Use
 
 ```go
 package main
 
-import "github.com/5rahim/seanime_parser"
+import "github.com/5rahim/seanime-parser"
 
 func main() {
-	data := seanime_parser.Parse("Hyouka (2012) S1-2 [BD 1080p HEVC OPUS] [Dual-Audio]")
+	data := seanime - parser.Parse("Hyouka (2012) S1-2 [BD 1080p HEVC OPUS] [Dual-Audio]")
 	println(data.Title)           // Hyouka
 	println(data.FormattedTitle)  // Hyouka (2012)
 	println(data.Year)            // 2012
