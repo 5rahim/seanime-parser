@@ -1634,24 +1634,6 @@
     ]
   },
   {
-    "file_name": "[UTW]_Accel_World_-_EX01_[BD][h264-720p_AAC][3E56EE18].mkv",
-    "title": "Accel World - EX01",
-    "formatted_title": "Accel World - EX01",
-    "audio_term": [
-      "AAC"
-    ],
-    "file_checksum": "3E56EE18",
-    "file_extension": "mkv",
-    "release_group": "UTW",
-    "source": [
-      "BD"
-    ],
-    "video_resolution": "720p",
-    "video_term": [
-      "h264"
-    ]
-  },
-  {
     "file_name": "[HorribleSubs] Tsukimonogatari - (01-04) [1080p].mkv",
     "title": "Tsukimonogatari",
     "formatted_title": "Tsukimonogatari",
@@ -1786,16 +1768,6 @@
     "release_information": [
       "remux"
     ],
-    "file_extension": "mkv"
-  },
-  {
-    "file_name": "The iDOLM@STER 765 Pro to Iu Monogatari.mkv",
-    "title": "The iDOLM@STER",
-    "formatted_title": "The iDOLM@STER",
-    "episode_number": [
-      "765"
-    ],
-    "episode_title": "Pro to Iu Monogatari",
     "file_extension": "mkv"
   },
   {
