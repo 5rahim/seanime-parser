@@ -174,7 +174,7 @@ func newKeywordManager() *keywordManager {
 		keywordCatAudioTerm,
 		keywordKindStandalone,
 		[]string{
-			"2CH", "DTS", "DTS-ES", "DTS5.1", "TRUEHD5.1", "5.1",
+			"2CH", "DTS", "DTS-ES", "DTS5.1", "TRUEHD5.1", "5.1", "2.0",
 			"AAC", "AACX2", "AACX3", "AACX4", "AC3", "EAC3", "E-AC-3", "FLAC",
 			"FLACX2", "FLACX3", "FLACX4", "LOSSLESS", "MP3", "OGG", "VORBIS",
 			"DD2", "DD2.0", "DDP", "DD", "HDMA", "DTSHD",
@@ -185,19 +185,20 @@ func newKeywordManager() *keywordManager {
 	km.addGroupParts(
 		keywordCatAudioTerm,
 		[]*keywordParts{
-			{prefix: "2", seqParts: []string{".", "0CH"}},          // 2.0CH
-			{prefix: "5", seqParts: []string{".", "1"}},            // 5.1
-			{prefix: "5", seqParts: []string{".", "1ch"}},          // 5.1ch
-			{prefix: "DTS", seqParts: []string{"-", "ES"}},         // DTS-ES
-			{prefix: "DTS", seqParts: []string{"-", "HD"}},         // DTS-HD
-			{prefix: "DTS", seqParts: []string{"-", "HDMA"}},       // DTS-HDMA
-			{prefix: "DTS5", seqParts: []string{".", "1"}},         // DTS5.1
-			{prefix: "TRUEHD5", seqParts: []string{".", "1"}},      // TRUEHD5.1
-			{prefix: "DUAL", seqParts: []string{"-", "AUDIO"}},     // DUAL-AUDIO
-			{prefix: "DUAL", seqParts: []string{".", "AUDIO"}},     // DUAL.AUDIO
-			{prefix: "DUAL", seqParts: []string{" ", "AUDIO"}},     // DUAL AUDIO
-			{prefix: "DD2", seqParts: []string{".", "0"}},          // DD2.0
-			{prefix: "E", seqParts: []string{"-", "AC", "-", "3"}}, // E-AC-3
+			{prefix: "2", seqParts: []string{".", "0CH"}},                   // 2.0CH
+			{prefix: "5", seqParts: []string{".", "1"}},                     // 5.1
+			{prefix: "5", seqParts: []string{".", "1", "+", "2", ".", "0"}}, // 5.1
+			{prefix: "5", seqParts: []string{".", "1ch"}},                   // 5.1ch
+			{prefix: "DTS", seqParts: []string{"-", "ES"}},                  // DTS-ES
+			{prefix: "DTS", seqParts: []string{"-", "HD"}},                  // DTS-HD
+			{prefix: "DTS", seqParts: []string{"-", "HDMA"}},                // DTS-HDMA
+			{prefix: "DTS5", seqParts: []string{".", "1"}},                  // DTS5.1
+			{prefix: "TRUEHD5", seqParts: []string{".", "1"}},               // TRUEHD5.1
+			{prefix: "DUAL", seqParts: []string{"-", "AUDIO"}},              // DUAL-AUDIO
+			{prefix: "DUAL", seqParts: []string{".", "AUDIO"}},              // DUAL.AUDIO
+			{prefix: "DUAL", seqParts: []string{" ", "AUDIO"}},              // DUAL AUDIO
+			{prefix: "DD2", seqParts: []string{".", "0"}},                   // DD2.0
+			{prefix: "E", seqParts: []string{"-", "AC", "-", "3"}},          // E-AC-3
 		},
 	)
 
@@ -282,6 +283,15 @@ func newKeywordManager() *keywordManager {
 		[]string{"ENG", "ENGLISH", "ESPANOL", "JAP", "JP", "EN", "JPN", "FR", "PT-BR", "SPANISH", "VOSTFR", "ESP", "ITA", "RU", "CHT", "CHS", "CH"},
 	)
 
+	km.addGroupParts(
+		keywordCatLanguage,
+		[]*keywordParts{
+			{prefix: "PT", seqParts: []string{"-", "BR"}},
+			{prefix: "PT", seqParts: []string{".", "BR"}},
+			{prefix: "PT", seqParts: []string{" ", "BR"}},
+		},
+	)
+
 	// Release info
 
 	km.addGroup(
@@ -301,6 +311,7 @@ func newKeywordManager() *keywordManager {
 	km.addGroupParts(
 		keywordCatSubtitles,
 		[]*keywordParts{
+			{prefix: "MULTI", seqParts: []string{"_", "SUB"}},
 			{prefix: "MULTI", seqParts: []string{" ", "SUB"}},
 			{prefix: "MULTI", seqParts: []string{"-", "SUB"}},
 			{prefix: "MULTI", seqParts: []string{".", "SUB"}},

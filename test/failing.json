@@ -175,5 +175,35 @@
       "video_resolution": "720"
     },
     "reason": "Missing 'p' after the video resolution"
+  },
+  {
+    "expected": {
+      "year": "1998",
+      "file_name": "[LRL] 1001 Nights (1998) [DVD]",
+      "formatted_title": "1001 Nights",
+      "release_group": "LRL",
+      "source": [
+        "DVD"
+      ],
+      "title": "1001 Nights"
+    }
+  },
+  {
+    "expected": {
+      "episode_number": [
+        "32"
+      ],
+      "episode_number_alt": [
+        "83"
+      ],
+      "episode_title": "Tartaros Arc Iron Fist of the Fire Dragon",
+      "file_name": "Fairy Tail - S06E32 - Tartaros Arc Iron Fist of the Fire Dragon [Episode 83]",
+      "formatted_title": "Fairy Tail",
+      "season_number": [
+        "06"
+      ],
+      "title": "Fairy Tail"
+    },
+    "reason": "Episode number already got parsed"
   }
 ]

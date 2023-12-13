@@ -882,16 +882,6 @@
     "release_group": "Judas"
   },
   {
-    "file_name": "[Judas] Zom 100: Zombie ni Naru Made ni Shitai 100 no Koto 05.mkv",
-    "title": "Zom 100: Zombie ni Naru Made ni Shitai 100 no Koto",
-    "formatted_title": "Zom 100: Zombie ni Naru Made ni Shitai 100 no Koto",
-    "episode_number": [
-      "05"
-    ],
-    "file_extension": "mkv",
-    "release_group": "Judas"
-  },
-  {
     "file_name": "[Edomae Subs] Kore wa Zombie desu ka  Episode 2.mkv",
     "title": "Kore wa Zombie desu ka",
     "formatted_title": "Kore wa Zombie desu ka",
@@ -1395,7 +1385,8 @@
     ],
     "audio_term": [
       "AACx2",
-      "5.1"
+      "5.1",
+      "2.0"
     ],
     "file_extension": "mp4",
     "source": [
@@ -1434,7 +1425,9 @@
     "formatted_title": "Kotonoha no Niwa",
     "audio_term": [
       "AACx3",
-      "5.1"
+      "5.1",
+      "2.0",
+      "2.0"
     ],
     "file_extension": "mp4",
     "source": [
@@ -1861,7 +1854,10 @@
     "title": "Gintama",
     "formatted_title": "Gintama",
     "episode_number": [
-      "111C"
+      "111"
+    ],
+    "release_version": [
+      "c"
     ],
     "video_resolution": "1080p",
     "release_group": "HorribleSubs",
@@ -2145,5 +2141,954 @@
     "video_term": [
       "10-bit"
     ]
+  },
+  {
+    "file_name": "[FFF] Seirei Tsukai no Blade Dance - SP01 [BD][720p-AAC][F1FF8588].mkv",
+    "title": "Seirei Tsukai no Blade Dance",
+    "formatted_title": "Seirei Tsukai no Blade Dance SP 01",
+    "anime_type": [
+      "SP"
+    ],
+    "audio_term": [
+      "AAC"
+    ],
+    "episode_number": [
+      "01"
+    ],
+    "file_checksum": "F1FF8588",
+    "file_extension": "mkv",
+    "release_group": "FFF",
+    "source": [
+      "BD"
+    ],
+    "video_resolution": "720p"
+  },
+  {
+    "file_name": "Byousoku 5 Centimeter [Blu-Ray][1920x1080 H.264][2.0ch AAC][SOFTSUBS]",
+    "title": "Byousoku 5 Centimeter",
+    "formatted_title": "Byousoku 5 Centimeter",
+    "audio_term": [
+      "2.0ch",
+      "AAC"
+    ],
+    "source": [
+      "Blu-Ray"
+    ],
+    "subtitles": [
+      "SOFTSUBS"
+    ],
+    "video_resolution": "1920x1080",
+    "video_term": [
+      "H.264"
+    ]
+  },
+  {
+    "file_name": "[SubDESU-H] Swing out Sisters Complete Version (720p x264 8bit AC3) [3ABD57E6].mp4",
+    "title": "Swing out Sisters",
+    "formatted_title": "Swing out Sisters",
+    "audio_term": [
+      "AC3"
+    ],
+    "file_checksum": "3ABD57E6",
+    "file_extension": "mp4",
+    "release_group": "SubDESU-H",
+    "release_information": [
+      "Complete"
+    ],
+    "video_resolution": "720p",
+    "video_term": [
+      "x264",
+      "8bit"
+    ]
+  },
+  {
+    "file_name": "Cyborg 009 (1968) [TSHS] episode 06 [30C15D62].mp4",
+    "title": "Cyborg 009",
+    "formatted_title": "Cyborg 009 (1968)",
+    "year": "1968",
+    "episode_number": [
+      "06"
+    ],
+    "file_checksum": "30C15D62",
+    "file_extension": "mp4",
+    "release_group": "TSHS"
+  },
+  {
+    "year": "2014",
+    "episode_number": [
+      "002"
+    ],
+    "episode_number_alt": [
+      "100"
+    ],
+    "file_name": "[Hatsuyuki] Dragon Ball Kai (2014) - 002 (100) [1280x720][DD66AFB7].mkv",
+    "title": "Dragon Ball Kai",
+    "formatted_title": "Dragon Ball Kai (2014)",
+    "file_checksum": "DD66AFB7",
+    "file_extension": "mkv",
+    "release_group": "Hatsuyuki",
+    "video_resolution": "1280x720"
+  },
+  {
+    "file_name": "[Deep] Tegami Bachi (REVERSE) - Letter Bee - 29 (04) [5203142B].mkv",
+    "title": "Tegami Bachi (REVERSE) - Letter Bee",
+    "formatted_title": "Tegami Bachi (REVERSE) - Letter Bee",
+    "episode_number": [
+      "29"
+    ],
+    "episode_number_alt": [
+      "04"
+    ],
+    "file_checksum": "5203142B",
+    "file_extension": "mkv",
+    "release_group": "Deep"
+  },
+  {
+    "file_name": "[FFF] Love Live! The School Idol Movie - PV [D1A15D2C].mkv",
+    "title": "Love Live! The School Idol Movie - PV",
+    "formatted_title": "Love Live! The School Idol Movie - PV",
+    "anime_type": [
+      "Movie",
+      "PV"
+    ],
+    "file_checksum": "D1A15D2C",
+    "file_extension": "mkv",
+    "release_group": "FFF"
+  },
+  {
+    "part_number": [
+      "1"
+    ],
+    "anime_type": [
+      "Movie"
+    ],
+    "file_checksum": "98965607",
+    "file_extension": "mkv",
+    "file_name": "[Nishi-Taku] Tamayura ~graduation photo~ Movie Part 1 [BD][720p][98965607].mkv",
+    "formatted_title": "Tamayura ~graduation photo~ Movie",
+    "release_group": "Nishi-Taku",
+    "source": [
+      "BD"
+    ],
+    "part_number": [
+      "1"
+    ],
+    "title": "Tamayura ~graduation photo~ Movie",
+    "video_resolution": "720p"
+  },
+  {
+    "file_extension": "mkv",
+    "file_name": "[TardRaws] 0 [640x360].mkv",
+    "formatted_title": "0",
+    "release_group": "TardRaws",
+    "title": "0",
+    "video_resolution": "640x360"
+  },
+  {
+    "file_name": "[FB] Crayon Shin-Chan Movie 2 The Secret of Buri Buri Kingdom [DivX5 AC3] 1994 [852X480] V2.avi",
+    "title": "Crayon Shin-Chan",
+    "formatted_title": "Crayon Shin-Chan Movie 2",
+    "episode_number": [
+      "2"
+    ],
+    "anime_type": [
+      "Movie"
+    ],
+    "audio_term": [
+      "AC3"
+    ],
+    "file_extension": "avi",
+    "release_group": "FB",
+    "release_version": [
+      "2"
+    ],
+    "video_resolution": "852X480",
+    "video_term": [
+      "DivX5"
+    ]
+  },
+  {
+    "episode_number": [
+      "52"
+    ],
+    "episode_number_alt": [
+      "227"
+    ],
+    "file_checksum": "9DF6B8D5",
+    "file_extension": "mkv",
+    "file_name": "[Hatsuyuki-Kaitou]_Fairy_Tail_2_-_52_(227)_[720p][10bit][9DF6B8D5].mkv",
+    "formatted_title": "Fairy Tail 2",
+    "release_group": "Hatsuyuki-Kaitou",
+    "title": "Fairy Tail 2",
+    "video_resolution": "720p",
+    "video_term": [
+      "10bit"
+    ]
+  },
+  {
+    "audio_term": [
+      "AAC"
+    ],
+    "episode_number": [
+      "01"
+    ],
+    "file_checksum": "457CC066",
+    "file_extension": "mkv",
+    "file_name": "[FBI] Baby Princess 3D Paradise Love 01v0 [BD][720p-AAC][457CC066].mkv",
+    "formatted_title": "Baby Princess 3D Paradise Love",
+    "release_group": "FBI",
+    "release_version": [
+      "0"
+    ],
+    "source": [
+      "BD"
+    ],
+    "title": "Baby Princess 3D Paradise Love",
+    "video_resolution": "720p"
+  },
+  {
+    "file_name": "[Shinsen-Subs]_Macross_Frontier_-_01b_[4D5EC315].avi",
+    "title": "Macross Frontier",
+    "formatted_title": "Macross Frontier",
+    "episode_number": [
+      "01"
+    ],
+    "release_version": [
+      "b"
+    ],
+    "file_checksum": "4D5EC315",
+    "file_extension": "avi",
+    "release_group": "Shinsen-Subs"
+  },
+  {
+    "file_name": "One Piece Episode 1001 - 1012 [English Dub][720p][onepiecedubb]",
+    "title": "One Piece",
+    "formatted_title": "One Piece",
+    "episode_number": [
+      "1001",
+      "1012"
+    ],
+    "release_group": "onepiecedubb",
+    "video_resolution": "720p",
+    "subtitles": [
+      "Dub"
+    ],
+    "language": [
+      "English"
+    ]
+  },
+  {
+    "file_name": "[NamaeNai] Hidamari Sketch x365 - 09a (DVD) [49874745].mkv",
+    "formatted_title": "Hidamari Sketch x365",
+    "episode_number": [
+      "09"
+    ],
+    "release_version": [
+      "a"
+    ],
+    "file_checksum": "49874745",
+    "file_extension": "mkv",
+    "release_group": "NamaeNai",
+    "source": [
+      "DVD"
+    ],
+    "title": "Hidamari Sketch x365"
+  },
+  {
+    "file_name": "[KLF]_D.Gray-man_04V2.avi",
+    "title": "D Gray-man",
+    "formatted_title": "D Gray-man",
+    "episode_number": [
+      "04"
+    ],
+    "file_extension": "avi",
+    "release_group": "KLF",
+    "release_version": [
+      "2"
+    ]
+  },
+  {
+    "episode_number": [
+      "01"
+    ],
+    "file_extension": "mkv",
+    "file_name": "[FaggotryRaws] Bakuman - 01 (NHK E 848x480).mkv",
+    "formatted_title": "Bakuman",
+    "release_group": "FaggotryRaws",
+    "title": "Bakuman",
+    "video_resolution": "848x480"
+  },
+  {
+    "part_number": [
+      "2"
+    ],
+    "episode_number": [
+      "14"
+    ],
+    "episode_title": "Forever Fall",
+    "file_extension": "mp4",
+    "file_name": "[5F] RWBY 14 Forever Fall Part 2 pt-BR.mp4",
+    "formatted_title": "RWBY",
+    "language": [
+      "pt-BR"
+    ],
+    "release_group": "5F",
+    "title": "RWBY",
+    "part_number": [
+      "2"
+    ]
+  },
+  {
+    "episode_number": [
+      "01"
+    ],
+    "file_extension": "mkv",
+    "file_name": "Dragon.Ball.KAI.-.01.-.1080p.BluRay.x264.DHD.mkv",
+    "formatted_title": "Dragon Ball KAI",
+    "source": [
+      "BluRay"
+    ],
+    "title": "Dragon Ball KAI",
+    "video_resolution": "1080p",
+    "video_term": [
+      "x264"
+    ],
+    "release_group": "DHD"
+  },
+  {
+    "anime_type": [
+      "TV"
+    ],
+    "episode_number": [
+      "02"
+    ],
+    "file_extension": "mkv",
+    "file_name": "[AnimeRG] Ushio to Tora (TV) - 02 [720p] [Xcelent].mkv",
+    "formatted_title": "Ushio to Tora (TV)",
+    "release_group": "AnimeRG",
+    "title": "Ushio to Tora (TV)",
+    "video_resolution": "720p"
+  },
+  {
+    "file_name": "[Anime"
+  },
+  {
+    "file_name": "Gekkan Shoujo Nozaki-kun [HorribleSubs] (1080p)",
+    "formatted_title": "Gekkan Shoujo Nozaki-kun",
+    "release_group": "HorribleSubs",
+    "title": "Gekkan Shoujo Nozaki-kun",
+    "video_resolution": "1080p"
+  },
+  {
+    "file_name": "[BM&T] Toradora! - 07v2 - Pool Opening [720p Hi10 ] [BD] [8F59F2BA]",
+    "title": "Toradora!",
+    "formatted_title": "Toradora!",
+    "episode_number": [
+      "07"
+    ],
+    "episode_title": "Pool Opening",
+    "anime_type": [
+      "Opening"
+    ],
+    "file_checksum": "8F59F2BA",
+    "release_group": "BM&T",
+    "release_version": [
+      "2"
+    ],
+    "source": [
+      "BD"
+    ],
+    "video_resolution": "720p",
+    "video_term": [
+      "Hi10"
+    ]
+  },
+  {
+    "audio_term": [
+      "FLAC"
+    ],
+    "file_checksum": "C09462E2",
+    "file_name": "[EveTaku] AKB0048 Vol.03 - Making of Kibou-ni-Tsuite Music Video (BDRip 1080i H.264-Hi10P FLAC)[C09462E2]",
+    "formatted_title": "AKB0048",
+    "release_group": "EveTaku",
+    "source": [
+      "BDRip"
+    ],
+    "title": "AKB0048",
+    "video_term": [
+      "H.264",
+      "Hi10P"
+    ],
+    "volume_number": [
+      "03"
+    ]
+  },
+  {
+    "file_name": "[DmonHiro] Magi - The Labyrinth Of Magic - Vol.1v2 (BD, 720p)",
+    "formatted_title": "Magi - The Labyrinth Of Magic",
+    "release_group": "DmonHiro",
+    "release_version": [
+      "2"
+    ],
+    "source": [
+      "BD"
+    ],
+    "title": "Magi - The Labyrinth Of Magic",
+    "video_resolution": "720p",
+    "volume_number": [
+      "1"
+    ]
+  },
+  {
+    "audio_term": [
+      "AAC"
+    ],
+    "file_name": "[tlacatlc6] Natsume Yuujinchou Shi Vol. 1v2 & Vol. 2 (BD 1280x720 x264 AAC)",
+    "formatted_title": "Natsume Yuujinchou Shi",
+    "release_group": "tlacatlc6",
+    "source": [
+      "BD"
+    ],
+    "title": "Natsume Yuujinchou Shi",
+    "video_resolution": "1280x720",
+    "video_term": [
+      "x264"
+    ],
+    "volume_number": [
+      "1",
+      "2"
+    ]
+  },
+  {
+    "audio_term": [
+      "FLAC"
+    ],
+    "episode_number": [
+      "01",
+      "04"
+    ],
+    "file_name": "[Tsundere] Hyouka - 01v2-04 [BDRip h264 1920x1080 10bit FLAC]",
+    "formatted_title": "Hyouka",
+    "release_group": "Tsundere",
+    "source": [
+      "BDRip"
+    ],
+    "title": "Hyouka",
+    "video_resolution": "1920x1080",
+    "video_term": [
+      "h264",
+      "10bit"
+    ]
+  },
+  {
+    "audio_term": [
+      "AAC"
+    ],
+    "episode_number": [
+      "01",
+      "03"
+    ],
+    "file_name": "[Doki] Nogizaka Haruka no Himitsu - Purezza - 01v2-03v2 (1280x720 h264 AAC)",
+    "formatted_title": "Nogizaka Haruka no Himitsu - Purezza",
+    "release_group": "Doki",
+    "release_version": [
+      "2"
+    ],
+    "title": "Nogizaka Haruka no Himitsu - Purezza",
+    "video_resolution": "1280x720",
+    "video_term": [
+      "h264"
+    ]
+  },
+  {
+    "episode_number": [
+      "32"
+    ],
+    "episode_title": "Tartaros Arc Iron Fist of the Fire Dragon",
+    "file_name": "Fairy Tail - S06E32 - Tartaros Arc Iron Fist of the Fire Dragon [Episode 83]",
+    "formatted_title": "Fairy Tail",
+    "season_number": [
+      "06"
+    ],
+    "title": "Fairy Tail",
+    "release_group": "Episode 83"
+  },
+  {
+    "episode_title": "What Must Be Done",
+    "file_name": "Noragami - S02E06 - What Must Be Done [Episode 6]",
+    "formatted_title": "Noragami",
+    "season_number": [
+      "02"
+    ],
+    "episode_number": [
+      "06"
+    ],
+    "title": "Noragami",
+    "release_group": "Episode 6"
+  },
+  {
+    "audio_term": [
+      "AAC"
+    ],
+    "file_name": "[Harunatsu] Classroom Crisis - Vol.1 [BD 720p-AAC]",
+    "formatted_title": "Classroom Crisis",
+    "release_group": "Harunatsu",
+    "source": [
+      "BD"
+    ],
+    "title": "Classroom Crisis",
+    "video_resolution": "720p",
+    "volume_number": [
+      "1"
+    ]
+  },
+  {
+    "audio_term": [
+      "FLAC"
+    ],
+    "file_name": "[GS] Classroom Crisis Vol.1&2 (BD 1080p 10bit FLAC)",
+    "formatted_title": "Classroom Crisis",
+    "release_group": "GS",
+    "source": [
+      "BD"
+    ],
+    "title": "Classroom Crisis",
+    "video_resolution": "1080p",
+    "video_term": [
+      "10bit"
+    ],
+    "volume_number": [
+      "1",
+      "2"
+    ]
+  },
+  {
+    "episode_number": [
+      "12"
+    ],
+    "file_name": "[Infantjedi] Norn9 - Norn + Nonetto - 12",
+    "formatted_title": "Norn9 - Norn + Nonetto",
+    "release_group": "Infantjedi",
+    "title": "Norn9 - Norn + Nonetto"
+  },
+  {
+    "audio_term": [
+      "DTS"
+    ],
+    "episode_number": [
+      "8",
+      "10"
+    ],
+    "file_name": "Dragon_Ball_Z_Movies_8_&_10_[720p,BluRay,DTS,x264]_-_THORA",
+    "title": "Dragon Ball Z",
+    "formatted_title": "Dragon Ball Z Movies 8",
+    "release_group": "THORA",
+    "source": [
+      "BluRay"
+    ],
+    "anime_type": [
+      "Movies"
+    ],
+    "video_resolution": "720p",
+    "video_term": [
+      "x264"
+    ]
+  },
+  {
+    "episode_number": [
+      "01",
+      "02"
+    ],
+    "file_name": "[HorribleSubs] Momokuri - 01+02 [720p]",
+    "formatted_title": "Momokuri",
+    "release_group": "HorribleSubs",
+    "title": "Momokuri",
+    "video_resolution": "720p"
+  },
+  {
+    "episode_number": [
+      "01",
+      "75"
+    ],
+    "file_extension": "mkv",
+    "file_name": "[HorribleSubs] Boku no Hero Academia S01-S03E01-75 [1080p].mkv",
+    "formatted_title": "Boku no Hero Academia",
+    "release_group": "HorribleSubs",
+    "season_number": [
+      "01",
+      "03"
+    ],
+    "title": "Boku no Hero Academia",
+    "video_resolution": "1080p"
+  },
+  {
+    "episode_number": [
+      "01",
+      "14"
+    ],
+    "file_name": "[Erai-raws] Great Pretender - 01 ~ 14 [720p][Multiple Subtitle]",
+    "formatted_title": "Great Pretender",
+    "release_group": "Erai-raws",
+    "title": "Great Pretender",
+    "video_resolution": "720p"
+  },
+  {
+    "episode_number": [
+      "01"
+    ],
+    "file_name": "[Erai-raws] Blue Lock - S01E01v2 [720p][Multiple Subtitle]",
+    "formatted_title": "Blue Lock",
+    "release_group": "Erai-raws",
+    "release_version": [
+      "2"
+    ],
+    "season_number": [
+      "01"
+    ],
+    "title": "Blue Lock",
+    "video_resolution": "720p"
+  },
+  {
+    "episode_number": [
+      "05"
+    ],
+    "file_extension": "mkv",
+    "file_name": "[Judas] Blue Lock - 01x05.mkv",
+    "formatted_title": "Blue Lock",
+    "release_group": "Judas",
+    "season_number": [
+      "01"
+    ],
+    "title": "Blue Lock"
+  },
+  {
+    "episode_number": [
+      "01"
+    ],
+    "file_name": "[Erai-raws] Blue Lock - 01' [Multiple Subtitle]",
+    "formatted_title": "Blue Lock",
+    "release_group": "Erai-raws",
+    "title": "Blue Lock",
+    "release_version": [
+      "2"
+    ]
+  },
+  {
+    "episode_number": [
+      "12"
+    ],
+    "file_extension": "mkv",
+    "file_name": "[Erai-raws] Blue Lock - 12'.mkv",
+    "formatted_title": "Blue Lock",
+    "release_group": "Erai-raws",
+    "title": "Blue Lock",
+    "release_version": [
+      "2"
+    ]
+  },
+  {
+    "episode_number": [
+      "05"
+    ],
+    "episode_title": "Episode title",
+    "file_extension": "mkv",
+    "file_name": "05 - Episode title.mkv"
+  },
+  {
+    "episode_number": [
+      "05"
+    ],
+    "episode_title": "Episode title",
+    "file_extension": "mkv",
+    "file_name": "S01E05 - Episode title.mkv",
+    "season_number": [
+      "01"
+    ]
+  },
+  {
+    "episode_number": [
+      "05"
+    ],
+    "episode_title": "'Episode title'",
+    "file_extension": "mkv",
+    "file_name": "S01E05-'Episode title'.mkv",
+    "season_number": [
+      "01"
+    ]
+  },
+  {
+    "episode_number": [
+      "21"
+    ],
+    "file_extension": "mkv",
+    "file_name": "[SubsPlease] 86 - Eighty Six - 21v2.mkv",
+    "formatted_title": "86 - Eighty Six",
+    "release_group": "SubsPlease",
+    "release_version": [
+      "2"
+    ],
+    "title": "86 - Eighty Six"
+  },
+  {
+    "file_name": "Season 2",
+    "season_number": [
+      "2"
+    ]
+  },
+  {
+    "part_number": [
+      "2"
+    ],
+    "file_name": "[SubsPlease] 86 - Eighty Six Part 2 [Batch]",
+    "formatted_title": "86 - Eighty Six",
+    "release_group": "SubsPlease",
+    "release_information": [
+      "Batch"
+    ],
+    "title": "86 - Eighty Six"
+  },
+  {
+    "part_number": [
+      "3"
+    ],
+    "episode_number": [
+      "29",
+      "31"
+    ],
+    "file_name": "[Trix] Shingeki no Kyojin - S04E29-31 (Part 3) [Multi Subs] (1080p AV1 E-AC3)",
+    "formatted_title": "Shingeki no Kyojin",
+    "release_group": "Trix",
+    "season_number": [
+      "04"
+    ],
+    "title": "Shingeki no Kyojin",
+    "video_resolution": "1080p",
+    "video_term": [
+      "AV1"
+    ],
+    "audio_term": [
+      "AC3"
+    ],
+    "subtitles": [
+      "Multi Subs"
+    ]
+  },
+  {
+    "year": "2023",
+    "audio_term": [
+      "Dual Audio"
+    ],
+    "file_name": "[EMBER] In/Spectre (2023) (Season 2) [BDRip] [1080p Dual Audio HEVC 10 bits] (Kyokou Suiri Season 2) (Batch)",
+    "formatted_title": "In/Spectre (2023)",
+    "release_group": "EMBER",
+    "release_information": [
+      "Batch"
+    ],
+    "season_number": [
+      "2"
+    ],
+    "source": [
+      "BDRip"
+    ],
+    "title": "In/Spectre",
+    "video_resolution": "1080p",
+    "video_term": [
+      "HEVC",
+      "10 bits"
+    ]
+  },
+  {
+    "episode_number": [
+      "12"
+    ],
+    "file_extension": "mkv",
+    "file_name": "[Erai-raws] Ryza no Atelier - Tokoyami no Joou to Himitsu no Kakurega - 12 [1080p][HEVC][Multiple Subtitle] [ENG][POR-BR].mkv",
+    "formatted_title": "Ryza no Atelier - Tokoyami no Joou to Himitsu no Kakurega",
+    "language": [
+      "ENG"
+    ],
+    "release_group": "Erai-raws",
+    "title": "Ryza no Atelier - Tokoyami no Joou to Himitsu no Kakurega",
+    "video_resolution": "1080p",
+    "video_term": [
+      "HEVC"
+    ]
+  },
+  {
+    "audio_term": [
+      "AAC"
+    ],
+    "episode_number": [
+      "12"
+    ],
+    "file_extension": "mkv",
+    "file_name": "[ASW] Yami Shibai 11 - 12 [1080p HEVC x265 10Bit][AAC].mkv",
+    "formatted_title": "Yami Shibai 11",
+    "release_group": "ASW",
+    "title": "Yami Shibai 11",
+    "video_resolution": "1080p",
+    "video_term": [
+      "HEVC",
+      "x265",
+      "10Bit"
+    ]
+  },
+  {
+    "file_name": "[Judas] Kimi ni Todoke (Seasons 1-2) [BD 1080p][HEVC x265 10bit][Eng-Subs]",
+    "formatted_title": "Kimi ni Todoke",
+    "release_group": "Judas",
+    "season_number": [
+      "1",
+      "2"
+    ],
+    "source": [
+      "BD"
+    ],
+    "title": "Kimi ni Todoke",
+    "video_resolution": "1080p",
+    "video_term": [
+      "HEVC",
+      "x265",
+      "10bit"
+    ],
+    "language": [
+      "Eng"
+    ]
+  },
+  {
+    "year": "2012",
+    "audio_term": [
+      "Dual-Audio"
+    ],
+    "file_name": "Hyouka (2012) [Season 1+OVA] [BD 1080p HEVC OPUS] [Dual-Audio]",
+    "formatted_title": "Hyouka (2012) OVA",
+    "season_number": [
+      "1"
+    ],
+    "anime_type": [
+      "OVA"
+    ],
+    "source": [
+      "BD"
+    ],
+    "title": "Hyouka",
+    "video_resolution": "1080p",
+    "video_term": [
+      "HEVC"
+    ],
+    "release_group": "OPUS"
+  },
+  {
+    "year": "2012",
+    "audio_term": [
+      "Dual-Audio"
+    ],
+    "file_name": "Hyouka (2012) S1-2 [BD 1080p HEVC OPUS] [Dual-Audio]",
+    "formatted_title": "Hyouka (2012)",
+    "season_number": [
+      "1",
+      "2"
+    ],
+    "source": [
+      "BD"
+    ],
+    "title": "Hyouka",
+    "video_resolution": "1080p",
+    "video_term": [
+      "HEVC"
+    ],
+    "release_group": "OPUS"
+  },
+  {
+    "file_name": "Zom 100 Zombie ni Naru Made ni Shitai 100 no Koto",
+    "formatted_title": "Zom 100 Zombie ni Naru Made ni Shitai 100 no Koto",
+    "title": "Zom 100 Zombie ni Naru Made ni Shitai 100 no Koto"
+  },
+  {
+    "file_name": "Zom 100 - Zombie ni Naru Made ni Shitai 100 no Koto",
+    "formatted_title": "Zom 100 - Zombie ni Naru Made ni Shitai 100 no Koto",
+    "title": "Zom 100 - Zombie ni Naru Made ni Shitai 100 no Koto"
+  },
+  {
+    "title": "Classroom Crisis",
+    "formatted_title": "Classroom Crisis",
+    "audio_term": [
+      "FLAC"
+    ],
+    "file_name": "[GS] Classroom Crisis Vol.1&2 (BD 1080p 10bit FLAC)",
+    "release_group": "GS",
+    "source": [
+      "BD"
+    ],
+    "video_resolution": "1080p",
+    "video_term": [
+      "10bit"
+    ],
+    "volume_number": [
+      "1",
+      "2"
+    ]
+  },
+  {
+    "file_name": "[HorribleSubs] Momokuri - 01+02 [720p]",
+    "title": "Momokuri",
+    "formatted_title": "Momokuri",
+    "episode_number": [
+      "01",
+      "02"
+    ],
+    "release_group": "HorribleSubs",
+    "video_resolution": "720p"
+  },
+  {
+    "file_name": "[(´• ω •`)] Nintama Rantarou - S23E1821 - Buddhist Priest-sama is a Ninja.mkv",
+    "title": "Nintama Rantarou",
+    "formatted_title": "Nintama Rantarou",
+    "episode_title": "Buddhist Priest-sama is a Ninja",
+    "season_number": [
+      "23"
+    ],
+    "episode_number": [
+      "1821"
+    ],
+    "release_group": "´• ω •`",
+    "file_extension": "mkv"
+  },
+  {
+    "file_name": "[Judas] Aharen-san wa Hakarenai - S01E06v2.mkv",
+    "title": "Aharen-san wa Hakarenai",
+    "formatted_title": "Aharen-san wa Hakarenai",
+    "season_number": [
+      "01"
+    ],
+    "episode_number": [
+      "06"
+    ],
+    "release_group": "Judas",
+    "release_version": [
+      "2"
+    ],
+    "file_extension": "mkv"
+  },
+  {
+    "file_name": "[0x539] Somali and the Forest Spirit - S01E01 (WEB 1080p Hi10P AAC) [BB7C6531].mkv",
+    "title": "Somali and the Forest Spirit",
+    "formatted_title": "Somali and the Forest Spirit",
+    "season_number": [
+      "01"
+    ],
+    "audio_term": [
+      "AAC"
+    ],
+    "episode_number": [
+      "01"
+    ],
+    "file_checksum": "BB7C6531",
+    "release_group": "0x539",
+    "video_resolution": "1080p",
+    "video_term": [
+      "Hi10P"
+    ],
+    "file_extension": "mkv"
   }
 ]

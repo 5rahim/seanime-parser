@@ -380,11 +380,11 @@ func cleanNumber(number string) (string, string) {
 	//	number = number[:sepIdx]
 	//	return number, "2"
 	//}
-	sepIdx := strings.IndexByte(number, 'v')
+	sepIdx := strings.IndexByte(strings.ToLower(number), 'v')
 	if sepIdx != -1 {
 		s := number
 		number = number[:sepIdx]
-		pre, ok := strings.CutPrefix(s, number+"v")
+		pre, ok := strings.CutPrefix(strings.ToLower(s), number+"v")
 		if !ok {
 			pre = ""
 		}
@@ -396,7 +396,7 @@ func cleanNumber(number string) (string, string) {
 		return number, "2"
 	}
 	for _, letter := range []rune{'a', 'b', 'c'} {
-		sepIdx = strings.IndexByte(number, byte(letter))
+		sepIdx = strings.IndexByte(strings.ToLower(number), byte(letter))
 		if sepIdx != -1 {
 			number = number[:sepIdx]
 			return number, string(letter)

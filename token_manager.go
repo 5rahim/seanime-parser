@@ -243,9 +243,11 @@ func (t *tokens) isIsolated(tkn *token) bool {
 	// Previous token should be non-existent OR a delimiter that is not "."
 	isolatedOnTheLeft := !found || (prevTkn.isDelimiter() && prevTkn.getValue() != ".")
 
-	prevPrevTkn, found := t.getTokenBefore(prevTkn)
-	// Previous previous token should be non-existent OR a non-number token
-	isolatedOnTheLeft = !found || (prevTkn.getValue() == "." && !prevPrevTkn.isNumberKind()) || prevTkn.getValue() != "."
+	if found {
+		prevPrevTkn, found := t.getTokenBefore(prevTkn)
+		// Previous previous token should be non-existent OR a non-number token
+		isolatedOnTheLeft = !found || (prevTkn.getValue() == "." && !prevPrevTkn.isNumberKind()) || prevTkn.getValue() != "."
+	}
 
 	nextTkn, found := t.getTokenAfter(tkn)
 	isolatedOnTheRight := !found || (nextTkn.isDelimiter() || nextTkn.isOpeningBracket())
@@ -300,6 +302,13 @@ func (t *tokens) isLastToken(tkn *token) bool {
 	return t.getIndexOf(tkn) == len(*t)-1
 }
 
+func (t *tokens) isFirstToken(tkn *token) bool {
+	if tkn == nil {
+		return false
+	}
+	return t.getIndexOf(tkn) == 0
+}
+
 // e.g. "-{tkn}" or "- {tkn}
 func (t *tokens) foundDashSeparatorBefore(tkn *token) bool {
 	// Check if token before previous token is a dash separator
@@ -333,7 +342,10 @@ func (t *tokens) checkNumberRangeBefore(tkn *token, rangeWithDelimiters bool) ([
 		tokenCatSeparator,
 		tokenCatUnknown,
 	}, rangeWithDelimiters)
-	if !found || !tkns[1].isNumberKind() {
+	if !found || !tkns[1].isNumberOrLikeKind() {
+		return nil, false
+	}
+	if tkns[1].isKeyword() {
 		return nil, false
 	}
 	return tkns, true

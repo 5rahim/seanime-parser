@@ -12,7 +12,7 @@ func (p *parser) parseEpisodeTitle() {
 	// Get all tokens after the last episode number token and before an opening bracket/file info metadata/EOF
 	found, epTkns := p.tokenManager.tokens.findWithMetadataCategory(metadataEpisodeNumber)
 	if !found {
-		return // Stop if no episode number found
+		return // Next try
 	}
 
 	// Get the last episode number token
@@ -342,7 +342,7 @@ func (p *parser) parseReleaseGroup() {
 		for _, lastClosingBracket := range closingBracketTkns {
 
 			// Get matching opening bracket going backwards
-			// e.g. `[` <- ... <--<- ]
+			// e.g. `[` <- ... <- ... <- ]
 			lastOpeningBracket, found := p.tokenManager.tokens.getFirstOccurrenceBefore(
 				p.tokenManager.tokens.getIndexOf(lastClosingBracket),
 				func(tkn *token) bool {

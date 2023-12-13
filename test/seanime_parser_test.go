@@ -1,14 +1,18 @@
 package test
 
 import (
+	"bytes"
 	"github.com/goccy/go-json"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/text/unicode/norm"
+	"io/ioutil"
 	"log"
 	"os"
 	"seanime-parser"
+	"strconv"
 	"strings"
 	"testing"
+	"time"
 	"unicode"
 )
 
@@ -144,4 +148,58 @@ func removeNonLatin(s string) string {
 		}
 		return r
 	}, s)
+}
+
+func TestConversion(t *testing.T) {
+	jsonFile, err := ioutil.ReadFile("./to_convert.json")
+	if err != nil {
+		panic(err)
+	}
+
+	var animes []map[string]interface{}
+	json.Unmarshal(jsonFile, &animes)
+
+	var convertedAnimes []map[string]interface{}
+	for _, anime := range animes {
+
+		// Create the new map with "file_name" field at the top
+		newAnime := make(map[string]interface{})
+
+		if val, ok := anime["file_name"]; ok {
+			newAnime["file_name"] = val
+		}
+
+		for key, value := range anime {
+			switch key {
+			case "anime_title":
+				newAnime["title"] = value
+				newAnime["formatted_title"] = value
+			case "anime_season":
+				newAnime["season_number"] = value
+			case "part":
+				newAnime["part_number"] = value
+			case "file_name":
+				// Already handled
+			default:
+				newAnime[key] = value
+			}
+		}
+
+		convertedAnimes = append(convertedAnimes, newAnime)
+	}
+
+	var buf bytes.Buffer
+	encoder := json.NewEncoder(&buf)
+	encoder.SetEscapeHTML(false)
+	err = encoder.Encode(convertedAnimes)
+	if err != nil {
+		panic(err)
+	}
+
+	timestamp := strconv.FormatInt(time.Now().Unix(), 10)
+	newFilePath := "./converted-" + timestamp + ".json"
+	err = ioutil.WriteFile(newFilePath, buf.Bytes(), 0644)
+	if err != nil {
+		panic(err)
+	}
 }

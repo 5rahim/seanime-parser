@@ -239,6 +239,7 @@ func (p *parser) parseEpisodeBySearching(aggressive bool) bool {
 	// Check for last unknown number
 	for {
 		var lastNumTkn *token
+		var count int
 
 		// Get the last unknown number token
 		for _, tkn := range *p.tokenManager.tokens {
@@ -247,6 +248,7 @@ func (p *parser) parseEpisodeBySearching(aggressive bool) bool {
 			}
 			if tkn.isNumberOrLikeKind() && tkn.isUnknown() {
 				lastNumTkn = tkn
+				count++
 			}
 		}
 
@@ -256,8 +258,12 @@ func (p *parser) parseEpisodeBySearching(aggressive bool) bool {
 
 		// Check we find a range before
 		// e.g. "1 - {lastNumTkn} [...]"
-		if rangeTkns, found := p.tokenManager.tokens.checkNumberRangeBefore(lastNumTkn, false); found {
-			rangeTkns[1].setMetadataCategory(metadataEpisodeNumber)
+		if rangeTkns, found := p.tokenManager.tokens.checkNumberRangeBefore(lastNumTkn, true); found {
+			if isNumberZeroPadded(lastNumTkn.getValue()) && !isNumberZeroPadded(rangeTkns[1].getValue()) {
+
+			} else {
+				rangeTkns[1].setMetadataCategory(metadataEpisodeNumber)
+			}
 			lastNumTkn.setMetadataCategory(metadataEpisodeNumber)
 			return true // Found episode number, end
 		}
@@ -272,6 +278,13 @@ func (p *parser) parseEpisodeBySearching(aggressive bool) bool {
 		// Check that the number might really be an episode number
 		// e.g. if {lastNumTkn} < 10, lastNumTkn should be zero padded to avoid false positives like "Title 2"
 		if aggressive {
+			// If we have more than one number, we can't be sure that it's an episode number
+			if count > 1 {
+				break
+			}
+			if p.tokenManager.tokens.foundDashSeparatorAfter(lastNumTkn) && !p.tokenManager.tokens.isFirstToken(lastNumTkn) {
+				break
+			}
 			if lastNumTkn.isNumberKind() {
 				intVal, err := strconv.Atoi(lastNumTkn.getValue())
 				if err != nil {
