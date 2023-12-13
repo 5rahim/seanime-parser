@@ -111,35 +111,6 @@
   },
   {
     "expected": {
-      "file_name": "37 [Ruberia]_Death_Note_-_37v2_[FINAL]_[XviD][6FA7D273].avi",
-      "title": "37 [Ruberia] Death Note",
-      "formatted_title": "37 [Ruberia] Death Note",
-      "episode_number": [
-        "37"
-      ],
-      "file_checksum": "6FA7D273",
-      "file_extension": "avi",
-      "release_group": "Ruberia",
-      "release_information": [
-        "FINAL"
-      ],
-      "release_version": [
-        "2"
-      ],
-      "video_term": [
-        "XviD"
-      ]
-    },
-    "failing_parts": {
-      "title": "37",
-      "formatted_title": "37",
-      "episode_number": null,
-      "release_group": "Ruberia"
-    },
-    "reason": "37 is considered as title because it is the first part of the file name"
-  },
-  {
-    "expected": {
       "file_name": "Episode 14 Ore no Imouto ga Konnani Kawaii Wake ga Nai. (saison 2) VOSTFR",
       "title": "Ore no Imouto ga Konnani Kawaii Wake ga Nai.",
       "formatted_title": "Ore no Imouto ga Konnani Kawaii Wake ga Nai.",
