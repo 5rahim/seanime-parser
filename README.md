@@ -7,7 +7,7 @@
 <h4 align="center">Smarter anime video filename parser written in Go.</h4>
 
 ```shell
-go get -u github.com/5rahim/seanime_parser
+go get -u github.com/5rahim/seanime-parser
 ```
 
 # Features
@@ -31,10 +31,12 @@ go get -u github.com/5rahim/seanime_parser
 ```go
 package main
 
-import "github.com/5rahim/seanime-parser"
+import (
+	parser "github.com/5rahim/seanime-parser"
+)
 
 func main() {
-	data := seanime - parser.Parse("Hyouka (2012) S1-2 [BD 1080p HEVC OPUS] [Dual-Audio]")
+	data := parser.Parse("Hyouka (2012) S1-2 [BD 1080p HEVC OPUS] [Dual-Audio]")
 	println(data.Title)           // Hyouka
 	println(data.FormattedTitle)  // Hyouka (2012)
 	println(data.Year)            // 2012
